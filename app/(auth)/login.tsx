@@ -21,9 +21,9 @@ export default function LoginScreen() {
         const { error } = await supabase.auth.signInWithPassword({
           email,
           password,
-        });
+        }); 
         if (error) throw error;
-        router.replace('/(app)');
+        router.replace('/(tabs)');
       } else {
         if (!showOTP) {
           const { error } = await supabase.auth.signUp({

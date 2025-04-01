@@ -49,7 +49,7 @@ export default function OnboardingStep3() {
         [
           {
             text: 'Commencer',
-            onPress: () => router.replace('/(app)'),
+            onPress: () => router.replace('/(tabs)'),
           },
         ]
       );

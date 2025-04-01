@@ -1,11 +1,11 @@
 import { StyleSheet, View, Text } from 'react-native';
 
-
-export default function HomeScreen() {
+export default function ReviewScreen() {
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Home</Text>
-    </View>
+      <Text style={styles.title}>review</Text>
+
+     </View>
   );
 }
 
@@ -14,9 +14,8 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: "white"
   },
   title: {  
-    color: 'black',
+    color: 'white',
   },
 });

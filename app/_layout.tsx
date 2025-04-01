@@ -30,7 +30,7 @@ export default function RootLayout() {
       
       if (session && inAuthGroup) {
         // Rediriger vers l'app si connecté et sur une page auth
-        router.replace('/(app)');
+        router.replace('/(tabs)');
       } else if (!session && !inAuthGroup) {
         // Rediriger vers login si non connecté et pas sur une page auth
         router.replace('/(auth)/login');
@@ -52,8 +52,8 @@ export default function RootLayout() {
     <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
       <Stack>
         <Stack.Screen name="(auth)" options={{ headerShown: false }} />
-        <Stack.Screen name="(app)" options={{ headerShown: false }} />
-        <Stack.Screen name="onboarding" options={{ headerShown: false }} />
+        <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+        <Stack.Screen name="(onboarding)" options={{ headerShown: false }} />
         <Stack.Screen name="+not-found" options={{ title: 'Oops!' }} />
       </Stack>
       <StatusBar style="auto" />
