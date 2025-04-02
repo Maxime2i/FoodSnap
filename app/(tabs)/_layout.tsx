@@ -42,6 +42,8 @@ export default function TabLayout() {
   });
 
   const renderTabBar = (props: any) => (
+    console.log(index),
+    index === 2 ? null : (
     <TabBar
       {...props}
       icon={({ route }: { route: { icon: any } }) => {
@@ -67,6 +69,7 @@ export default function TabLayout() {
         }
       }}
     />
+    )
   );
 
   return (
@@ -90,39 +93,41 @@ export default function TabLayout() {
         style={{ marginBottom: 0 }}
         tabBarPosition="bottom"
       />
-      <View style={{
-        position: 'absolute',
-        bottom: 5,
-        alignItems: 'center',
-        width: 72,
-        alignSelf: 'center',
-        zIndex: 1000
-      }}>
-        <TouchableOpacity 
-          style={{ 
-            backgroundColor: "#31AFF0", 
-            width: 72, 
-            height: 72, 
-            borderRadius: 36, 
-            alignItems: "center", 
-            justifyContent: "center",
-            shadowColor: "#000",
-            shadowOffset: {
-              width: 0,
-              height: 2,
-            },
-            shadowOpacity: 0.25,
-            shadowRadius: 3.84,
-            elevation: 5
-          }} 
-          activeOpacity={1}
-          onPress={() => 
-            setIndex(2)
-          }
-        >
-          <Feather name="camera" color="white" size={32} />
-        </TouchableOpacity>
-      </View>
+      {index !== 2 && (
+        <View style={{
+          position: 'absolute',
+          bottom: 5,
+          alignItems: 'center',
+          width: 72,
+          alignSelf: 'center',
+          zIndex: 1000
+        }}>
+          <TouchableOpacity 
+            style={{ 
+              backgroundColor: "#31AFF0", 
+              width: 72, 
+              height: 72, 
+              borderRadius: 36, 
+              alignItems: "center", 
+              justifyContent: "center",
+              shadowColor: "#000",
+              shadowOffset: {
+                width: 0,
+                height: 2,
+              },
+              shadowOpacity: 0.25,
+              shadowRadius: 3.84,
+              elevation: 5
+            }} 
+            activeOpacity={1}
+            onPress={() => 
+              setIndex(2)
+            }
+          >
+            <Feather name="camera" color="white" size={32} />
+          </TouchableOpacity>
+        </View>
+      )}
     </View>
   );
 }
