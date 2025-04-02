@@ -5,7 +5,7 @@ import Feather from '@expo/vector-icons/Feather';
 import { router } from 'expo-router';
 import { manipulateAsync, SaveFormat } from 'expo-image-manipulator';
 import { supabase } from '@/lib/supabase';
-import { decode } from 'base64-arraybuffer';
+import { decode, encode } from 'base64-arraybuffer';
 import { useAuth } from '@/hooks/useAuth';
 
 // Données de test
@@ -22,6 +22,66 @@ const testData = {
     { id: 3, nom: "Brocolis", quantite: 100, unite: "g" },
     { id: 4, nom: "Sauce soja", quantite: 15, unite: "ml" },
   ]
+};
+
+// Ajout de l'interface pour la réponse de ChatGPT
+interface FoodAnalysis {
+  ingredients: {
+    nom: string;
+    quantite: number;
+    unite: string;
+  }[];
+  macros: {
+    calories: number;
+    proteines: number;
+    glucides: number;
+    lipides: number;
+  };
+}
+
+const analyzeImageWithGPT = async (base64Image: string): Promise<FoodAnalysis> => {
+  console.log( "base64Image", process.env.EXPO_PUBLIC_OPENAI_API_KEY)
+  try {
+    const response = await fetch('https://api.openai.com/v1/chat/completions', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${process.env.EXPO_PUBLIC_OPENAI_API_KEY}`,
+      },
+      body: JSON.stringify({
+        model: "gpt-4-turbo",
+        messages: [
+          {
+            role: "user",
+            content: [
+              {
+                type: "text",
+                text: "Analyze this food image and return a JSON object with the following structure: { ingredients: [{ nom: string, quantite: number, unite: string }], macros: { calories: number, proteines: number, glucides: number, lipides: number } }. Estimate the quantities and nutritional values based on what you see. Return ONLY the JSON, no other text."
+              },
+              {
+                type: "image_url",
+                image_url: {
+                  url: `data:image/jpeg;base64,${base64Image}`
+                }
+              }
+            ]
+          }
+        ],
+        max_tokens: 1000,
+      })
+    });
+
+    const data = await response.json();
+    console.log( "data", data)
+    if (!data.choices?.[0]?.message?.content) {
+      throw new Error('Invalid response from GPT');
+    }
+
+    return JSON.parse(data.choices[0].message.content);
+  } catch (error) {
+    console.error('Erreur lors de l\'analyse avec GPT:', error);
+    throw error;
+  }
 };
 
 export default function CaptureScreen() {
@@ -71,26 +131,46 @@ export default function CaptureScreen() {
     if (!cameraRef.current) return;
 
     try {
-      const photo = await cameraRef.current.takePictureAsync();
+      const photo = await cameraRef.current.takePictureAsync({ base64: true });
       
       if (!photo?.uri) return;
 
       const manipulatedImage = await manipulateAsync(
         photo.uri,
         [{ resize: { width: 800 } }],
-        { compress: 0.7, format: SaveFormat.JPEG }
+        { base64: true, compress: 0.7, format: SaveFormat.JPEG }
       );
 
       setPhoto(manipulatedImage.uri);
       setIsAnalyzing(true);
 
-      // Simulons l'analyse
-      setTimeout(() => {
-        setIsAnalyzing(false);
+      try {
+        // Analyse avec GPT
+        const analysis = await analyzeImageWithGPT(manipulatedImage.base64 || '');
+        console.log( "analysis", analysis)
+        
+        // Mise à jour des données
+        setIngredients(analysis.ingredients.map((ing, index) => ({
+          id: index + 1,
+          ...ing
+        })));
+        
+        // Mise à jour des macros
+        testData.macros = analysis.macros;
+        
         setAnalysisComplete(true);
-      }, 3000);
+      } catch (error) {
+        console.error('Erreur lors de l\'analyse:', error);
+        Alert.alert(
+          'Erreur',
+          'Une erreur est survenue lors de l\'analyse de l\'image. Veuillez réessayer.'
+        );
+      } finally {
+        setIsAnalyzing(false);
+      }
     } catch (error) {
       console.error("Erreur lors de la capture:", error);
+      setIsAnalyzing(false);
     }
   };
 
