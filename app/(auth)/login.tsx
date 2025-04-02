@@ -42,7 +42,7 @@ export default function LoginScreen() {
             type: 'signup',
           });
           if (error) throw error;
-          router.replace('/onboarding/step1');
+          router.replace('/(onboarding)/step1');
         }
       }
     } catch (err) {

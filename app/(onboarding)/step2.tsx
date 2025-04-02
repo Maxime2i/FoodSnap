@@ -20,12 +20,12 @@ export default function OnboardingStep2() {
 
   const handleNext = () => {
     router.push({
-      pathname: '/onboarding/step3',
+      pathname: '/(onboarding)/step3',
       params: {
         ...params,
         goal,
-        allergies: allergies.split(',').map(a => a.trim()).filter(Boolean),
-        medical_conditions: medicalConditions.split(',').map(m => m.trim()).filter(Boolean),
+        // allergies: allergies.split(',').map(a => a.trim()).filter(Boolean),
+        // medical_conditions: medicalConditions.split(',').map(m => m.trim()).filter(Boolean),
       },
     });
   };
@@ -53,7 +53,7 @@ export default function OnboardingStep2() {
         </View>
       </View>
 
-      <View style={styles.section}>
+      {/* <View style={styles.section}>
         <Text style={styles.label}>Allergies</Text>
         <TextInput
           style={styles.input}
@@ -63,9 +63,9 @@ export default function OnboardingStep2() {
           multiline
         />
         <Text style={styles.hint}>Ex: arachides, fruits de mer, lactose</Text>
-      </View>
+      </View> */}
 
-      <View style={styles.section}>
+      {/* <View style={styles.section}>
         <Text style={styles.label}>Conditions médicales</Text>
         <TextInput
           style={styles.input}
@@ -75,7 +75,7 @@ export default function OnboardingStep2() {
           multiline
         />
         <Text style={styles.hint}>Ex: diabète, hypertension</Text>
-      </View>
+      </View> */}
 
       <TouchableOpacity style={styles.button} onPress={handleNext}>
         <Text style={styles.buttonText}>Suivant</Text>
@@ -87,7 +87,7 @@ export default function OnboardingStep2() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: Colors.background,
+    backgroundColor: Colors.light.background,
   },
   contentContainer: {
     padding: 20,
@@ -97,7 +97,7 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     marginBottom: 30,
     textAlign: 'center',
-    color: Colors.text,
+    color: Colors.light.text,
   },
   section: {
     marginBottom: 25,
@@ -105,7 +105,7 @@ const styles = StyleSheet.create({
   label: {
     fontSize: 16,
     marginBottom: 10,
-    color: Colors.text,
+    color: Colors.light.text,
     fontWeight: '500',
   },
   goalButtons: {
@@ -115,21 +115,21 @@ const styles = StyleSheet.create({
     padding: 15,
     borderRadius: 10,
     borderWidth: 1,
-    borderColor: Colors.primary,
+    borderColor: Colors.light.primary,
     alignItems: 'center',
   },
   goalButtonActive: {
-    backgroundColor: Colors.primary,
+    backgroundColor: Colors.light.primary,
   },
   goalButtonText: {
-    color: Colors.primary,
+    color: Colors.light.primary,
     fontSize: 16,
   },
   goalButtonTextActive: {
-    color: Colors.white,
+    color: Colors.light.white,
   },
   input: {
-    backgroundColor: Colors.white,
+    backgroundColor: Colors.light.white,
     padding: 15,
     borderRadius: 10,
     fontSize: 16,
@@ -138,24 +138,24 @@ const styles = StyleSheet.create({
   },
   hint: {
     fontSize: 12,
-    color: Colors.gray,
+    color: Colors.light.icon,
     marginTop: 5,
     fontStyle: 'italic',
   },
   button: {
-    backgroundColor: Colors.primary,
+    backgroundColor: Colors.light.primary,
     padding: 15,
     borderRadius: 10,
     alignItems: 'center',
     marginTop: 20,
   },
-  buttonText: {
-    color: Colors.white,
+  buttonText: { 
+    color: Colors.light.white,
     fontSize: 16,
     fontWeight: 'bold',
   },
   error: {
-    color: Colors.error,
+    color: Colors.light.error,
     marginBottom: 15,
     textAlign: 'center',
   },

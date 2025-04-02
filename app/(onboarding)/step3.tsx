@@ -54,6 +54,7 @@ export default function OnboardingStep3() {
         ]
       );
     } catch (err) {
+      console.log(err);
       setError(err instanceof Error ? err.message : 'Une erreur est survenue');
     } finally {
       setLoading(false);
@@ -104,7 +105,7 @@ export default function OnboardingStep3() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: Colors.background,
+    backgroundColor: Colors.light.background,
   },
   contentContainer: {
     padding: 20,
@@ -114,7 +115,7 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     marginBottom: 30,
     textAlign: 'center',
-    color: Colors.text,
+    color: Colors.light.text,
   },
   inputContainer: {
     marginBottom: 20,
@@ -122,29 +123,29 @@ const styles = StyleSheet.create({
   label: {
     fontSize: 16,
     marginBottom: 10,
-    color: Colors.text,
+    color: Colors.light.text,
     fontWeight: '500',
   },
   input: {
-    backgroundColor: Colors.white,
+    backgroundColor: Colors.light.white,
     padding: 15,
     borderRadius: 10,
     fontSize: 16,
   },
   button: {
-    backgroundColor: Colors.primary,
+    backgroundColor: Colors.light.primary,
     padding: 15,
     borderRadius: 10,
     alignItems: 'center',
     marginTop: 20,
   },
   buttonText: {
-    color: Colors.white,
+    color: Colors.light.white,
     fontSize: 16,
     fontWeight: 'bold',
   },
   error: {
-    color: Colors.error,
+    color: Colors.light.error,
     marginBottom: 15,
     textAlign: 'center',
   },

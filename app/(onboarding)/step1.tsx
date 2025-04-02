@@ -3,8 +3,11 @@ import { View, Text, StyleSheet, TouchableOpacity, TextInput, ScrollView } from 
 import { router } from 'expo-router';
 import { Colors } from '@/constants/Colors';
 import { Gender } from '@/types/auth';
+import { useColorScheme } from '@/hooks/useColorScheme';
 
 export default function OnboardingStep1() {
+  const colorScheme = useColorScheme();
+  const theme = Colors[colorScheme];
   const [gender, setGender] = useState<Gender>('male');
   const [age, setAge] = useState('');
   const [height, setHeight] = useState('');
@@ -21,9 +24,9 @@ export default function OnboardingStep1() {
       setError('Veuillez entrer des valeurs numériques valides');
       return;
     }
-
+console.log("step1", gender, age, height, weight);
     router.push({
-      pathname: '/onboarding/step2',
+      pathname: '/(onboarding)/step2',
       params: {
         gender,
         age,
@@ -76,7 +79,7 @@ export default function OnboardingStep1() {
           value={age}
           onChangeText={setAge}
           placeholder="Votre âge"
-          keyboardType="numeric"
+          keyboardType="number-pad"
         />
       </View>
 
@@ -87,7 +90,7 @@ export default function OnboardingStep1() {
           value={height}
           onChangeText={setHeight}
           placeholder="Votre taille en centimètres"
-          keyboardType="numeric"
+          keyboardType="number-pad"
         />
       </View>
 
@@ -98,7 +101,7 @@ export default function OnboardingStep1() {
           value={weight}
           onChangeText={setWeight}
           placeholder="Votre poids en kilogrammes"
-          keyboardType="numeric"
+          keyboardType="number-pad"
         />
       </View>
 
@@ -112,7 +115,7 @@ export default function OnboardingStep1() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: Colors.background,
+    backgroundColor: Colors.light.background,
   },
   contentContainer: {
     padding: 20,
@@ -122,7 +125,7 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     marginBottom: 30,
     textAlign: 'center',
-    color: Colors.text,
+    color: Colors.light.text,
   },
   genderContainer: {
     marginBottom: 20,
@@ -130,7 +133,7 @@ const styles = StyleSheet.create({
   label: {
     fontSize: 16,
     marginBottom: 10,
-    color: Colors.text,
+    color: Colors.light.text,
     fontWeight: '500',
   },
   genderButtons: {
@@ -141,44 +144,48 @@ const styles = StyleSheet.create({
     flex: 1,
     padding: 15,
     borderRadius: 10,
-    borderWidth: 1,
-    borderColor: Colors.primary,
+    borderWidth: 2,
+    borderColor: Colors.light.buttonInactive,
     marginHorizontal: 5,
     alignItems: 'center',
+    backgroundColor: Colors.light.buttonInactive,
   },
   genderButtonActive: {
-    backgroundColor: Colors.primary,
+    backgroundColor: Colors.light.primary,
+    borderColor: Colors.light.primary,
   },
   genderButtonText: {
-    color: Colors.primary,
+    color: Colors.light.buttonTextInactive,
     fontSize: 16,
+    fontWeight: '500',
   },
   genderButtonTextActive: {
-    color: Colors.white,
+    color: Colors.light.white,
+    fontWeight: 'bold',
   },
   inputContainer: {
     marginBottom: 20,
   },
   input: {
-    backgroundColor: Colors.white,
+    backgroundColor: Colors.light.white,
     padding: 15,
     borderRadius: 10,
     fontSize: 16,
   },
   button: {
-    backgroundColor: Colors.primary,
+    backgroundColor: Colors.light.primary,
     padding: 15,
     borderRadius: 10,
     alignItems: 'center',
     marginTop: 20,
   },
   buttonText: {
-    color: Colors.white,
+    color: Colors.light.white,
     fontSize: 16,
     fontWeight: 'bold',
   },
   error: {
-    color: Colors.error,
+    color: Colors.light.error,
     marginBottom: 15,
     textAlign: 'center',
   },
