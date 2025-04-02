@@ -12,6 +12,27 @@ export default function LoginScreen() {
   const [error, setError] = useState<string | null>(null);
   const [showOTP, setShowOTP] = useState(false);
   const [otpCode, setOtpCode] = useState('');
+  const [resendLoading, setResendLoading] = useState(false);
+
+  const handleResendOTP = async () => {
+    setResendLoading(true);
+    setError(null);
+    try {
+      const { error } = await supabase.auth.signUp({
+        email,
+        password,
+        options: {
+          emailRedirectTo: undefined,
+        },
+      });
+      if (error) throw error;
+      alert('Un nouveau code de vérification a été envoyé à votre email');
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Erreur lors de l\'envoi du code');
+    } finally {
+      setResendLoading(false);
+    }
+  };
 
   const handleSubmit = async () => {
     setLoading(true);
@@ -100,6 +121,15 @@ export default function LoginScreen() {
               keyboardType="number-pad"
               autoCapitalize="none"
             />
+            <TouchableOpacity 
+              style={styles.resendButton}
+              onPress={handleResendOTP}
+              disabled={resendLoading}
+            >
+              <Text style={styles.resendButtonText}>
+                {resendLoading ? 'Envoi en cours...' : 'Renvoyer le code'}
+              </Text>
+            </TouchableOpacity>
           </>
         )}
 
@@ -181,5 +211,14 @@ const styles = StyleSheet.create({
     color: '#ff0000',
     marginBottom: 15,
     textAlign: 'center',
+  },
+  resendButton: {
+    marginBottom: 15,
+    alignItems: 'center',
+  },
+  resendButtonText: {
+    color: Colors.light.tint,
+    fontSize: 14,
+    textDecorationLine: 'underline',
   },
 }); 
