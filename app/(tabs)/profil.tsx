@@ -176,7 +176,7 @@ export default function ProfilScreen() {
         />
       </View>
 
-      <Pressable style={getStyles(colorScheme).menuItem}>
+      <Pressable style={getStyles(colorScheme).menuItem} onPress={() => router.push('/help')}>
         <View style={getStyles(colorScheme).menuItemLeft}>
           <View style={[getStyles(colorScheme).iconContainer, { backgroundColor: '#E8F1FF' }]}>
             <Ionicons name="help-circle-outline" size={24} color="#4A90E2" />
