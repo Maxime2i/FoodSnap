@@ -1,4 +1,4 @@
-import { StyleSheet, View, Text, Button, TouchableOpacity, Image, Animated, TextInput, ScrollView, Alert } from 'react-native';
+import { StyleSheet, View, Text, Button, TouchableOpacity, Image, Animated, TextInput, ScrollView, Alert, Modal, Switch } from 'react-native';
 import { CameraView, CameraType, useCameraPermissions } from 'expo-camera';
 import { useEffect, useState, useRef } from 'react';
 import Feather from '@expo/vector-icons/Feather';
@@ -7,6 +7,7 @@ import { manipulateAsync, SaveFormat } from 'expo-image-manipulator';
 import { supabase } from '@/lib/supabase';
 import { decode, encode } from 'base64-arraybuffer';
 import { useAuth } from '@/hooks/useAuth';
+import { Picker } from '@react-native-picker/picker';
 
 // Données de test
 const testData = {
@@ -82,6 +83,38 @@ const analyzeImageWithGPT = async (base64Image: string): Promise<FoodAnalysis> =
   }
 };
 
+// Modification de la structure des types de plats pour le Picker
+const MEAL_TYPES_LIST = [
+  { label: "-- Sélectionner un type --", value: "" },
+  { label: "Types généraux", value: "", isHeader: true },
+  { label: "Petit-déjeuner", value: "Petit-déjeuner" },
+  { label: "Déjeuner", value: "Déjeuner" },
+  { label: "Dîner", value: "Dîner" },
+  { label: "Collation", value: "Collation" },
+  { label: "Apéritif", value: "Apéritif" },
+  { label: "Types spécifiques", value: "", isHeader: true },
+  { label: "Plat principal", value: "Plat principal" },
+  { label: "Entrée", value: "Entrée" },
+  { label: "Dessert", value: "Dessert" },
+  { label: "Boisson", value: "Boisson" },
+  { label: "Snack sucré", value: "Snack sucré" },
+  { label: "Snack salé", value: "Snack salé" },
+  { label: "Types diététiques", value: "", isHeader: true },
+  { label: "Végétarien", value: "Végétarien" },
+  { label: "Végétalien / Vegan", value: "Végétalien / Vegan" },
+  { label: "Sans gluten", value: "Sans gluten" },
+  { label: "High protein", value: "High protein" },
+  { label: "Low carb", value: "Low carb" },
+  { label: "Kéto", value: "Kéto" },
+  { label: "Paleo", value: "Paleo" },
+  { label: "Diabétique-friendly", value: "Diabétique-friendly" },
+  { label: "Types selon l'objectif", value: "", isHeader: true },
+  { label: "Prise de masse", value: "Prise de masse" },
+  { label: "Perte de poids", value: "Perte de poids" },
+  { label: "Énergie rapide", value: "Énergie rapide" },
+  { label: "Repas équilibré", value: "Repas équilibré" }
+];
+
 export default function CaptureScreen() {
   const { user } = useAuth();
   const [facing, setFacing] = useState<CameraType>('back');
@@ -91,6 +124,12 @@ export default function CaptureScreen() {
   const [analysisComplete, setAnalysisComplete] = useState(false);
   const [ingredients, setIngredients] = useState(testData.ingredients);
   const [isSaving, setIsSaving] = useState(false);
+  const [showSaveModal, setShowSaveModal] = useState(false);
+  const [platName, setPlatName] = useState('');
+  const [platDescription, setPlatDescription] = useState('');
+  const [isPublished, setIsPublished] = useState(true);
+  const [selectedType, setSelectedType] = useState('');
+  const [showTypeSelector, setShowTypeSelector] = useState(false);
   const cameraRef = useRef<CameraView | null>(null);
   const spinValue = useRef(new Animated.Value(0)).current;
 
@@ -177,6 +216,19 @@ export default function CaptureScreen() {
     setIngredients(testData.ingredients);
   };
 
+  const handleSave = () => {
+    if (!platName.trim()) {
+      Alert.alert('Erreur', 'Veuillez donner un nom à votre plat');
+      return;
+    }
+    if (!selectedType) {
+      Alert.alert('Erreur', 'Veuillez sélectionner un type de plat');
+      return;
+    }
+    setShowSaveModal(false);
+    saveToSupabase();
+  };
+
   const saveToSupabase = async () => {
     if (!photo || !user) return;
 
@@ -222,7 +274,11 @@ export default function CaptureScreen() {
           calories: testData.macros.calories,
           proteines: testData.macros.proteines,
           glucides: testData.macros.glucides,
-          lipides: testData.macros.lipides
+          lipides: testData.macros.lipides,
+          name: platName,
+          description: platDescription,
+          is_published: isPublished,
+          type: selectedType
         })
         .select()
         .single();
@@ -332,22 +388,95 @@ export default function CaptureScreen() {
                 styles.saveButton,
                 isSaving && styles.saveButtonDisabled
               ]}
-              onPress={saveToSupabase}
+              onPress={() => setShowSaveModal(true)}
               disabled={isSaving}
             >
-              {isSaving ? (
-                <View style={styles.saveButtonContent}>
-                  <Animated.View style={{ transform: [{ rotate: spin }] }}>
-                    <Feather name="loader" size={24} color="white" />
-                  </Animated.View>
-                  <Text style={[styles.saveButtonText, { marginLeft: 8 }]}>
-                    Sauvegarde en cours...
-                  </Text>
-                </View>
-              ) : (
-                <Text style={styles.saveButtonText}>Enregistrer et publier</Text>
-              )}
+              <Text style={styles.saveButtonText}>Enregistrer et publier</Text>
             </TouchableOpacity>
+
+            <Modal
+              visible={showSaveModal}
+              animationType="slide"
+              transparent={true}
+              onRequestClose={() => setShowSaveModal(false)}
+            >
+              <View style={styles.modalContainer}>
+                <View style={styles.modalContent}>
+                  <Text style={styles.modalTitle}>Enregistrer le plat</Text>
+                  
+                  <TextInput
+                    style={styles.modalInput}
+                    placeholder="Nom du plat"
+                    value={platName}
+                    onChangeText={setPlatName}
+                    placeholderTextColor="#666"
+                  />
+                  
+                  <TextInput
+                    style={[styles.modalInput, styles.modalTextArea]}
+                    placeholder="Description (optionnelle)"
+                    value={platDescription}
+                    onChangeText={setPlatDescription}
+                    multiline
+                    numberOfLines={4}
+                    placeholderTextColor="#666"
+                  />
+
+                  <View style={styles.pickerContainer}>
+                    <Picker
+                      selectedValue={selectedType}
+                      onValueChange={(itemValue) => setSelectedType(itemValue)}
+                      style={styles.picker}
+                    >
+                      {MEAL_TYPES_LIST.map((item, index) => (
+                        item.isHeader ? (
+                          <Picker.Item
+                            key={index}
+                            label={item.label}
+                            value={item.value}
+                            enabled={false}
+                            style={styles.pickerHeader}
+                          />
+                        ) : (
+                          <Picker.Item
+                            key={index}
+                            label={item.label}
+                            value={item.value}
+                            style={item.value === "" ? styles.pickerPlaceholder : styles.pickerItem}
+                          />
+                        )
+                      ))}
+                    </Picker>
+                  </View>
+
+                  <View style={styles.publishContainer}>
+                    <Text style={styles.publishText}>Publier le plat</Text>
+                    <Switch
+                      value={isPublished}
+                      onValueChange={setIsPublished}
+                      trackColor={{ false: '#767577', true: '#81b0ff' }}
+                      thumbColor={isPublished ? '#31AFF0' : '#f4f3f4'}
+                    />
+                  </View>
+
+                  <View style={styles.modalButtons}>
+                    <TouchableOpacity 
+                      style={[styles.modalButton, styles.cancelButton]}
+                      onPress={() => setShowSaveModal(false)}
+                    >
+                      <Text style={styles.cancelButtonText}>Annuler</Text>
+                    </TouchableOpacity>
+                    
+                    <TouchableOpacity 
+                      style={[styles.modalButton, styles.confirmButton]}
+                      onPress={handleSave}
+                    >
+                      <Text style={styles.confirmButtonText}>Enregistrer</Text>
+                    </TouchableOpacity>
+                  </View>
+                </View>
+              </View>
+            </Modal>
 
             <TouchableOpacity 
               style={styles.closeButton} 
@@ -564,9 +693,99 @@ const styles = StyleSheet.create({
   saveButtonDisabled: {
     opacity: 0.7,
   },
-  saveButtonContent: {
+  modalContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+  },
+  modalContent: {
+    backgroundColor: 'white',
+    padding: 20,
+    borderRadius: 10,
+    width: '80%',
+    maxHeight: '80%',
+  },
+  modalTitle: {
+    fontSize: 20,
+    fontWeight: 'bold',
+    marginBottom: 10,
+    color: '#333',
+  },
+  modalInput: {
+    width: '100%',
+    height: 40,
+    borderWidth: 1,
+    borderColor: '#ddd',
+    borderRadius: 8,
+    paddingHorizontal: 8,
+    marginBottom: 10,
+  },
+  modalTextArea: {
+    height: 100,
+    paddingVertical: 8,
+  },
+  publishContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    justifyContent: 'center',
+    marginBottom: 10,
+  },
+  publishText: {
+    fontSize: 16,
+    fontWeight: 'bold',
+    marginRight: 10,
+    color: '#333',
+  },
+  modalButtons: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    marginTop: 20,
+  },
+  modalButton: {
+    flex: 1,
+    marginHorizontal: 5,
+    padding: 10,
+    borderRadius: 8,
+  },
+  cancelButton: {
+    backgroundColor: '#ccc',
+  },
+  cancelButtonText: {
+    fontSize: 16,
+    fontWeight: 'bold',
+    color: '#333',
+  },
+  confirmButton: {
+    backgroundColor: '#31AFF0',
+  },
+  confirmButtonText: {
+    fontSize: 16,
+    fontWeight: 'bold',
+    color: 'white',
+  },
+  pickerContainer: {
+    borderWidth: 1,
+    borderColor: '#ddd',
+    borderRadius: 8,
+    marginBottom: 10,
+    overflow: 'hidden',
+  },
+  picker: {
+    width: '100%',
+    backgroundColor: 'white',
+  },
+  pickerHeader: {
+    fontSize: 16,
+    fontWeight: 'bold',
+    color: '#666',
+    backgroundColor: '#f5f5f5',
+  },
+  pickerItem: {
+    fontSize: 16,
+    color: '#333',
+  },
+  pickerPlaceholder: {
+    fontSize: 16,
+    color: '#666',
   },
 });
