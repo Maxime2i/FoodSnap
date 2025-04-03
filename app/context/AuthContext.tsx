@@ -42,13 +42,13 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
     return data?.first_name;
   };
-
+  
   const fetchUserMeals = async (userId: string) => {
     const { data, error } = await supabase
       .from('plats')
       .select('*')
       .eq('user_id', userId)
-      .order('created_at', { ascending: false })
+      .order('created_at', { ascending: true })
       .limit(10);
 
     if (error) {
