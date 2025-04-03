@@ -1,15 +1,21 @@
-import { StyleSheet, View, Text, Pressable, ScrollView } from 'react-native';
+import { StyleSheet, View, Text, Pressable, ScrollView, Switch, Image } from 'react-native';
 import { router } from 'expo-router';
 import { supabase } from '../../lib/supabase';
 import { useAuth } from '@/hooks/useAuth';
 import { useState, useEffect } from 'react';
 import { UserProfile } from '@/types/auth';
 import { Colors } from '@/constants/Colors';
+import { Ionicons, MaterialIcons } from '@expo/vector-icons';
+import { useTheme } from '@/app/context/ThemeContext';
+import { useColorScheme } from "@/hooks/useColorScheme";
 
 export default function ProfilScreen() {
   const { user } = useAuth();
+  const { theme, setTheme, isSystemTheme, setIsSystemTheme } = useTheme();
+  const colorScheme = useColorScheme();
   const [profile, setProfile] = useState<UserProfile | null>(null);
   const [loading, setLoading] = useState(true);
+  const [notifications, setNotifications] = useState(true);
 
   useEffect(() => {
     fetchProfile();
@@ -47,8 +53,8 @@ export default function ProfilScreen() {
 
   if (loading) {
     return (
-      <View style={styles.container}>
-        <Text style={styles.text}>Chargement...</Text>
+      <View style={getStyles(colorScheme).container}>
+        <Text style={getStyles(colorScheme).loadingText}>Chargement...</Text>
       </View>
     );
   }
@@ -64,126 +70,269 @@ export default function ProfilScreen() {
   };
 
   return (
-    <ScrollView style={styles.container}>
-      <View style={styles.header}>
-        <Text style={styles.title}>Mon Profil</Text>
+    <ScrollView style={getStyles(colorScheme).container}>
+      <View style={getStyles(colorScheme).titleContainer}>
+        <Text style={getStyles(colorScheme).titleText}>Profil</Text>
+        <Pressable style={getStyles(colorScheme).settingsButton}>
+          <Ionicons name="settings-outline" size={24} color={colorScheme === 'dark' ? Colors.dark.text : Colors.light.text} />
+        </Pressable>
       </View>
 
-      <View style={styles.section}>
-        <Text style={styles.sectionTitle}>Informations Personnelles</Text>
-        <View style={styles.infoContainer}>
-          <Text style={styles.label}>Nom:</Text>
-          <Text style={styles.text}>{profile?.last_name || '-'}</Text>
+      <View style={getStyles(colorScheme).header}>
+        <View style={getStyles(colorScheme).profileImageContainer}>
+          <Image 
+            source={require('@/assets/images/defaultProfilPicture.png')} 
+            style={getStyles(colorScheme).profileImage} 
+          />
         </View>
-        <View style={styles.infoContainer}>
-          <Text style={styles.label}>Prénom:</Text>
-          <Text style={styles.text}>{profile?.first_name || '-'}</Text>
-        </View>
-        <View style={styles.infoContainer}>
-          <Text style={styles.label}>Email:</Text>
-          <Text style={styles.text}>{profile?.email || '-'}</Text>
-        </View>
-      </View>
-
-      <View style={styles.section}>
-        <Text style={styles.sectionTitle}>Mensurations</Text>
-        <View style={styles.infoContainer}>
-          <Text style={styles.label}>Âge:</Text>
-          <Text style={styles.text}>{profile?.age || '-'} ans</Text>
-        </View>
-        <View style={styles.infoContainer}>
-          <Text style={styles.label}>Taille:</Text>
-          <Text style={styles.text}>{profile?.height || '-'} cm</Text>
-        </View>
-        <View style={styles.infoContainer}>
-          <Text style={styles.label}>Poids:</Text>
-          <Text style={styles.text}>{profile?.weight || '-'} kg</Text>
+        <View style={getStyles(colorScheme).profileInfo}>
+          <Text style={getStyles(colorScheme).name}>{profile?.first_name || 'Thomas'} {profile?.last_name || 'Martin'}</Text>
+          <Text style={getStyles(colorScheme).objective}>Objectif: {profile?.goal ? getGoalLabel(profile.goal) : 'Prise de masse musculaire'}</Text>
+          <Pressable style={getStyles(colorScheme).editButton}>
+            <Text style={getStyles(colorScheme).editButtonText}>Modifier le profil</Text>
+          </Pressable>
         </View>
       </View>
 
-      <View style={styles.section}>
-        <Text style={styles.sectionTitle}>Objectif</Text>
-        <Text style={styles.text}>{profile?.goal ? getGoalLabel(profile.goal) : '-'}</Text>
+      <Text style={getStyles(colorScheme).sectionTitle}>Objectifs nutritionnels</Text>
+
+      <Pressable style={getStyles(colorScheme).menuItem}>
+        <View style={getStyles(colorScheme).menuItemLeft}>
+          <View style={[getStyles(colorScheme).iconContainer, { backgroundColor: '#E8F1FF' }]}>
+            <Ionicons name="phone-portrait-outline" size={24} color="#4A90E2" />
+          </View>
+          <View>
+            <Text style={getStyles(colorScheme).menuItemTitle}>Appareils connectés</Text>
+            <Text style={getStyles(colorScheme).menuItemSubtitle}>Montre connectée, balance intelligente</Text>
+          </View>
+        </View>
+        <Ionicons name="chevron-forward" size={24} color="#999" />
+      </Pressable>
+
+      <Pressable style={getStyles(colorScheme).menuItem}>
+        <View style={getStyles(colorScheme).menuItemLeft}>
+          <View style={[getStyles(colorScheme).iconContainer, { backgroundColor: '#E8FFE8' }]}>
+            <Ionicons name="stats-chart" size={24} color="#4CAF50" />
+          </View>
+          <View>
+            <Text style={getStyles(colorScheme).menuItemTitle}>Objectifs personnalisés</Text>
+            <Text style={getStyles(colorScheme).menuItemSubtitle}>Calories, macronutriments, hydratation</Text>
+          </View>
+        </View>
+        <Ionicons name="chevron-forward" size={24} color="#999" />
+      </Pressable>
+
+      <Pressable style={getStyles(colorScheme).menuItem}>
+        <View style={getStyles(colorScheme).menuItemLeft}>
+          <View style={[getStyles(colorScheme).iconContainer, { backgroundColor: '#F8E8FF' }]}>
+            <MaterialIcons name="person-outline" size={24} color="#9C27B0" />
+          </View>
+          <View>
+            <Text style={getStyles(colorScheme).menuItemTitle}>Préférences alimentaires</Text>
+            <Text style={getStyles(colorScheme).menuItemSubtitle}>Allergies, régimes spécifiques</Text>
+          </View>
+        </View>
+        <Ionicons name="chevron-forward" size={24} color="#999" />
+      </Pressable>
+
+      <Text style={getStyles(colorScheme).sectionTitle}>Paramètres de l'application</Text>
+
+      <View style={getStyles(colorScheme).menuItem}>
+        <View style={getStyles(colorScheme).menuItemLeft}>
+          <View style={[getStyles(colorScheme).iconContainer, { backgroundColor: '#E8F1FF' }]}>
+            <Ionicons name="moon-outline" size={24} color="#4A90E2" />
+          </View>
+          <View>
+            <Text style={getStyles(colorScheme).menuItemTitle}>Mode sombre</Text>
+            <Text style={getStyles(colorScheme).menuItemSubtitle}>Suivre le système</Text>
+          </View>
+        </View>
+        <View style={{ flexDirection: 'row', gap: 10 }}>
+
+          {!isSystemTheme && (
+            <Switch
+              value={theme === 'dark'}
+              onValueChange={(value) => setTheme(value ? 'dark' : 'light')}
+              trackColor={{ false: '#D1D1D6', true: '#4A90E2' }}
+            />
+          )}
+        </View>
       </View>
 
-      {profile?.allergies && profile.allergies.length > 0 && (
-        <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Allergies</Text>
-          {profile.allergies.map((allergie, index) => (
-            <Text key={index} style={styles.listItem}>• {allergie}</Text>
-          ))}
+      <View style={getStyles(colorScheme).menuItem}>
+        <View style={getStyles(colorScheme).menuItemLeft}>
+          <View style={[getStyles(colorScheme).iconContainer, { backgroundColor: '#FFE8E8' }]}>
+            <Ionicons name="notifications-outline" size={24} color="#F44336" />
+          </View>
+          <View>
+            <Text style={getStyles(colorScheme).menuItemTitle}>Notifications</Text>
+            <Text style={getStyles(colorScheme).menuItemSubtitle}>Rappels de repas, conseils nutritionnels</Text>
+          </View>
         </View>
-      )}
+        <Switch
+          value={notifications}
+          onValueChange={setNotifications}
+          trackColor={{ false: '#D1D1D6', true: '#4A90E2' }}
+        />
+      </View>
 
-      {profile?.medical_conditions && profile.medical_conditions.length > 0 && (
-        <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Conditions Médicales</Text>
-          {profile.medical_conditions.map((condition, index) => (
-            <Text key={index} style={styles.listItem}>• {condition}</Text>
-          ))}
+      <Pressable style={getStyles(colorScheme).menuItem}>
+        <View style={getStyles(colorScheme).menuItemLeft}>
+          <View style={[getStyles(colorScheme).iconContainer, { backgroundColor: '#E8F1FF' }]}>
+            <Ionicons name="help-circle-outline" size={24} color="#4A90E2" />
+          </View>
+          <Text style={getStyles(colorScheme).menuItemTitle}>Aide et support</Text>
         </View>
-      )}
-      
-      <Pressable style={styles.logoutButton} onPress={handleLogout}>
-        <Text style={styles.logoutText}>Déconnexion</Text>
+        <Ionicons name="chevron-forward" size={24} color="#999" />
+      </Pressable>
+
+      <Text style={getStyles(colorScheme).version}>Version 1.0.0</Text>
+
+      <Pressable style={getStyles(colorScheme).logoutButton} onPress={handleLogout}>
+        <Ionicons name="log-out-outline" size={24} color="#FF4444" />
+        <Text style={getStyles(colorScheme).logoutText}>Déconnexion</Text>
       </Pressable>
     </ScrollView>
   );
 }
 
-const styles = StyleSheet.create({
+const getStyles = (colorScheme: 'light' | 'dark') => StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: Colors.light.background,
+    backgroundColor: colorScheme === 'dark' ? Colors.dark.background : Colors.light.background,
+  },
+  titleContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    paddingHorizontal: 20,
+    paddingTop: 20,
+    paddingBottom: 10,
+  },
+  titleText: {
+    fontSize: 32,
+    fontWeight: 'bold',
+    color: colorScheme === 'dark' ? Colors.dark.text : Colors.light.text,
+  },
+  settingsButton: {
+    padding: 8,
+    backgroundColor: colorScheme === 'dark' ? Colors.dark.background : Colors.light.background,
+    borderRadius: 12,
+    shadowColor: colorScheme === 'dark' ? Colors.dark.text : Colors.light.text,
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.1,
+    shadowRadius: 3,
+    elevation: 3,
   },
   header: {
+    flexDirection: 'row',
     padding: 20,
-    alignItems: 'center',
+    paddingTop: 10,
+    alignItems: 'flex-start',
   },
-  title: {
-    fontSize: 24,
+  profileImageContainer: {
+    marginRight: 15,
+  },
+  profileImage: {
+    width: 90,
+    height: 90,
+    borderRadius: 45,
+    backgroundColor: colorScheme === 'dark' ? Colors.dark.buttonInactive : Colors.light.buttonInactive,
+  },
+  profileInfo: {
+    flex: 1,
+    justifyContent: 'center',
+  },
+  name: {
+    fontSize: 26,
     fontWeight: 'bold',
-    color: Colors.light.text,
-    marginBottom: 20,
+    color: colorScheme === 'dark' ? Colors.dark.text : Colors.light.text,
+    marginBottom: 8,
   },
-  section: {
-    padding: 20,
-    borderBottomWidth: 1,
-    borderBottomColor: '#eee',
+  objective: {
+    fontSize: 16,
+    color: colorScheme === 'dark' ? Colors.dark.icon : Colors.light.icon,
+    marginBottom: 12,
+  },
+  editButton: {
+    paddingVertical: 6,
+    paddingHorizontal: 0,
+    alignSelf: 'flex-start',
+  },
+  editButtonText: {
+    color: Colors.light.primary,
+    fontSize: 16,
   },
   sectionTitle: {
     fontSize: 18,
     fontWeight: 'bold',
-    marginBottom: 15,
-    color: Colors.light.text,
+    color: colorScheme === 'dark' ? Colors.dark.text : Colors.light.text,
+    marginTop: 15,
+    marginBottom: 10,
+    paddingHorizontal: 20,
   },
-  infoContainer: {
+  menuItem: {
     flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    padding: 15,
+    paddingHorizontal: 20,
+    borderBottomWidth: 1,
+    borderBottomColor: colorScheme === 'dark' ? Colors.dark.buttonInactive : Colors.light.buttonInactive,
+  },
+  menuItemLeft: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    flex: 1,
+  },
+  iconContainer: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginRight: 15,
+  },
+  menuItemTitle: {
+    fontSize: 16,
+    color: colorScheme === 'dark' ? Colors.dark.text : Colors.light.text,
+    marginBottom: 2,
+  },
+  menuItemSubtitle: {
+    fontSize: 14,
+    color: colorScheme === 'dark' ? Colors.dark.icon : Colors.light.icon,
+  },
+  version: {
+    textAlign: 'center',
+    color: colorScheme === 'dark' ? Colors.dark.icon : Colors.light.icon,
+    marginTop: 20,
     marginBottom: 10,
   },
-  label: {
-    width: 100,
-    fontWeight: '500',
-    color: Colors.light.text,
-  },
-  text: {
-    flex: 1,
-    color: Colors.light.text,
-  },
-  listItem: {
-    marginBottom: 5,
-    color: Colors.light.text,
-  },
   logoutButton: {
-    backgroundColor: '#ff4444',
-    padding: 15,
-    borderRadius: 10,
-    margin: 20,
+    flexDirection: 'row',
     alignItems: 'center',
+    justifyContent: 'center',
+    padding: 15,
+    marginBottom: 30,
+    margin: 20,
+    borderRadius: 10,
+    backgroundColor: colorScheme === 'dark' ? Colors.dark.background : Colors.light.background,
+    borderWidth: 1,
+    borderColor: colorScheme === 'dark' ? Colors.dark.error : Colors.light.error,
   },
   logoutText: {
-    color: 'white',
+    color: colorScheme === 'dark' ? Colors.dark.error : Colors.light.error,
     fontSize: 16,
     fontWeight: 'bold',
+    marginLeft: 10,
+  },
+  loadingText: {
+    fontSize: 16,
+    color: '#666',
+    textAlign: 'center',
+    marginTop: 20,
   },
 });

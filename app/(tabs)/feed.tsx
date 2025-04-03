@@ -4,6 +4,7 @@ import { supabase } from '@/lib/supabase';
 import { Colors } from '@/constants/Colors';
 import { router } from 'expo-router';
 import { useAuth } from '@/hooks/useAuth';
+import { useColorScheme } from '@/hooks/useColorScheme';
 
 interface Profile {
   first_name: string;
@@ -27,6 +28,7 @@ export default function FeedScreen() {
   const [plats, setPlats] = useState<Plat[]>([]);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
+  const colorScheme = useColorScheme();
 
   const fetchPlats = async () => {
     if (!user) return;
@@ -50,7 +52,6 @@ export default function FeedScreen() {
             .eq('id', plat.user_id)
             .single();
 
-          console.log("profileData", profileData, plat.user_id);
 
           if (profileError) {
             //console.error('Erreur lors de la récupération du profil:', profileError);
@@ -86,29 +87,29 @@ export default function FeedScreen() {
   }, [user]);
 
   const MacroBadge = ({ label, value, color }: { label: string; value: number; color: string }) => (
-    <View style={[styles.badge, { backgroundColor: color }]}>
-      <Text style={styles.badgeValue}>{value}</Text>
-      <Text style={styles.badgeLabel}>{label}</Text>
+    <View style={[getStyles(colorScheme).badge, { backgroundColor: color }]}>
+      <Text style={getStyles(colorScheme).badgeValue}>{value}</Text>
+      <Text style={getStyles(colorScheme).badgeLabel}>{label}</Text>
     </View>
   );
 
   const renderPlat = ({ item }: { item: Plat }) => (
     <TouchableOpacity 
-      style={styles.card}
-      onPress={() => router.push(`/plat-detail?id=${item.id}`)}
+      style={getStyles(colorScheme).card}
+      onPress={() => router.push(`/meal-detail?id=${item.id}`)}
       activeOpacity={0.8}
     >
       <Image 
         source={{ uri: item.photo_url }} 
-        style={styles.photo}
+        style={getStyles(colorScheme).photo}
         resizeMode="cover"
       />
-      <View style={styles.cardContent}>
-        <Text style={styles.userName}>
+      <View style={getStyles(colorScheme).cardContent}>
+        <Text style={getStyles(colorScheme).userName}>
           {item.user_profile?.first_name} {item.user_profile?.last_name}
         </Text>
         
-        <View style={styles.macrosContainer}>
+        <View style={getStyles(colorScheme).macrosContainer}>
           <MacroBadge label="kcal" value={item.calories} color="#FF6B6B" />
           <MacroBadge label="P" value={item.proteines} color="#4ECDC4" />
           <MacroBadge label="G" value={item.glucides} color="#45B7D1" />
@@ -120,7 +121,7 @@ export default function FeedScreen() {
 
   if (loading) {
     return (
-      <View style={styles.container}>
+      <View style={getStyles(colorScheme).container}>
         <ActivityIndicator size="large" color={Colors.light.tint} />
       </View>
     );
@@ -128,19 +129,19 @@ export default function FeedScreen() {
 
   if (plats.length === 0) {
     return (
-      <View style={[styles.container, styles.emptyContainer]}>
-        <Text style={styles.emptyText}>Aucun plat à afficher pour le moment</Text>
+      <View style={[getStyles(colorScheme).container, getStyles(colorScheme).emptyContainer]}>
+        <Text style={getStyles(colorScheme).emptyText}>Aucun plat à afficher pour le moment</Text>
       </View>
     );
   }
 
   return (
-    <View style={styles.container}>
+    <View style={getStyles(colorScheme).container}>
       <FlatList
         data={plats}
         renderItem={renderPlat}
         keyExtractor={(item) => item.id}
-        contentContainerStyle={styles.list}
+        contentContainerStyle={getStyles(colorScheme).list}
         showsVerticalScrollIndicator={false}
         refreshControl={
           <RefreshControl
@@ -155,10 +156,10 @@ export default function FeedScreen() {
   );
 }
 
-const styles = StyleSheet.create({
+const getStyles = (colorScheme: 'light' | 'dark') => StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: Colors.light.background,
+    backgroundColor: colorScheme === 'dark' ? Colors.dark.background : Colors.light.background,
   },
   emptyContainer: {
     justifyContent: 'center',
@@ -166,17 +167,17 @@ const styles = StyleSheet.create({
   },
   emptyText: {
     fontSize: 16,
-    color: Colors.light.text,
+    color: colorScheme === 'dark' ? Colors.dark.text : Colors.light.text,
     textAlign: 'center',
   },
   list: {
     padding: 10,
   },
   card: {
-    backgroundColor: '#fff',
+    backgroundColor: colorScheme === 'dark' ? Colors.dark.background : Colors.light.background,
     borderRadius: 15,
     marginBottom: 15,
-    shadowColor: '#000',
+    shadowColor: colorScheme === 'dark' ? Colors.dark.text : Colors.light.text,
     shadowOffset: {
       width: 0,
       height: 2,
@@ -198,7 +199,7 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: 'bold',
     marginBottom: 10,
-    color: Colors.light.text,
+    color: colorScheme === 'dark' ? Colors.dark.text : Colors.light.text,
   },
   macrosContainer: {
     flexDirection: 'row',
@@ -212,12 +213,12 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   badgeValue: {
-    color: 'white',
+    color: colorScheme === 'dark' ? Colors.dark.text : Colors.light.text,
     fontSize: 16,
     fontWeight: 'bold',
   },
   badgeLabel: {
-    color: 'white',
+    color: colorScheme === 'dark' ? Colors.dark.text : Colors.light.text,
     fontSize: 12,
     marginTop: 2,
   },

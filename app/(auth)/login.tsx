@@ -3,8 +3,10 @@ import { View, Text, TextInput, TouchableOpacity, StyleSheet, KeyboardAvoidingVi
 import { router } from 'expo-router';
 import { Colors } from '@/constants/Colors';
 import { supabase } from '@/lib/supabase';
+import { useColorScheme } from "@/hooks/useColorScheme";
 
 export default function LoginScreen() {
+  const colorScheme = useColorScheme();
   const [isLogin, setIsLogin] = useState(true);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -76,21 +78,21 @@ export default function LoginScreen() {
   return (
     <KeyboardAvoidingView 
       behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-      style={styles.container}
+      style={getStyles(colorScheme).container}
     >
-      <View style={styles.form}>
-        <Text style={styles.title}>
+      <View style={getStyles(colorScheme).form}>
+        <Text style={getStyles(colorScheme).title}>
           {isLogin ? 'Connexion' : (showOTP ? 'Vérification Email' : 'Inscription')}
         </Text>
         
         {error && (
-          <Text style={styles.error}>{error}</Text>
+          <Text style={getStyles(colorScheme).error}>{error}</Text>
         )}
 
         {!showOTP && (
           <>
             <TextInput
-              style={styles.input}
+              style={getStyles(colorScheme).input}
               placeholder="Email"
               value={email}
               onChangeText={setEmail}
@@ -99,7 +101,7 @@ export default function LoginScreen() {
             />
 
             <TextInput
-              style={styles.input}
+              style={getStyles(colorScheme).input}
               placeholder="Mot de passe"
               value={password}
               onChangeText={setPassword}
@@ -110,11 +112,11 @@ export default function LoginScreen() {
 
         {showOTP && (
           <>
-            <Text style={styles.description}>
+            <Text style={getStyles(colorScheme).description}>
               Veuillez entrer le code de vérification envoyé à votre email
             </Text>
             <TextInput
-              style={styles.input}
+              style={getStyles(colorScheme).input}
               placeholder="Code de vérification"
               value={otpCode}
               onChangeText={setOtpCode}
@@ -122,11 +124,11 @@ export default function LoginScreen() {
               autoCapitalize="none"
             />
             <TouchableOpacity 
-              style={styles.resendButton}
+              style={getStyles(colorScheme).resendButton}
               onPress={handleResendOTP}
               disabled={resendLoading}
             >
-              <Text style={styles.resendButtonText}>
+              <Text style={getStyles(colorScheme).resendButtonText}>
                 {resendLoading ? 'Envoi en cours...' : 'Renvoyer le code'}
               </Text>
             </TouchableOpacity>
@@ -134,11 +136,11 @@ export default function LoginScreen() {
         )}
 
         <TouchableOpacity 
-          style={styles.button}
+          style={getStyles(colorScheme).button}
           onPress={handleSubmit}
           disabled={loading}
         >
-          <Text style={styles.buttonText}>
+          <Text style={getStyles(colorScheme).buttonText}>
             {loading ? 'Chargement...' : (isLogin ? 'Se connecter' : (showOTP ? 'Vérifier' : "S'inscrire"))}
           </Text>
         </TouchableOpacity>
@@ -146,9 +148,9 @@ export default function LoginScreen() {
         {!showOTP && (
           <TouchableOpacity 
             onPress={() => setIsLogin(!isLogin)}
-            style={styles.switchButton}
+            style={getStyles(colorScheme).switchButton}
           >
-            <Text style={styles.switchText}>
+            <Text style={getStyles(colorScheme).switchText}>
               {isLogin ? "Pas encore de compte ? S'inscrire" : 'Déjà un compte ? Se connecter'}
             </Text>
           </TouchableOpacity>
@@ -158,10 +160,10 @@ export default function LoginScreen() {
   );
 }
 
-const styles = StyleSheet.create({
+const getStyles = (colorScheme: 'light' | 'dark') => StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: Colors.light.background,
+    backgroundColor: colorScheme === 'dark' ? Colors.dark.background : Colors.light.background,
   },
   form: {
     flex: 1,
@@ -173,29 +175,30 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     marginBottom: 30,
     textAlign: 'center',
-    color: Colors.light.text,
+    color: colorScheme === 'dark' ? Colors.dark.text : Colors.light.text,
   },
   description: {
     textAlign: 'center',
     marginBottom: 20,
-    color: Colors.light.text,
+    color: colorScheme === 'dark' ? Colors.dark.text : Colors.light.text,
   },
   input: {
-    backgroundColor: '#fff',
+    backgroundColor: colorScheme === 'dark' ? Colors.dark.background : Colors.light.background,
     padding: 15,
     borderRadius: 10,
     marginBottom: 15,
     fontSize: 16,
+    color: colorScheme === 'dark' ? Colors.dark.text : Colors.light.text,
   },
   button: {
-    backgroundColor: Colors.light.tint,
+    backgroundColor: colorScheme === 'dark' ? Colors.dark.tint : Colors.light.tint,
     padding: 15,
     borderRadius: 10,
     alignItems: 'center',
     marginTop: 10,
   },
   buttonText: {
-    color: '#fff',
+    color: colorScheme === 'dark' ? Colors.dark.background : Colors.light.background,
     fontSize: 16,
     fontWeight: 'bold',
   },
@@ -204,11 +207,11 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   switchText: {
-    color: Colors.light.tint,
+    color: colorScheme === 'dark' ? Colors.dark.tint : Colors.light.tint,
     fontSize: 14,
   },
   error: {
-    color: '#ff0000',
+    color: colorScheme === 'dark' ? Colors.dark.error : Colors.light.error,
     marginBottom: 15,
     textAlign: 'center',
   },
@@ -217,7 +220,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   resendButtonText: {
-    color: Colors.light.tint,
+    color: colorScheme === 'dark' ? Colors.dark.tint : Colors.light.tint,
     fontSize: 14,
     textDecorationLine: 'underline',
   },

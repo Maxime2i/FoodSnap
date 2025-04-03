@@ -5,10 +5,14 @@ import { useAuth } from '../context/AuthContext';
 import { format } from 'date-fns';
 import { fr } from 'date-fns/locale';
 import { router } from 'expo-router';
+import { useColorScheme } from "@/hooks/useColorScheme";
+import { Colors } from "@/constants/Colors";
+
 
 
 export default function HomeScreen() {
   const { user } = useAuth();
+  const colorScheme = useColorScheme();
   const currentDate = new Date();
   const options: Intl.DateTimeFormatOptions = { 
     weekday: 'long', 
@@ -38,85 +42,85 @@ export default function HomeScreen() {
   };
 
   return (
-    <ScrollView style={styles.container}>
-      <View style={styles.header}>
-        <Text style={styles.greeting}>Bonjour, {user?.first_name || 'Utilisateur'}</Text>
-        <Text style={styles.date}>{formattedDate}</Text>
+    <ScrollView style={getStyles(colorScheme).container}>
+      <View style={getStyles(colorScheme).header}>
+        <Text style={getStyles(colorScheme).greeting}>Bonjour, {user?.first_name || 'Utilisateur'}</Text>
+        <Text style={getStyles(colorScheme).date}>{formattedDate}</Text>
       </View>
 
-      <View style={styles.caloriesCard}>
-        <View style={styles.caloriesHeader}>
-          <Text style={styles.caloriesTitle}>Calories aujourd'hui</Text>
-          <Text style={styles.caloriesTotal}>{totals.calories} / {goals.calories} kcal</Text>
+      <View style={getStyles(colorScheme).caloriesCard}>
+        <View style={getStyles(colorScheme).caloriesHeader}>
+          <Text style={getStyles(colorScheme).caloriesTitle}>Calories aujourd'hui</Text>
+          <Text style={getStyles(colorScheme).caloriesTotal}>{totals.calories} / {goals.calories} kcal</Text>
         </View>
 
-        <View style={styles.caloriesMain}>
+        <View style={getStyles(colorScheme).caloriesMain}>
           <Ionicons name="flame-outline" size={32} color="#ff9500" />
-          <Text style={styles.caloriesValue}>{totals.calories}</Text>
+          <Text style={getStyles(colorScheme).caloriesValue}>{totals.calories}</Text>
         </View>
 
-        <Text style={styles.caloriesRemaining}>{goals.calories - totals.calories} kcal restantes</Text>
+        <Text style={getStyles(colorScheme).caloriesRemaining}>{goals.calories - totals.calories} kcal restantes</Text>
 
-        <View style={styles.caloriesBar}>
+        <View style={getStyles(colorScheme).caloriesBar}>
           <LinearGradient
             colors={['#3498db', '#e8f4f8']}
-            style={[styles.caloriesProgress, { width: `${(totals.calories / goals.calories) * 100}%` }]}
+            style={[getStyles(colorScheme).caloriesProgress, { width: `${(totals.calories / goals.calories) * 100}%` }]}
             start={{ x: 0, y: 0 }}
             end={{ x: 1, y: 0 }}
           />
         </View>
-        <View style={styles.caloriesRange}>
-          <Text style={styles.caloriesRangeText}>{totals.calories} kcal</Text>
-          <Text style={styles.caloriesRangeText}>{goals.calories} kcal</Text>
+        <View style={getStyles(colorScheme).caloriesRange}>
+          <Text style={getStyles(colorScheme).caloriesRangeText}>{totals.calories} kcal</Text>
+          <Text style={getStyles(colorScheme).caloriesRangeText}>{goals.calories} kcal</Text>
         </View>
       </View>
 
-      <View style={styles.macrosSection}>
-        <Text style={styles.macrosTitle}>Macronutriments</Text>
-        <View style={styles.macrosGrid}>
-          <View style={styles.macroCard}>
-            <View style={[styles.macroIcon, { backgroundColor: '#e8f0ff' }]}>
+      <View style={getStyles(colorScheme).macrosSection}>
+        <Text style={getStyles(colorScheme).macrosTitle}>Macronutriments</Text>
+        <View style={getStyles(colorScheme).macrosGrid}>
+          <View style={getStyles(colorScheme).macroCard}>
+            <View style={[getStyles(colorScheme).macroIcon, { backgroundColor: '#e8f0ff' }]}>
               <Ionicons name="pizza-outline" size={24} color="#4a90e2" />
             </View>
-            <Text style={styles.macroLabel}>Glucides</Text>
-            <Text style={styles.macroValue}>{totals.glucides}g</Text>
-            <Text style={styles.macroGoal}>sur {goals.glucides}g</Text>
+            <Text style={getStyles(colorScheme).macroLabel}>Glucides</Text>
+            <Text style={getStyles(colorScheme).macroValue}>{totals.glucides}g</Text>
+            <Text style={getStyles(colorScheme).macroGoal}>sur {goals.glucides}g</Text>
           </View>
 
-          <View style={styles.macroCard}>
-            <View style={[styles.macroIcon, { backgroundColor: '#e8fff0' }]}>
+          <View style={getStyles(colorScheme).macroCard}>
+            <View style={[getStyles(colorScheme).macroIcon, { backgroundColor: '#e8fff0' }]}>
               <Ionicons name="fish-outline" size={24} color="#2ecc71" />
             </View>
-            <Text style={styles.macroLabel}>Protéines</Text>
-            <Text style={styles.macroValue}>{totals.proteines}g</Text>
-            <Text style={styles.macroGoal}>sur {goals.proteines}g</Text>
+            <Text style={getStyles(colorScheme).macroLabel}>Protéines</Text>
+            <Text style={getStyles(colorScheme).macroValue}>{totals.proteines}g</Text>
+            <Text style={getStyles(colorScheme).macroGoal}>sur {goals.proteines}g</Text>
           </View>
 
-          <View style={styles.macroCard}>
-            <View style={[styles.macroIcon, { backgroundColor: '#fff8e8' }]}>
+          <View style={getStyles(colorScheme).macroCard}>
+            <View style={[getStyles(colorScheme).macroIcon, { backgroundColor: '#fff8e8' }]}>
               <Ionicons name="water-outline" size={24} color="#f1c40f" />
             </View>
-            <Text style={styles.macroLabel}>Lipides</Text>
-            <Text style={styles.macroValue}>{totals.lipides}g</Text>
-            <Text style={styles.macroGoal}>sur {goals.lipides}g</Text>
+            <Text style={getStyles(colorScheme).macroLabel}>Lipides</Text>
+            <Text style={getStyles(colorScheme).macroValue}>{totals.lipides}g</Text>
+            <Text style={getStyles(colorScheme).macroGoal}>sur {goals.lipides}g</Text>
           </View>
         </View>
       </View>
 
-      <View style={styles.mealsSection}>
-        <View style={styles.sectionHeader}>
-          <Text style={styles.sectionTitle}>Repas récents</Text>
-          <TouchableOpacity onPress={() => router.push('/(tabs)/review')}>
-            <Text style={styles.seeAll}>Voir tout</Text>
+      <View style={getStyles(colorScheme).mealsSection}>
+        <View style={getStyles(colorScheme).sectionHeader}>
+          <Text style={getStyles(colorScheme).sectionTitle}>Repas récents</Text>
+          <TouchableOpacity onPress={() => router.push('/my-meals')}>
+            <Text style={getStyles(colorScheme).seeAll}>Voir tout</Text>
           </TouchableOpacity>
         </View>
 
         {user?.meals?.slice(0, 2).map((meal) => (
-          <View key={meal.id} style={styles.mealCard}>
-            <Image source={{ uri: meal.photo_url }} style={styles.mealIcon} />
-            <View style={styles.mealInfo}>
-              <Text style={styles.mealTitle}>{meal.name}</Text>
-              <Text style={styles.mealDetails}>
+          <View key={meal.id} style={getStyles(colorScheme).mealCard}>
+            <Image source={{ uri: meal.photo_url }} style={getStyles(colorScheme).mealIcon} />
+            <View style={getStyles(colorScheme).mealInfo}>
+              <Text style={getStyles(colorScheme).mealTitle}>{meal.name}</Text>
+              <Text style={getStyles(colorScheme).mealDetails}>
                 {format(new Date(meal.created_at), 'HH:mm', { locale: fr })} • {meal.glucides}g glucides
               </Text>
             </View>
@@ -124,19 +128,19 @@ export default function HomeScreen() {
           </View>
         ))}
 
-        <TouchableOpacity style={styles.addMealButton}>
+        <TouchableOpacity style={getStyles(colorScheme).addMealButton}>
           <Ionicons name="add" size={24} color="#4a90e2" />
-          <Text style={styles.addMealText}>Ajouter un repas</Text>
+          <Text style={getStyles(colorScheme).addMealText}>Ajouter un repas</Text>
         </TouchableOpacity>
       </View>
     </ScrollView>
   );
 }
 
-const styles = StyleSheet.create({
+const getStyles = (colorScheme: 'light' | 'dark') => StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#f5f6fa',
+    backgroundColor: colorScheme === 'dark' ? Colors.dark.background : Colors.light.background,
   },
   header: {
     padding: 20,
@@ -145,19 +149,19 @@ const styles = StyleSheet.create({
   greeting: {
     fontSize: 28,
     fontWeight: 'bold',
-    color: '#1a1a1a',
+    color: colorScheme === 'dark' ? Colors.dark.text : Colors.light.text,
   },
   date: {
     fontSize: 16,
-    color: '#666',
+    color: colorScheme === 'dark' ? Colors.dark.text : Colors.light.text,
     marginTop: 4,
   },
   caloriesCard: {
-    backgroundColor: 'white',
+    backgroundColor: colorScheme === 'dark' ? Colors.dark.background : Colors.light.background,
     margin: 16,
     borderRadius: 16,
     padding: 20,
-    shadowColor: '#000',
+    shadowColor: colorScheme === 'dark' ? Colors.dark.text : Colors.light.text,
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.1,
     shadowRadius: 8,
@@ -171,12 +175,12 @@ const styles = StyleSheet.create({
   caloriesTitle: {
     fontSize: 18,
     fontWeight: '600',
-    color: '#1a1a1a',
+    color: colorScheme === 'dark' ? Colors.dark.text : Colors.light.text,
   },
   caloriesTotal: {
     fontSize: 16,
     fontWeight: '600',
-    color: '#1a1a1a',
+    color: colorScheme === 'dark' ? Colors.dark.text : Colors.light.text,
   },
   caloriesMain: {
     flexDirection: 'row',
@@ -186,24 +190,24 @@ const styles = StyleSheet.create({
   caloriesValue: {
     fontSize: 48,
     fontWeight: 'bold',
-    color: '#1a1a1a',
+    color: colorScheme === 'dark' ? Colors.dark.text : Colors.light.text,
     marginLeft: 16,
   },
   caloriesRemaining: {
     fontSize: 16,
-    color: '#666',
+    color: colorScheme === 'dark' ? Colors.dark.text : Colors.light.text,
     marginTop: 4,
   },
   caloriesBar: {
     height: 8,
     borderRadius: 4,
-    backgroundColor: '#e8f4f8',
+    backgroundColor: colorScheme === 'dark' ? Colors.dark.background : Colors.light.background,
     marginTop: 20,
   },
   caloriesProgress: {
     height: 8,
     borderRadius: 4,
-    backgroundColor: '#3498db',
+    backgroundColor: colorScheme === 'dark' ? Colors.dark.background : Colors.light.background,
   },
   caloriesRange: {
     flexDirection: 'row',
@@ -212,7 +216,7 @@ const styles = StyleSheet.create({
   },
   caloriesRangeText: {
     fontSize: 14,
-    color: '#666',
+    color: colorScheme === 'dark' ? Colors.dark.text : Colors.light.text,
   },
   macrosSection: {
     padding: 16,
@@ -220,7 +224,7 @@ const styles = StyleSheet.create({
   macrosTitle: {
     fontSize: 20,
     fontWeight: '600',
-    color: '#1a1a1a',
+    color: colorScheme === 'dark' ? Colors.dark.text : Colors.light.text,
     marginBottom: 16,
   },
   macrosGrid: {
@@ -229,12 +233,12 @@ const styles = StyleSheet.create({
   },
   macroCard: {
     flex: 1,
-    backgroundColor: 'white',
+    backgroundColor: colorScheme === 'dark' ? Colors.dark.background : Colors.light.background,
     borderRadius: 16,
     padding: 16,
     marginHorizontal: 4,
     alignItems: 'center',
-    shadowColor: '#000',
+    shadowColor: colorScheme === 'dark' ? Colors.dark.text : Colors.light.text,
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.1,
     shadowRadius: 8,
@@ -250,18 +254,18 @@ const styles = StyleSheet.create({
   },
   macroLabel: {
     fontSize: 14,
-    color: '#666',
+    color: colorScheme === 'dark' ? Colors.dark.text : Colors.light.text,
     marginBottom: 4,
   },
   macroValue: {
     fontSize: 20,
     fontWeight: '600',
-    color: '#1a1a1a',
+    color: colorScheme === 'dark' ? Colors.dark.text : Colors.light.text,
     marginBottom: 2,
   },
   macroGoal: {
     fontSize: 14,
-    color: '#666',
+    color: colorScheme === 'dark' ? Colors.dark.text : Colors.light.text,
   },
   mealsSection: {
     padding: 16,
@@ -275,14 +279,14 @@ const styles = StyleSheet.create({
   sectionTitle: {
     fontSize: 20,
     fontWeight: '600',
-    color: '#1a1a1a',
+    color: colorScheme === 'dark' ? Colors.dark.text : Colors.light.text,
   },
   seeAll: {
     fontSize: 14,
-    color: '#4a90e2',
+    color: colorScheme === 'dark' ? Colors.dark.text : Colors.light.text,
   },
   mealCard: {
-    backgroundColor: 'white',
+    backgroundColor: colorScheme === 'dark' ? Colors.dark.background : Colors.light.background,
     borderRadius: 16,
     padding: 16,
     marginBottom: 12,
@@ -307,33 +311,33 @@ const styles = StyleSheet.create({
   mealTitle: {
     fontSize: 16,
     fontWeight: '600',
-    color: '#1a1a1a',
+    color: colorScheme === 'dark' ? Colors.dark.text : Colors.light.text,
   },
   mealDetails: {
     fontSize: 14,
-    color: '#666',
+    color: colorScheme === 'dark' ? Colors.dark.text : Colors.light.text,
     marginTop: 4,
   },
   glucoseChange: {
     fontSize: 16,
     fontWeight: '600',
-    color: '#4a90e2',
+    color: colorScheme === 'dark' ? Colors.dark.text : Colors.light.text,
   },
   addMealButton: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: 'white',
+    backgroundColor: colorScheme === 'dark' ? Colors.dark.background : Colors.light.background,
     borderRadius: 16,
     padding: 16,
     marginTop: 12,
     borderWidth: 1,
-    borderColor: '#e0e0e0',
+    borderColor: colorScheme === 'dark' ? Colors.dark.buttonInactive : Colors.light.buttonInactive,
     borderStyle: 'dashed',
   },
   addMealText: {
     fontSize: 16,
-    color: '#4a90e2',
+    color: colorScheme === 'dark' ? Colors.dark.text : Colors.light.text,
     marginLeft: 8,
   },
 });

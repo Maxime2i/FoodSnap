@@ -40,7 +40,6 @@ interface FoodAnalysis {
 }
 
 const analyzeImageWithGPT = async (base64Image: string): Promise<FoodAnalysis> => {
-  console.log( "base64Image", process.env.EXPO_PUBLIC_OPENAI_API_KEY)
   try {
     const response = await fetch('https://api.openai.com/v1/chat/completions', {
       method: 'POST',
@@ -72,7 +71,6 @@ const analyzeImageWithGPT = async (base64Image: string): Promise<FoodAnalysis> =
     });
 
     const data = await response.json();
-    console.log( "data", data)
     if (!data.choices?.[0]?.message?.content) {
       throw new Error('Invalid response from GPT');
     }
@@ -121,7 +119,6 @@ export default function CaptureScreen() {
   });
 
   const updateIngredientQuantity = (id: number, newQuantity: string) => {
-    console.log(newQuantity, "eeee")
     setIngredients(ingredients.map(ing => 
       ing.id === id ? { ...ing, quantite: Number(newQuantity) || ing.quantite } : ing
     ));
@@ -147,7 +144,6 @@ export default function CaptureScreen() {
       try {
         // Analyse avec GPT
         const analysis = await analyzeImageWithGPT(manipulatedImage.base64 || '');
-        console.log( "analysis", analysis)
         
         // Mise à jour des données
         setIngredients(analysis.ingredients.map((ing, index) => ({
@@ -201,7 +197,7 @@ export default function CaptureScreen() {
         };
         reader.readAsDataURL(blob);
       });
-      console.log( "test", base64)
+
       // Upload de la photo
       const { error: uploadError } = await supabase.storage
         .from('photos')
@@ -209,7 +205,6 @@ export default function CaptureScreen() {
           contentType: 'image/jpeg',
           upsert: true,
         });
-        console.log( "uploadError", uploadError)
 
       if (uploadError) throw uploadError;
 
@@ -217,10 +212,8 @@ export default function CaptureScreen() {
       const { data: { publicUrl } } = supabase.storage
         .from('photos')
         .getPublicUrl(photoPath);
-        console.log( "publicUrl", publicUrl)
 
       // 2. Créer le plat
-      console.log(user.id, "user")
       const { data: plat, error: platError } = await supabase
         .from('plats')
         .insert({

@@ -1,9 +1,10 @@
-import { StyleSheet, View, Text, Image, ScrollView, ActivityIndicator, TouchableOpacity } from 'react-native';
-import { useLocalSearchParams } from 'expo-router';
+import { StyleSheet, View, Text, Image, ScrollView, ActivityIndicator, TouchableOpacity, Modal, Dimensions } from 'react-native';
+import { useLocalSearchParams, router } from 'expo-router';
 import { useState, useEffect } from 'react';
 import { supabase } from '@/lib/supabase';
 import { Colors } from '@/constants/Colors';
 import { Ionicons } from '@expo/vector-icons';
+import { useColorScheme } from '@/hooks/useColorScheme';
 
 interface Ingredient {
   nom: string;
@@ -30,10 +31,12 @@ interface PlatDetail {
 }
 
 export default function PlatDetailScreen() {
+  const colorScheme = useColorScheme();
   const { id } = useLocalSearchParams();
   const [plat, setPlat] = useState<PlatDetail | null>(null);
   const [loading, setLoading] = useState(true);
   const [likeLoading, setLikeLoading] = useState(false);
+  const [isImageModalVisible, setIsImageModalVisible] = useState(false);
 
   useEffect(() => {
     fetchPlatDetail();
@@ -146,7 +149,7 @@ export default function PlatDetailScreen() {
 
   if (loading) {
     return (
-      <View style={styles.container}>
+      <View style={getStyles(colorScheme).container}>
         <ActivityIndicator size="large" color={Colors.light.tint} />
       </View>
     );
@@ -154,23 +157,36 @@ export default function PlatDetailScreen() {
 
   if (!plat) {
     return (
-      <View style={styles.container}>
-        <Text style={styles.errorText}>Plat non trouvé</Text>
+      <View style={getStyles(colorScheme).container}>
+        <Text style={getStyles(colorScheme).errorText}>Plat non trouvé</Text>
       </View>
     );
   }
 
   return (
-    <View style={styles.container}>
-      <ScrollView style={styles.resultContainer}>
-        <Image source={{ uri: plat.photo_url }} style={styles.thumbnailImage} />
+    <View style={getStyles(colorScheme).container}>
+      <TouchableOpacity 
+        style={getStyles(colorScheme).backButton}
+        onPress={() => router.back()}
+      >
+        <Ionicons 
+          name="arrow-back" 
+          size={24} 
+          color={colorScheme === 'dark' ? Colors.dark.text : Colors.light.text} 
+        />
+      </TouchableOpacity>
+
+      <ScrollView style={getStyles(colorScheme).resultContainer}>
+        <TouchableOpacity onPress={() => setIsImageModalVisible(true)}>
+          <Image source={{ uri: plat.photo_url }} style={getStyles(colorScheme).thumbnailImage} />
+        </TouchableOpacity>
         
-        <View style={styles.headerContainer}>
-          <Text style={styles.userName}>
+        <View style={getStyles(colorScheme).headerContainer}>
+          <Text style={getStyles(colorScheme).userName}>
             {plat.user_profile?.first_name} {plat.user_profile?.last_name}
           </Text>
           <TouchableOpacity 
-            style={styles.likeButton} 
+            style={getStyles(colorScheme).likeButton} 
             onPress={handleLike}
             disabled={likeLoading}
           >
@@ -179,52 +195,70 @@ export default function PlatDetailScreen() {
               size={24} 
               color={plat.is_liked ? Colors.light.tint : "#666"} 
             />
-            <Text style={styles.likeCount}>{plat.likes_count}</Text>
+            <Text style={getStyles(colorScheme).likeCount}>{plat.likes_count}</Text>
           </TouchableOpacity>
         </View>
 
-        <View style={styles.macrosContainer}>
-          <Text style={styles.sectionTitle}>Valeurs nutritionnelles</Text>
-          <View style={styles.macrosGrid}>
-            <View style={styles.macroItem}>
-              <Text style={styles.macroValue}>{plat.calories}</Text>
-              <Text style={styles.macroLabel}>Calories</Text>
+        <View style={getStyles(colorScheme).macrosContainer}>
+          <Text style={getStyles(colorScheme).sectionTitle}>Valeurs nutritionnelles</Text>
+          <View style={getStyles(colorScheme).macrosGrid}>
+            <View style={getStyles(colorScheme).macroItem}>
+              <Text style={getStyles(colorScheme).macroValue}>{plat.calories}</Text>
+              <Text style={getStyles(colorScheme).macroLabel}>Calories</Text>
             </View>
-            <View style={styles.macroItem}>
-              <Text style={styles.macroValue}>{plat.proteines}g</Text>
-              <Text style={styles.macroLabel}>Protéines</Text>
+            <View style={getStyles(colorScheme).macroItem}>
+              <Text style={getStyles(colorScheme).macroValue}>{plat.proteines}g</Text>
+              <Text style={getStyles(colorScheme).macroLabel}>Protéines</Text>
             </View>
-            <View style={styles.macroItem}>
-              <Text style={styles.macroValue}>{plat.glucides}g</Text>
-              <Text style={styles.macroLabel}>Glucides</Text>
+            <View style={getStyles(colorScheme).macroItem}>
+              <Text style={getStyles(colorScheme).macroValue}>{plat.glucides}g</Text>
+              <Text style={getStyles(colorScheme).macroLabel}>Glucides</Text>
             </View>
-            <View style={styles.macroItem}>
-              <Text style={styles.macroValue}>{plat.lipides}g</Text>
-              <Text style={styles.macroLabel}>Lipides</Text>
+            <View style={getStyles(colorScheme).macroItem}>
+              <Text style={getStyles(colorScheme).macroValue}>{plat.lipides}g</Text>
+              <Text style={getStyles(colorScheme).macroLabel}>Lipides</Text>
             </View>
           </View>
         </View>
 
-        <View style={styles.ingredientsContainer}>
-          <Text style={styles.sectionTitle}>Ingrédients</Text>
+        <View style={getStyles(colorScheme).ingredientsContainer}>
+          <Text style={getStyles(colorScheme).sectionTitle}>Ingrédients</Text>
           {plat.ingredients.map((ingredient, index) => (
-            <View key={index} style={styles.ingredientItem}>
-              <Text style={styles.ingredientName}>{ingredient.nom}</Text>
-              <Text style={styles.ingredientQuantity}>
+            <View key={index} style={getStyles(colorScheme).ingredientItem}>
+              <Text style={getStyles(colorScheme).ingredientName}>{ingredient.nom}</Text>
+              <Text style={getStyles(colorScheme).ingredientQuantity}>
                 {ingredient.quantite} {ingredient.unite}
               </Text>
             </View>
           ))}
         </View>
       </ScrollView>
+
+      <Modal
+        visible={isImageModalVisible}
+        transparent={true}
+        onRequestClose={() => setIsImageModalVisible(false)}
+      >
+        <TouchableOpacity 
+          style={getStyles(colorScheme).modalContainer}
+          activeOpacity={1}
+          onPress={() => setIsImageModalVisible(false)}
+        >
+          <Image 
+            source={{ uri: plat?.photo_url }} 
+            style={getStyles(colorScheme).fullScreenImage}
+            resizeMode="contain"
+          />
+        </TouchableOpacity>
+      </Modal>
     </View>
   );
 }
 
-const styles = StyleSheet.create({
+const getStyles = (colorScheme: 'light' | 'dark') => StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: Colors.light.background,
+    backgroundColor: colorScheme === 'dark' ? Colors.dark.background : Colors.light.background,
   },
   resultContainer: {
     flex: 1,
@@ -237,23 +271,23 @@ const styles = StyleSheet.create({
     fontSize: 20,
     fontWeight: 'bold',
     padding: 15,
-    color: Colors.light.text,
+    color: colorScheme === 'dark' ? Colors.dark.text : Colors.light.text,
   },
   macrosContainer: {
     padding: 15,
-    backgroundColor: '#fff',
+    backgroundColor: colorScheme === 'dark' ? Colors.dark.background : Colors.light.background,
     marginBottom: 10,
   },
   sectionTitle: {
     fontSize: 18,
     fontWeight: 'bold',
     marginBottom: 10,
-    color: Colors.light.text,
+    color: colorScheme === 'dark' ? Colors.dark.text : Colors.light.text,
   },
   macrosGrid: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    backgroundColor: '#f5f5f5',
+    backgroundColor: colorScheme === 'dark' ? Colors.dark.background : Colors.light.background,
     padding: 15,
     borderRadius: 10,
   },
@@ -263,16 +297,16 @@ const styles = StyleSheet.create({
   macroValue: {
     fontSize: 18,
     fontWeight: 'bold',
-    color: '#31AFF0',
+    color: colorScheme === 'dark' ? Colors.dark.tint : Colors.light.tint,
   },
   macroLabel: {
     fontSize: 12,
-    color: '#666',
+    color: colorScheme === 'dark' ? Colors.dark.text : Colors.light.text,
     marginTop: 4,
   },
   ingredientsContainer: {
     padding: 15,
-    backgroundColor: '#fff',
+    backgroundColor: colorScheme === 'dark' ? Colors.dark.background : Colors.light.background,
   },
   ingredientItem: {
     flexDirection: 'row',
@@ -280,15 +314,15 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     paddingVertical: 12,
     borderBottomWidth: 1,
-    borderBottomColor: '#eee',
+    borderBottomColor: colorScheme === 'dark' ? Colors.dark.text : Colors.light.text,
   },
   ingredientName: {
     fontSize: 16,
-    color: Colors.light.text,
+    color: colorScheme === 'dark' ? Colors.dark.text : Colors.light.text,
   },
   ingredientQuantity: {
     fontSize: 16,
-    color: '#666',
+    color: colorScheme === 'dark' ? Colors.dark.text : Colors.light.text,
   },
   errorText: {
     fontSize: 16,
@@ -309,6 +343,25 @@ const styles = StyleSheet.create({
   likeCount: {
     marginLeft: 5,
     fontSize: 16,
-    color: '#666',
+    color: colorScheme === 'dark' ? Colors.dark.text : Colors.light.text,
+  },
+  backButton: {
+    position: 'absolute',
+    top: 50,
+    left: 15,
+    zIndex: 10,
+    padding: 8,
+    borderRadius: 20,
+    backgroundColor: colorScheme === 'dark' ? 'rgba(0,0,0,0.5)' : 'rgba(255,255,255,0.5)',
+  },
+  modalContainer: {
+    flex: 1,
+    backgroundColor: 'rgba(0,0,0,0.9)',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  fullScreenImage: {
+    width: Dimensions.get('window').width,
+    height: Dimensions.get('window').height,
   },
 }); 

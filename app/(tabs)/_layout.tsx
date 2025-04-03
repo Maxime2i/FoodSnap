@@ -1,7 +1,7 @@
 import { Tabs } from "expo-router";
 import React, { useState } from "react";
 import { Dimensions, View, Text, TouchableOpacity } from "react-native";
-import { TabView, SceneMap, TabBar, Route } from "react-native-tab-view";
+import { TabView, SceneMap, TabBar } from "react-native-tab-view";
 import { useColorScheme } from "@/hooks/useColorScheme";
 import HomeScreen from ".";
 import ProfilScreen from "./profil";
@@ -9,23 +9,25 @@ import CaptureScreen from "./capture";
 import ReviewScreen from "./review";
 import FeedScreen from "./feed";
 import Feather from '@expo/vector-icons/Feather';
+import { Colors } from "@/constants/Colors";
 
+type TabRoute = {
+  key: string;
+  title: string;
+  icon: keyof typeof Feather.glyphMap;
+};
 
 const HomeRoute = () => <HomeScreen />;
-
 const ProfileRoute = () => <ProfilScreen />;
-
 const ReviewRoute = () => <ReviewScreen />;
-
 const FeedRoute = () => <FeedScreen />;
-
 const CaptureRoute = () => <CaptureScreen />;
 
 export default function TabLayout() {
   const colorScheme = useColorScheme();
 
   const [index, setIndex] = useState(0);
-  const [routes] = useState([
+  const [routes] = useState<TabRoute[]>([
     { key: "home", title: "Home", icon: "home" },
     { key: "feed", title: "Feed", icon: "list" },
     { key: "capture", title: "Capture", icon: "camera" },
@@ -42,22 +44,21 @@ export default function TabLayout() {
   });
 
   const renderTabBar = (props: any) => (
-    console.log(index),
     index === 2 ? null : (
     <TabBar
       {...props}
-      icon={({ route }: { route: { icon: any } }) => {
+      icon={({ route }: { route: TabRoute }) => {
         if (route.key === 'capture') {
           return <View style={{ height: 24 }} />;
         }
-        return <Feather name={route.icon} size={24} color={props.navigationState.index === props.navigationState.routes.findIndex(r => r.key === route.key) ? "#31AFF0" : "gray"} />;
+        return <Feather name={route.icon} size={24} color={props.navigationState.index === props.navigationState.routes.findIndex((r: TabRoute) => r.key === route.key) ? "#31AFF0" : "gray"} />;
       }}
       style={{ 
-        backgroundColor: "white", 
+        backgroundColor: colorScheme === 'dark' ? Colors.dark.background : Colors.light.background, 
         maxHeight: 50,
         elevation: 0,
         borderTopWidth: 1,
-        borderTopColor: '#f0f0f0'
+        borderTopColor: colorScheme === 'dark' ? Colors.dark.buttonInactive : Colors.light.buttonInactive
       }}
       activeColor="#31AFF0"
       indicatorStyle={{ backgroundColor: 'transparent' }}
@@ -120,9 +121,7 @@ export default function TabLayout() {
               elevation: 5
             }} 
             activeOpacity={1}
-            onPress={() => 
-              setIndex(2)
-            }
+            onPress={() => setIndex(2)}
           >
             <Feather name="camera" color="white" size={32} />
           </TouchableOpacity>

@@ -16,7 +16,7 @@ interface Plat {
   likes_count: number;
 }
 
-export default function ReviewScreen() {
+export default function MyMealsScreen() {
   const { user } = useAuth();
   const [plats, setPlats] = useState<Plat[]>([]);
   const [loading, setLoading] = useState(true);

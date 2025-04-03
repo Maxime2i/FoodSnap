@@ -24,7 +24,7 @@ export default function OnboardingStep1() {
       setError('Veuillez entrer des valeurs numériques valides');
       return;
     }
-console.log("step1", gender, age, height, weight);
+
     router.push({
       pathname: '/(onboarding)/step2',
       params: {
