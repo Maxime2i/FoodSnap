@@ -1,8 +1,8 @@
 import { StyleSheet, View, Text, Pressable, ScrollView, Switch, Image } from 'react-native';
-import { router } from 'expo-router';
+import { router, useFocusEffect } from 'expo-router';
 import { supabase } from '../../lib/supabase';
 import { useAuth } from '@/hooks/useAuth';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { UserProfile } from '@/types/auth';
 import { Colors } from '@/constants/Colors';
 import { Ionicons, MaterialIcons } from '@expo/vector-icons';
@@ -16,10 +16,6 @@ export default function ProfilScreen() {
   const [profile, setProfile] = useState<UserProfile | null>(null);
   const [loading, setLoading] = useState(true);
   const [notifications, setNotifications] = useState(true);
-
-  useEffect(() => {
-    fetchProfile();
-  }, [user]);
 
   const fetchProfile = async () => {
     if (!user) return;
@@ -39,6 +35,18 @@ export default function ProfilScreen() {
       setLoading(false);
     }
   };
+
+  // Charger le profil au montage initial
+  useEffect(() => {
+    fetchProfile();
+  }, [user]);
+
+  // Recharger le profil quand l'écran redevient actif
+  useFocusEffect(
+    useCallback(() => {
+      fetchProfile();
+    }, [user])
+  );
 
   const handleLogout = async () => {
     try {
@@ -88,7 +96,7 @@ export default function ProfilScreen() {
         <View style={getStyles(colorScheme).profileInfo}>
           <Text style={getStyles(colorScheme).name}>{profile?.first_name || 'Thomas'} {profile?.last_name || 'Martin'}</Text>
           <Text style={getStyles(colorScheme).objective}>Objectif: {profile?.goal ? getGoalLabel(profile.goal) : 'Prise de masse musculaire'}</Text>
-          <Pressable style={getStyles(colorScheme).editButton}>
+          <Pressable style={getStyles(colorScheme).editButton} onPress={() => router.push('/profilEdit')}>
             <Text style={getStyles(colorScheme).editButtonText}>Modifier le profil</Text>
           </Pressable>
         </View>

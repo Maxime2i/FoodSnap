@@ -44,7 +44,7 @@ export default function TabLayout() {
   });
 
   const renderTabBar = (props: any) => (
-    index === 2 ? null : (
+    // index === 2 ? null : (
     <TabBar
       {...props}
       icon={({ route }: { route: TabRoute }) => {
@@ -70,7 +70,7 @@ export default function TabLayout() {
         }
       }}
     />
-    )
+    // )
   );
 
   return (
@@ -94,7 +94,7 @@ export default function TabLayout() {
         style={{ marginBottom: 0 }}
         tabBarPosition="bottom"
       />
-      {index !== 2 && (
+      {/* {index !== 2 && ( */}
         <View style={{
           position: 'absolute',
           bottom: 5,
@@ -126,7 +126,7 @@ export default function TabLayout() {
             <Feather name="camera" color="white" size={32} />
           </TouchableOpacity>
         </View>
-      )}
+      {/* )} */}
     </View>
   );
 }
