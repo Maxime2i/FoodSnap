@@ -60,6 +60,9 @@ function LayoutContent() {
           <Stack.Screen name="meal-detail" options={{ headerShown: false }} />
           <Stack.Screen name="my-meals" options={{ headerShown: false }} />
           <Stack.Screen name="help" options={{ headerShown: false }} />
+          <Stack.Screen name="camera" options={{ headerShown: false }} />
+          <Stack.Screen name="barcode" options={{ headerShown: false }} />
+          <Stack.Screen name="profilEdit" options={{ headerShown: false }} />
           <Stack.Screen name="+not-found" options={{ title: 'Oops!' }} />
         </Stack>
         <StatusBar style="auto" />
