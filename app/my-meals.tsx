@@ -5,6 +5,7 @@ import { Colors } from '@/constants/Colors';
 import { router } from 'expo-router';
 import { useAuth } from '@/hooks/useAuth';
 import { Ionicons } from '@expo/vector-icons';
+import { useColorScheme } from '@/hooks/useColorScheme';
 
 interface Plat {
   id: string;
@@ -32,7 +33,8 @@ export default function MyMealsScreen() {
   const [plats, setPlats] = useState<Plat[]>([]);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
-
+  const colorScheme = useColorScheme();
+  
   const fetchPlats = async () => {
     if (!user) return;
 
@@ -75,53 +77,53 @@ export default function MyMealsScreen() {
 
   const renderPlat = ({ item }: { item: Plat }) => (
     <TouchableOpacity 
-      style={styles.card}
+      style={getStyles(colorScheme).card}
       onPress={() => router.push(`/meal-detail?id=${item.id}`)}
       activeOpacity={0.8}
     >
       <Image 
         source={{ uri: item.photo_url }} 
-        style={styles.photo}
+        style={getStyles(colorScheme).photo}
         resizeMode="cover"
       />
       {item.type && (
-        <View style={styles.cardOverlay}>
-          <View style={styles.typeContainer}>
-            <Text style={styles.typeText}>{item.type}</Text>
+        <View style={getStyles(colorScheme).cardOverlay}>
+          <View style={getStyles(colorScheme).typeContainer}>
+            <Text style={getStyles(colorScheme).typeText}>{item.type}</Text>
           </View>
         </View>
       )}
-      <View style={styles.cardContent}>
-        <View style={styles.titleContainer}>
+      <View style={getStyles(colorScheme).cardContent}>
+        <View style={getStyles(colorScheme).titleContainer}>
           <View>
-            <Text style={styles.cardTitle}>{item.name}</Text>
-            <Text style={styles.cardDescription}>{item.description}</Text>
+            <Text style={getStyles(colorScheme).cardTitle}>{item.name}</Text>
+            <Text style={getStyles(colorScheme).cardDescription}>{item.description}</Text>
           </View>
         </View>
-        <View style={styles.statsContainer}>
-          <View style={styles.macrosContainer}>
-            <View style={styles.macroItem}>
-              <Text style={[styles.macroValue, { color: MacroColors.calories }]}>{item.calories}</Text>
-              <Text style={[styles.macroLabel, { color: MacroColors.calories }]}>calories</Text>
+        <View style={getStyles(colorScheme).statsContainer}>
+          <View style={getStyles(colorScheme).macrosContainer}>
+            <View style={getStyles(colorScheme).macroItem}>
+              <Text style={[getStyles(colorScheme).macroValue, { color: MacroColors.calories }]}>{item.calories}</Text>
+              <Text style={[getStyles(colorScheme).macroLabel, { color: MacroColors.calories }]}>calories</Text>
             </View>
-            <View style={styles.macroItem}>
-              <Text style={[styles.macroValue, { color: MacroColors.glucides }]}>{item.glucides}g</Text>
-              <Text style={[styles.macroLabel, { color: MacroColors.glucides }]}>glucides</Text>
+            <View style={getStyles(colorScheme).macroItem}>
+              <Text style={[getStyles(colorScheme).macroValue, { color: MacroColors.glucides }]}>{item.glucides}g</Text>
+              <Text style={[getStyles(colorScheme).macroLabel, { color: MacroColors.glucides }]}>glucides</Text>
             </View>
-            <View style={styles.macroItem}>
-              <Text style={[styles.macroValue, { color: MacroColors.proteines }]}>{item.proteines}g</Text>
-              <Text style={[styles.macroLabel, { color: MacroColors.proteines }]}>protéines</Text>
+            <View style={getStyles(colorScheme).macroItem}>
+              <Text style={[getStyles(colorScheme).macroValue, { color: MacroColors.proteines }]}>{item.proteines}g</Text>
+              <Text style={[getStyles(colorScheme).macroLabel, { color: MacroColors.proteines }]}>protéines</Text>
             </View>
-            <View style={styles.macroItem}>
-              <Text style={[styles.macroValue, { color: MacroColors.lipides }]}>{item.lipides}g</Text>
-              <Text style={[styles.macroLabel, { color: MacroColors.lipides }]}>lipides</Text>
+            <View style={getStyles(colorScheme).macroItem}>
+              <Text style={[getStyles(colorScheme).macroValue, { color: MacroColors.lipides }]}>{item.lipides}g</Text>
+              <Text style={[getStyles(colorScheme).macroLabel, { color: MacroColors.lipides }]}>lipides</Text>
             </View>
           </View>
           <TouchableOpacity 
-            style={styles.voirButton}
+            style={getStyles(colorScheme).voirButton}
             onPress={() => router.push(`/meal-detail?id=${item.id}`)}
           >
-            <Text style={styles.voirText}>Voir</Text>
+            <Text style={getStyles(colorScheme).voirText}>Voir</Text>
             <Ionicons name="arrow-forward" size={16} color={Colors.light.tint} />
           </TouchableOpacity>
         </View>
@@ -131,7 +133,7 @@ export default function MyMealsScreen() {
 
   if (loading) {
     return (
-      <View style={styles.container}>
+      <View style={getStyles(colorScheme).container}>
         <ActivityIndicator size="large" color={Colors.light.tint} />
       </View>
     );
@@ -139,33 +141,33 @@ export default function MyMealsScreen() {
 
   if (plats.length === 0) {
     return (
-      <View style={[styles.container, styles.emptyContainer]}>
-        <View style={styles.header}>
-          <TouchableOpacity onPress={() => router.back()} style={styles.backButton}>
+      <View style={[getStyles(colorScheme).container, getStyles(colorScheme).emptyContainer]}>
+        <View style={getStyles(colorScheme).header}>
+          <TouchableOpacity onPress={() => router.back()} style={getStyles(colorScheme).backButton}>
             <Ionicons name="arrow-back" size={24} color={Colors.light.text} />
           </TouchableOpacity>
-          <Text style={styles.title}>Mes Repas</Text>
-          <View style={styles.backButton} />
+          <Text style={getStyles(colorScheme).title}>Mes Repas</Text>
+          <View style={getStyles(colorScheme).backButton} />
         </View>
-        <Text style={styles.emptyText}>Vous n'avez pas encore publié de plats</Text>
+        <Text style={getStyles(colorScheme).emptyText}>Vous n'avez pas encore publié de plats</Text>
       </View>
     );
   }
 
   return (
-    <View style={styles.container}>
-      <View style={styles.header}>
-        <TouchableOpacity onPress={() => router.back()} style={styles.backButton}>
-          <Ionicons name="arrow-back" size={24} color={Colors.light.text} />
+    <View style={getStyles(colorScheme).container}>
+      <View style={getStyles(colorScheme).header}>
+        <TouchableOpacity onPress={() => router.back()} style={getStyles(colorScheme).backButton}>
+          <Ionicons name="arrow-back" size={24} color={colorScheme === 'dark' ? Colors.dark.text : Colors.light.text} />
         </TouchableOpacity>
-        <Text style={styles.title}>Mes Repas</Text>
-        <View style={styles.backButton} />
+        <Text style={getStyles(colorScheme).title}>Mes Repas</Text>
+        <View style={getStyles(colorScheme).backButton} />
       </View>
       <FlatList
         data={plats}
         renderItem={renderPlat}
         keyExtractor={(item) => item.id}
-        contentContainerStyle={styles.list}
+        contentContainerStyle={getStyles(colorScheme).list}
         showsVerticalScrollIndicator={false}
         refreshControl={
           <RefreshControl
@@ -180,10 +182,10 @@ export default function MyMealsScreen() {
   );
 }
 
-const styles = StyleSheet.create({
+const getStyles = (colorScheme: 'light' | 'dark') => StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: Colors.light.background,
+    backgroundColor: colorScheme === 'dark' ? Colors.dark.background : Colors.light.background,
   },
   header: {
     flexDirection: 'row',
@@ -192,7 +194,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
     paddingTop: 60,
     paddingBottom: 20,
-    backgroundColor: Colors.light.background,
+    backgroundColor: colorScheme === 'dark' ? Colors.dark.background : Colors.light.background,
   },
   backButton: {
     width: 40,
@@ -203,7 +205,7 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 20,
     fontWeight: 'bold',
-    color: Colors.light.text,
+    color: colorScheme === 'dark' ? Colors.dark.text : Colors.light.text,
   },
   emptyContainer: {
     justifyContent: 'center',
@@ -211,17 +213,17 @@ const styles = StyleSheet.create({
   },
   emptyText: {
     fontSize: 16,
-    color: Colors.light.text,
+    color: colorScheme === 'dark' ? Colors.dark.text : Colors.light.text,
     textAlign: 'center',
   },
   list: {
     padding: 10,
   },
   card: {
-    backgroundColor: '#fff',
+    backgroundColor: colorScheme === 'dark' ? '#121212' : '#fff',
     borderRadius: 15,
     marginBottom: 15,
-    shadowColor: '#000',
+    shadowColor: colorScheme === 'dark' ? Colors.dark.text : Colors.light.text,
     shadowOffset: {
       width: 0,
       height: 2,
@@ -242,13 +244,13 @@ const styles = StyleSheet.create({
     padding: 12,
   },
   typeContainer: {
-    backgroundColor: '#E8F5E9',
+    backgroundColor: colorScheme === 'dark' ? '#121212' : '#E8F5E9',
     paddingHorizontal: 12,
     paddingVertical: 6,
     borderRadius: 20,
   },
   typeText: {
-    color: '#2E7D32',
+    color: colorScheme === 'dark' ? '#2E7D32' : '#2E7D32',
     fontSize: 14,
     fontWeight: '600',
   },
@@ -261,12 +263,12 @@ const styles = StyleSheet.create({
   cardTitle: {
     fontSize: 18,
     fontWeight: 'bold',
-    color: '#000',
+    color: colorScheme === 'dark' ? '#fff' : '#000',
     marginBottom: 4,
   },
   cardDescription: {
     fontSize: 14,
-    color: '#666',
+    color: colorScheme === 'dark' ? '#666' : '#000',
     lineHeight: 20,
   },
   statsContainer: {
