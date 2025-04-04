@@ -4,15 +4,15 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { useAuth } from '../context/AuthContext';
 import { format } from 'date-fns';
 import { fr } from 'date-fns/locale';
-import { router } from 'expo-router';
+import { router, useFocusEffect } from 'expo-router';
 import { useColorScheme } from "@/hooks/useColorScheme";
 import { Colors } from "@/constants/Colors";
-
-
+import { useState, useCallback } from 'react';
 
 export default function HomeScreen() {
-  const { user } = useAuth();
+  const { user, refreshUser } = useAuth();
   const colorScheme = useColorScheme();
+  const [loading, setLoading] = useState(false);
   const currentDate = new Date();
   const options: Intl.DateTimeFormatOptions = { 
     weekday: 'long', 
@@ -20,6 +20,25 @@ export default function HomeScreen() {
     month: 'long' 
   };
   const formattedDate = currentDate.toLocaleDateString('fr-FR', options);
+
+  const fetchData = useCallback(async () => {
+    if (!user) return;
+    setLoading(true);
+    try {
+      await refreshUser();
+    } catch (error) {
+      console.error('Erreur lors du rafraîchissement des données:', error);
+    } finally {
+      setLoading(false);
+    }
+  }, [user]);
+
+  // Recharger les données quand l'écran redevient actif
+  useFocusEffect(
+    useCallback(() => {
+      fetchData();
+    }, [user])
+  );
 
   // Calculer le total des calories et macronutriments pour aujourd'hui
   const todayMeals = user?.meals?.filter(meal => {
@@ -120,15 +139,30 @@ export default function HomeScreen() {
             <Image source={{ uri: meal.photo_url }} style={getStyles(colorScheme).mealIcon} />
             <View style={getStyles(colorScheme).mealInfo}>
               <Text style={getStyles(colorScheme).mealTitle}>{meal.name}</Text>
-              <Text style={getStyles(colorScheme).mealDetails}>
-                {format(new Date(meal.created_at), 'HH:mm', { locale: fr })} • {meal.glucides}g glucides
-              </Text>
+              <View style={getStyles(colorScheme).mealDetails}>
+              <Text style={getStyles(colorScheme).mealDetailsText}>{format(new Date(meal.created_at), 'HH:mm', { locale: fr })} • {meal.calories} kcal</Text>
+
+              <View style={getStyles(colorScheme).macroContainer}>
+                <View style={[getStyles(colorScheme).macroBadge, { backgroundColor: '#e8f0ff' }]}>
+                  <Text style={getStyles(colorScheme).macroText}>{meal.glucides}g G</Text>
+                </View>
+                <View style={[getStyles(colorScheme).macroBadge, { backgroundColor: '#e8fff0' }]}>
+                  <Text style={getStyles(colorScheme).macroText}>{meal.proteines}g P</Text>
+                </View>
+                <View style={[getStyles(colorScheme).macroBadge, { backgroundColor: '#fff8e8' }]}>
+                  <Text style={getStyles(colorScheme).macroText}>{meal.lipides}g L</Text>
+                </View>
+              </View>
+
+                
+              </View>
+             
             </View>
            
           </View>
         ))}
 
-        <TouchableOpacity style={getStyles(colorScheme).addMealButton}>
+        <TouchableOpacity style={getStyles(colorScheme).addMealButton} onPress={() => router.push('/capture')}>
           <Ionicons name="add" size={24} color="#4a90e2" />
           <Text style={getStyles(colorScheme).addMealText}>Ajouter un repas</Text>
         </TouchableOpacity>
@@ -292,7 +326,7 @@ const getStyles = (colorScheme: 'light' | 'dark') => StyleSheet.create({
     marginBottom: 12,
     flexDirection: 'row',
     alignItems: 'center',
-    shadowColor: '#000',
+    shadowColor: colorScheme === 'dark' ? Colors.dark.text : Colors.light.text,
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.1,
     shadowRadius: 8,
@@ -302,7 +336,7 @@ const getStyles = (colorScheme: 'light' | 'dark') => StyleSheet.create({
     width: 48,
     height: 48,
     borderRadius: 24,
-    backgroundColor: '#f0f0f0',
+    backgroundColor: colorScheme === 'dark' ? Colors.dark.background : Colors.light.background,
     marginRight: 16,
   },
   mealInfo: {
@@ -317,6 +351,8 @@ const getStyles = (colorScheme: 'light' | 'dark') => StyleSheet.create({
     fontSize: 14,
     color: colorScheme === 'dark' ? Colors.dark.text : Colors.light.text,
     marginTop: 4,
+    flexDirection: 'row',
+    justifyContent: 'space-between',
   },
   glucoseChange: {
     fontSize: 16,
@@ -339,5 +375,23 @@ const getStyles = (colorScheme: 'light' | 'dark') => StyleSheet.create({
     fontSize: 16,
     color: colorScheme === 'dark' ? Colors.dark.text : Colors.light.text,
     marginLeft: 8,
+  },
+  macroContainer: {
+    flexDirection: 'row',
+    gap: 4,
+  },
+  macroBadge: {
+    paddingHorizontal: 8,
+    paddingVertical: 4,
+    borderRadius: 12,
+  },
+  macroText: {
+    fontSize: 10,
+    fontWeight: '600',
+    color: colorScheme === 'dark' ? Colors.dark.background : Colors.light.text,
+  },
+  mealDetailsText: {
+    fontSize: 14,
+    color: colorScheme === 'dark' ? Colors.dark.text : Colors.light.text,
   },
 });

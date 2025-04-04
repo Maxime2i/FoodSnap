@@ -20,9 +20,14 @@ type AuthContextType = {
     meals: Meal[];
   } | null;
   loading: boolean;
+  refreshUser: () => Promise<void>;
 };
 
-const AuthContext = createContext<AuthContextType>({ user: null, loading: true });
+const AuthContext = createContext<AuthContextType>({ 
+  user: null, 
+  loading: true,
+  refreshUser: async () => {} 
+});
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<AuthContextType['user']>(null);
@@ -48,7 +53,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       .from('plats')
       .select('*')
       .eq('user_id', userId)
-      .order('created_at', { ascending: true })
+      .order('created_at', { ascending: false })
       .limit(10);
 
     if (error) {
@@ -76,6 +81,19 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       setUser(null);
     }
     setLoading(false);
+  };
+
+  const refreshUser = async () => {
+    if (!user) return;
+    const [first_name, meals] = await Promise.all([
+      fetchUserProfile(user.id),
+      fetchUserMeals(user.id)
+    ]);
+    setUser(prev => prev ? {
+      ...prev,
+      first_name: first_name || prev.first_name,
+      meals
+    } : null);
   };
 
   useEffect(() => {
@@ -118,7 +136,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   }, [user?.id]);
 
   return (
-    <AuthContext.Provider value={{ user, loading }}>
+    <AuthContext.Provider value={{ user, loading, refreshUser }}>
       {children}
     </AuthContext.Provider>
   );
