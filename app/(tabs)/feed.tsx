@@ -319,7 +319,7 @@ const getStyles = (colorScheme: string) =>
       borderRadius: 12,
       marginBottom: 15,
       overflow: "hidden",
-      shadowColor: "#000",
+      shadowColor: colorScheme === 'dark' ? Colors.dark.text : Colors.light.text,
       shadowOffset: {
         width: 0,
         height: 2,

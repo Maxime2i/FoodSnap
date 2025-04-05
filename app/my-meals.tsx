@@ -97,7 +97,7 @@ export default function MyMealsScreen() {
         <View style={getStyles(colorScheme).titleContainer}>
           <View>
             <Text style={getStyles(colorScheme).cardTitle}>{item.name}</Text>
-            <Text style={getStyles(colorScheme).cardDescription}>{item.description}</Text>
+            {item.description && <Text style={getStyles(colorScheme).cardDescription}>{item.description}</Text>}
           </View>
         </View>
         <View style={getStyles(colorScheme).statsContainer}>

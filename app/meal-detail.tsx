@@ -14,6 +14,8 @@ interface Ingredient {
 
 interface PlatDetail {
   id: string;
+  name: string;
+  description: string;
   photo_url: string;
   calories: number;
   proteines: number;
@@ -182,9 +184,12 @@ export default function PlatDetailScreen() {
         </TouchableOpacity>
         
         <View style={getStyles(colorScheme).headerContainer}>
-          <Text style={getStyles(colorScheme).userName}>
-            {plat.user_profile?.first_name} {plat.user_profile?.last_name}
-          </Text>
+          <View style={getStyles(colorScheme).titleContainer}>
+            <Text style={getStyles(colorScheme).platName}>{plat.name}</Text>
+            <Text style={getStyles(colorScheme).userName}>
+              {plat.user_profile?.first_name} {plat.user_profile?.last_name}
+            </Text>
+          </View>
           <TouchableOpacity 
             style={getStyles(colorScheme).likeButton} 
             onPress={handleLike}
@@ -202,37 +207,51 @@ export default function PlatDetailScreen() {
         <View style={getStyles(colorScheme).macrosContainer}>
           <Text style={getStyles(colorScheme).sectionTitle}>Valeurs nutritionnelles</Text>
           <View style={getStyles(colorScheme).macrosGrid}>
-            <View style={getStyles(colorScheme).macroItem}>
-              <Text style={getStyles(colorScheme).macroValue}>{plat.calories}</Text>
+            <View style={[getStyles(colorScheme).macroItem, {backgroundColor: "#ffd8a1"}]}>
               <Text style={getStyles(colorScheme).macroLabel}>Calories</Text>
+              <Text style={getStyles(colorScheme).macroValue}>{plat.calories}</Text>
+              <Text style={getStyles(colorScheme).macroUnit}>kcal</Text>
             </View>
-            <View style={getStyles(colorScheme).macroItem}>
-              <Text style={getStyles(colorScheme).macroValue}>{plat.proteines}g</Text>
-              <Text style={getStyles(colorScheme).macroLabel}>Protéines</Text>
-            </View>
-            <View style={getStyles(colorScheme).macroItem}>
-              <Text style={getStyles(colorScheme).macroValue}>{plat.glucides}g</Text>
+            <View style={[getStyles(colorScheme).macroItem, {backgroundColor: "#e8f0ff"}]}>
               <Text style={getStyles(colorScheme).macroLabel}>Glucides</Text>
+              <Text style={getStyles(colorScheme).macroValue}>{plat.glucides}</Text>
+              <Text style={getStyles(colorScheme).macroUnit}>g</Text>
             </View>
-            <View style={getStyles(colorScheme).macroItem}>
-              <Text style={getStyles(colorScheme).macroValue}>{plat.lipides}g</Text>
+            <View style={[getStyles(colorScheme).macroItem, {backgroundColor: "#e8fff0"}]}>
+              <Text style={getStyles(colorScheme).macroLabel}>Protéines</Text>
+              <Text style={getStyles(colorScheme).macroValue}>{plat.proteines}</Text>
+              <Text style={getStyles(colorScheme).macroUnit}>g</Text>
+            </View>
+            <View style={[getStyles(colorScheme).macroItem, {backgroundColor: "#fff8e8"}]}>
               <Text style={getStyles(colorScheme).macroLabel}>Lipides</Text>
+              <Text style={getStyles(colorScheme).macroValue}>{plat.lipides}</Text>
+              <Text style={getStyles(colorScheme).macroUnit}>g</Text>
             </View>
           </View>
         </View>
 
-        <View style={getStyles(colorScheme).ingredientsContainer}>
-          <Text style={getStyles(colorScheme).sectionTitle}>Ingrédients</Text>
-          {plat.ingredients.map((ingredient, index) => (
-            <View key={index} style={getStyles(colorScheme).ingredientItem}>
-              <Text style={getStyles(colorScheme).ingredientName}>{ingredient.nom}</Text>
-              <Text style={getStyles(colorScheme).ingredientQuantity}>
-                {ingredient.quantite} {ingredient.unite}
-              </Text>
-            </View>
-          ))}
-        </View>
+        {plat.description && (
+          <View style={getStyles(colorScheme).descriptionContainer}>
+            <Text style={getStyles(colorScheme).sectionTitle}>Description</Text>
+            <Text style={getStyles(colorScheme).descriptionText}>{plat.description}</Text>
+          </View>
+        )}
+
+        {plat.ingredients.length > 0 && (
+          <View style={getStyles(colorScheme).ingredientsContainer}>
+            <Text style={getStyles(colorScheme).sectionTitle}>Ingrédients</Text>
+            {plat.ingredients.map((ingredient, index) => (
+              <View key={index} style={getStyles(colorScheme).ingredientItem}>
+                <Text style={getStyles(colorScheme).ingredientBullet}>•</Text>
+                <Text style={getStyles(colorScheme).ingredientText}>
+                  {ingredient.quantite} {ingredient.unite} {ingredient.nom}
+                </Text>
+              </View>
+            ))}
+          </View>
+        )}
       </ScrollView>
+
 
       <Modal
         visible={isImageModalVisible}
@@ -268,15 +287,27 @@ const getStyles = (colorScheme: 'light' | 'dark') => StyleSheet.create({
     height: 250,
   },
   userName: {
-    fontSize: 20,
+    fontSize: 16,
+    color: colorScheme === 'dark' ? Colors.dark.text : '#666666',
+  },
+  titleContainer: {
+    flex: 1,
+    marginRight: 15,
+  },
+  platName: {
+    fontSize: 24,
     fontWeight: 'bold',
-    padding: 15,
     color: colorScheme === 'dark' ? Colors.dark.text : Colors.light.text,
+    marginBottom: 4,
   },
   macrosContainer: {
-    padding: 15,
+    padding: 6,
+    margin: 10,
     backgroundColor: colorScheme === 'dark' ? Colors.dark.background : Colors.light.background,
     marginBottom: 10,
+    borderRadius: 10,
+    borderWidth: 0.5,
+    borderColor: colorScheme === 'dark' ? Colors.dark.text : Colors.light.text,
   },
   sectionTitle: {
     fontSize: 18,
@@ -286,23 +317,43 @@ const getStyles = (colorScheme: 'light' | 'dark') => StyleSheet.create({
   },
   macrosGrid: {
     flexDirection: 'row',
-    justifyContent: 'space-between',
+    justifyContent: 'center',
     backgroundColor: colorScheme === 'dark' ? Colors.dark.background : Colors.light.background,
     padding: 15,
     borderRadius: 10,
+    gap: 6,
+    alignItems: 'center',
   },
   macroItem: {
     alignItems: 'center',
+    padding: 6,
+    borderRadius: 8,
+    minWidth: 80,
   },
   macroValue: {
-    fontSize: 18,
+    fontSize: 20,
     fontWeight: 'bold',
-    color: colorScheme === 'dark' ? Colors.dark.tint : Colors.light.tint,
+    color: '#000000',
   },
   macroLabel: {
-    fontSize: 12,
-    color: colorScheme === 'dark' ? Colors.dark.text : Colors.light.text,
+    fontSize: 14,
+    color: '#666666',
     marginTop: 4,
+  },
+  macroUnit: {
+    fontSize: 14,
+    color: '#666666',
+    marginTop: 4,
+  },
+  descriptionContainer: {
+    padding: 15,
+    backgroundColor: colorScheme === 'dark' ? Colors.dark.background : Colors.light.background,
+    marginBottom: 15,
+  },
+  descriptionText: {
+    fontSize: 16,
+    color: colorScheme === 'dark' ? Colors.dark.text : Colors.light.text,
+    lineHeight: 24,
   },
   ingredientsContainer: {
     padding: 15,
@@ -310,19 +361,18 @@ const getStyles = (colorScheme: 'light' | 'dark') => StyleSheet.create({
   },
   ingredientItem: {
     flexDirection: 'row',
-    justifyContent: 'space-between',
     alignItems: 'center',
-    paddingVertical: 12,
-    borderBottomWidth: 1,
-    borderBottomColor: colorScheme === 'dark' ? Colors.dark.text : Colors.light.text,
+    paddingVertical: 8,
   },
-  ingredientName: {
-    fontSize: 16,
-    color: colorScheme === 'dark' ? Colors.dark.text : Colors.light.text,
+  ingredientBullet: {
+    fontSize: 20,
+    color: '#666666',
+    marginRight: 10,
   },
-  ingredientQuantity: {
+  ingredientText: {
     fontSize: 16,
-    color: colorScheme === 'dark' ? Colors.dark.text : Colors.light.text,
+    color: '#666666',
+    flex: 1,
   },
   errorText: {
     fontSize: 16,

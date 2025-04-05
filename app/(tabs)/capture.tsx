@@ -242,26 +242,26 @@ export default function CaptureScreen() {
               <View style={getStyles(colorScheme).macrosContainer}>
                 <View style={getStyles(colorScheme).macroItem}>
                   <View>
-                    <Text style={getStyles(colorScheme).macroValue}>
-                      {selectedFood.calories}
+                    <Text style={[getStyles(colorScheme).macroValue, { color: '#ff9500' }]}>
+                      {selectedFood.calories}Kcal
                     </Text>
                     <Text style={getStyles(colorScheme).macroLabel}>kcal</Text>
                   </View>
                 </View>
                 <View style={getStyles(colorScheme).macroItem}>
                   <View>
-                    <Text style={getStyles(colorScheme).macroValue}>
-                      {selectedFood.protein}
+                    <Text style={[getStyles(colorScheme).macroValue, { color: '#4a90e2' }]}>
+                      {selectedFood.protein}g
                     </Text>
-                    <Text style={getStyles(colorScheme).macroLabel}>
+                    <Text style={[getStyles(colorScheme).macroLabel]}>
                       Protéines
                     </Text>
                   </View>
                 </View>
                 <View style={getStyles(colorScheme).macroItem}>
                   <View>
-                    <Text style={getStyles(colorScheme).macroValue}>
-                      {selectedFood.carbohydrates}
+                    <Text style={[getStyles(colorScheme).macroValue, { color: '#2ecc71' }]}>
+                      {selectedFood.carbohydrates}g
                     </Text>
                     <Text style={getStyles(colorScheme).macroLabel}>
                       Glucides
@@ -270,10 +270,10 @@ export default function CaptureScreen() {
                 </View>
                 <View style={getStyles(colorScheme).macroItem}>
                   <View>
-                    <Text style={getStyles(colorScheme).macroValue}>
-                      {selectedFood.fat}
+                    <Text style={[getStyles(colorScheme).macroValue, { color: '#f1c40f' }]}>
+                      {selectedFood.fat}g
                     </Text>
-                    <Text style={getStyles(colorScheme).macroLabel}>
+                    <Text style={[getStyles(colorScheme).macroLabel]}>
                       Lipides
                     </Text>
                   </View>
