@@ -103,19 +103,6 @@ export default function ProfilScreen() {
 
       <Pressable style={getStyles(colorScheme).menuItem}>
         <View style={getStyles(colorScheme).menuItemLeft}>
-          <View style={[getStyles(colorScheme).iconContainer, { backgroundColor: '#E8F1FF' }]}>
-            <Ionicons name="phone-portrait-outline" size={24} color="#4A90E2" />
-          </View>
-          <View>
-            <Text style={getStyles(colorScheme).menuItemTitle}>Appareils connectés</Text>
-            <Text style={getStyles(colorScheme).menuItemSubtitle}>Montre connectée, balance intelligente</Text>
-          </View>
-        </View>
-        <Ionicons name="chevron-forward" size={24} color="#999" />
-      </Pressable>
-
-      <Pressable style={getStyles(colorScheme).menuItem}>
-        <View style={getStyles(colorScheme).menuItemLeft}>
           <View style={[getStyles(colorScheme).iconContainer, { backgroundColor: '#E8FFE8' }]}>
             <Ionicons name="stats-chart" size={24} color="#4CAF50" />
           </View>
@@ -135,6 +122,19 @@ export default function ProfilScreen() {
           <View>
             <Text style={getStyles(colorScheme).menuItemTitle}>Préférences alimentaires</Text>
             <Text style={getStyles(colorScheme).menuItemSubtitle}>Allergies, régimes spécifiques</Text>
+          </View>
+        </View>
+        <Ionicons name="chevron-forward" size={24} color="#999" />
+      </Pressable>
+
+      <Pressable style={getStyles(colorScheme).menuItem} onPress={() => router.push('/liked-meals')}>
+        <View style={getStyles(colorScheme).menuItemLeft}>
+          <View style={[getStyles(colorScheme).iconContainer, { backgroundColor: '#E8F1FF' }]}>
+            <Ionicons name="heart-outline" size={24} color="#4A90E2" />
+          </View>
+          <View>
+            <Text style={getStyles(colorScheme).menuItemTitle}>Plats likés</Text>
+            <Text style={getStyles(colorScheme).menuItemSubtitle}>Voir les plats que vous aimez</Text>
           </View>
         </View>
         <Ionicons name="chevron-forward" size={24} color="#999" />

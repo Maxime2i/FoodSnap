@@ -38,41 +38,45 @@ interface Plat {
   likes_count: number;
 }
 
-const MacroColors = {
-  calories: "#FF6B6B", // Rouge
-  glucides: "#4a90e2", // Turquoise
-  proteines: "#f1c40f", // Bleu
-  lipides: "#2ecc71", // Vert
-};
-
-export default function FeedScreen() {
+export default function LikedMealsScreen() {
   const { user } = useAuth();
   const [plats, setPlats] = useState<Plat[]>([]);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
-  const [likedPlats, setLikedPlats] = useState<Set<string>>(new Set());
   const colorScheme = useColorScheme();
 
-  const fetchPlats = async () => {
+  const fetchLikedPlats = async () => {
     if (!user) return;
 
     try {
-      // 1. Récupérer tous les plats publiés sauf ceux de l'utilisateur connecté
+      // 1. Récupérer les IDs des plats likés par l'utilisateur
+      const { data: likedPlatsData, error: likesError } = await supabase
+        .from("likes")
+        .select("plat_id")
+        .eq("user_id", user.id);
+
+      if (likesError) throw likesError;
+
+      const likedPlatsIds = likedPlatsData.map(like => like.plat_id);
+
+      if (likedPlatsIds.length === 0) {
+        setPlats([]);
+        return;
+      }
+
+      // 2. Récupérer les détails des plats likés
       const { data: platsData, error: platsError } = await supabase
         .from("plats")
-        .select(
-          `
+        .select(`
           *,
           likes:likes(count)
-        `
-        )
-        .neq("user_id", user.id)
-        .eq("is_published", true)
+        `)
+        .in("id", likedPlatsIds)
         .order("created_at", { ascending: false });
 
       if (platsError) throw platsError;
 
-      // 2. Pour chaque plat, récupérer le profil de l'utilisateur
+      // 3. Pour chaque plat, récupérer le profil de l'utilisateur
       const platsWithProfiles = await Promise.all(
         (platsData || []).map(async (plat) => {
           const { data: profileData, error: profileError } = await supabase
@@ -93,88 +97,21 @@ export default function FeedScreen() {
 
       setPlats(platsWithProfiles);
     } catch (error) {
-      console.error("Erreur lors de la récupération des plats:", error);
-    }
-  };
-
-  const fetchUserLikes = async () => {
-    if (!user) return;
-
-    try {
-      const { data: likes, error } = await supabase
-        .from("likes")
-        .select("plat_id")
-        .eq("user_id", user.id);
-
-      if (error) throw error;
-
-      setLikedPlats(new Set(likes?.map((like) => like.plat_id)));
-    } catch (error) {
-      console.error("Erreur lors de la récupération des likes:", error);
-    }
-  };
-
-  const toggleLike = async (platId: string) => {
-    if (!user) return;
-
-    try {
-      const isLiked = likedPlats.has(platId);
-
-      if (isLiked) {
-        // Supprimer le like
-        await supabase
-          .from("likes")
-          .delete()
-          .eq("plat_id", platId)
-          .eq("user_id", user.id);
-
-        setLikedPlats((prev) => {
-          const newSet = new Set(prev);
-          newSet.delete(platId);
-          return newSet;
-        });
-
-        setPlats((prev) =>
-          prev.map((plat) =>
-            plat.id === platId
-              ? { ...plat, likes_count: Math.max(0, plat.likes_count - 1) }
-              : plat
-          )
-        );
-      } else {
-        // Ajouter le like
-        await supabase
-          .from("likes")
-          .insert([{ plat_id: platId, user_id: user.id }]);
-
-        setLikedPlats((prev) => new Set([...prev, platId]));
-
-        setPlats((prev) =>
-          prev.map((plat) =>
-            plat.id === platId
-              ? { ...plat, likes_count: plat.likes_count + 1 }
-              : plat
-          )
-        );
-      }
-    } catch (error) {
-      console.error("Erreur lors du like/unlike:", error);
+      console.error("Erreur lors de la récupération des plats likés:", error);
     }
   };
 
   const fetchData = useCallback(async () => {
     if (!user) return;
     setLoading(true);
-    await Promise.all([fetchPlats(), fetchUserLikes()]);
+    await fetchLikedPlats();
     setLoading(false);
   }, [user]);
 
-  // Charger les données au montage initial
   useEffect(() => {
     fetchData();
   }, [user]);
 
-  // Recharger les données quand l'écran redevient actif
   useFocusEffect(
     useCallback(() => {
       fetchData();
@@ -192,7 +129,6 @@ export default function FeedScreen() {
       onPress={() => router.push(`/meal-detail?id=${item.id}`)}
       activeOpacity={0.8}
     >
-
       <Image
         source={{ uri: item.photo_url }}
         style={getStyles(colorScheme).photo}
@@ -266,7 +202,7 @@ export default function FeedScreen() {
         ]}
       >
         <Text style={getStyles(colorScheme).emptyText}>
-          Aucun plat à afficher pour le moment
+          Vous n'avez pas encore liké de plats
         </Text>
       </View>
     );
@@ -275,7 +211,17 @@ export default function FeedScreen() {
   return (
     <View style={getStyles(colorScheme).container}>
       <View style={getStyles(colorScheme).header}>
-        <Text style={getStyles(colorScheme).title}>Feed</Text>
+        <TouchableOpacity
+          style={getStyles(colorScheme).backButton}
+          onPress={() => router.back()}
+        >
+          <Ionicons
+            name="arrow-back"
+            size={24}
+            color={colorScheme === 'dark' ? Colors.dark.text : Colors.light.text}
+          />
+        </TouchableOpacity>
+        <Text style={getStyles(colorScheme).title}>Mes plats favoris</Text>
       </View>
       <FlatList
         data={plats}
@@ -416,15 +362,22 @@ const getStyles = (colorScheme: string) =>
     header: {
       flexDirection: "row",
       alignItems: "center",
-      justifyContent: "center",
       paddingHorizontal: 16,
       paddingTop: 30,
       paddingBottom: 10,
       backgroundColor: colorScheme === 'dark' ? Colors.dark.background : Colors.light.background,
     },
+    backButton: {
+      position: 'absolute',
+      left: 16,
+      top: 30,
+      zIndex: 1,
+    },
     title: {
       fontSize: 20,
       fontWeight: "bold",
       color: colorScheme === 'dark' ? Colors.dark.text : Colors.light.text,
+      flex: 1,
+      textAlign: 'center',
     },
   });
