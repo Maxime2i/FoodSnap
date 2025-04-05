@@ -20,6 +20,7 @@ export const Colors = {
     buttonInactive: '#e5e7eb',
     buttonTextInactive: '#4b5563',
     border: '#e5e7eb',
+    card: '#ffffff',
   },
   dark: {
     text: '#ECEDEE',
@@ -34,5 +35,6 @@ export const Colors = {
     buttonInactive: '#374151',
     buttonTextInactive: '#9ca3af',
     border: '#374151',
+    card: '#1E2021',
   },
 };
