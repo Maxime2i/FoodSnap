@@ -19,6 +19,7 @@ export const Colors = {
     error: '#dc2626',
     buttonInactive: '#e5e7eb',
     buttonTextInactive: '#4b5563',
+    border: '#e5e7eb',
   },
   dark: {
     text: '#ECEDEE',
@@ -32,5 +33,6 @@ export const Colors = {
     error: '#ef4444',
     buttonInactive: '#374151',
     buttonTextInactive: '#9ca3af',
+    border: '#374151',
   },
 };
