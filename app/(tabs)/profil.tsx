@@ -81,15 +81,12 @@ export default function ProfilScreen() {
     <ScrollView style={getStyles(colorScheme).container}>
       <View style={getStyles(colorScheme).titleContainer}>
         <Text style={getStyles(colorScheme).titleText}>Profil</Text>
-        <Pressable style={getStyles(colorScheme).settingsButton}>
-          <Ionicons name="settings-outline" size={24} color={colorScheme === 'dark' ? Colors.dark.text : Colors.light.text} />
-        </Pressable>
       </View>
 
       <View style={getStyles(colorScheme).header}>
         <View style={getStyles(colorScheme).profileImageContainer}>
           <Image 
-            source={require('@/assets/images/defaultProfilPicture.png')} 
+            source={profile?.avatar_url ? { uri: profile.avatar_url } : require('@/assets/images/defaultProfilPicture.png')} 
             style={getStyles(colorScheme).profileImage} 
           />
         </View>
@@ -157,13 +154,13 @@ export default function ProfilScreen() {
         </View>
         <View style={{ flexDirection: 'row', gap: 10 }}>
 
-          {!isSystemTheme && (
+       
             <Switch
               value={theme === 'dark'}
               onValueChange={(value) => setTheme(value ? 'dark' : 'light')}
               trackColor={{ false: '#D1D1D6', true: '#4A90E2' }}
             />
-          )}
+     
         </View>
       </View>
 
@@ -239,6 +236,7 @@ const getStyles = (colorScheme: 'light' | 'dark') => StyleSheet.create({
     flexDirection: 'row',
     padding: 20,
     paddingTop: 10,
+    paddingBottom: 10,
     alignItems: 'flex-start',
   },
   profileImageContainer: {
@@ -258,15 +256,15 @@ const getStyles = (colorScheme: 'light' | 'dark') => StyleSheet.create({
     fontSize: 26,
     fontWeight: 'bold',
     color: colorScheme === 'dark' ? Colors.dark.text : Colors.light.text,
-    marginBottom: 8,
+    marginBottom: 4,
   },
   objective: {
     fontSize: 16,
     color: colorScheme === 'dark' ? Colors.dark.icon : Colors.light.icon,
-    marginBottom: 12,
+    marginBottom: 4,
   },
   editButton: {
-    paddingVertical: 6,
+    paddingVertical: 0,
     paddingHorizontal: 0,
     alignSelf: 'flex-start',
   },

@@ -19,6 +19,7 @@ import { Ionicons } from "@expo/vector-icons";
 interface Profile {
   first_name: string;
   last_name: string;
+  avatar_url: string;
 }
 
 interface Plat {
@@ -76,7 +77,7 @@ export default function FeedScreen() {
         (platsData || []).map(async (plat) => {
           const { data: profileData, error: profileError } = await supabase
             .from("profiles")
-            .select("first_name, last_name")
+            .select("first_name, last_name, avatar_url")
             .eq("id", plat.user_id)
             .single();
 
@@ -191,90 +192,46 @@ export default function FeedScreen() {
       onPress={() => router.push(`/meal-detail?id=${item.id}`)}
       activeOpacity={0.8}
     >
+
       <Image
         source={{ uri: item.photo_url }}
         style={getStyles(colorScheme).photo}
         resizeMode="cover"
       />
-      {item.type && (
-        <View style={getStyles(colorScheme).cardOverlay}>
+   
+      <View style={getStyles(colorScheme).cardHeader}>
+        <View style={getStyles(colorScheme).userInfo}>
+          <Image
+            source={item.user_profile?.avatar_url ? { uri: item.user_profile?.avatar_url } : require("@/assets/images/defaultProfilPicture.png")}
+            style={getStyles(colorScheme).userAvatar}
+          />
+          <Text style={getStyles(colorScheme).userName}>{item.user_profile?.first_name} {item.user_profile?.last_name}</Text>
+        </View>
+        {item.type && (
           <View style={getStyles(colorScheme).typeContainer}>
             <Text style={getStyles(colorScheme).typeText}>{item.type}</Text>
           </View>
-        </View>
-      )}
+        )}
+      </View>
+
       <View style={getStyles(colorScheme).cardContent}>
-        <View style={getStyles(colorScheme).titleContainer}>
-          <View style={getStyles(colorScheme).titleRow}>
-            <View>
-              <Text style={getStyles(colorScheme).userName}>
-                {item.user_profile?.first_name} {item.user_profile?.last_name}
-              </Text>
-              <Text style={getStyles(colorScheme).cardTitle}>{item.name}</Text>
-              <Text style={getStyles(colorScheme).cardDescription}>
-                {item.description}
-              </Text>
-            </View>
-            <TouchableOpacity
-              style={getStyles(colorScheme).likeButton}
-              onPress={(e) => {
-                e.stopPropagation();
-                toggleLike(item.id);
-              }}
-            >
-              <Ionicons
-                name={likedPlats.has(item.id) ? "heart" : "heart-outline"}
-                size={24}
-                color={likedPlats.has(item.id) ? "#FF6B6B" : colorScheme === 'dark' ? Colors.dark.text : Colors.light.text}
-              />
-              <Text style={getStyles(colorScheme).likeCount}>
-                {item.likes_count}
-              </Text>
-            </TouchableOpacity>
+        <Text style={getStyles(colorScheme).cardTitle}>{item.name}</Text>
+        <Text style={getStyles(colorScheme).cardDescription}>
+          {item.description}
+        </Text>
+
+        <View style={getStyles(colorScheme).macroContainer}>
+          <View style={[getStyles(colorScheme).macroItem, {backgroundColor: "#ffd8a1"}]}>
+            <Text style={[getStyles(colorScheme).macroValue, {color: "#ff9500"}]}>{item.calories}kcal C</Text>
           </View>
-        </View>
-        <View style={getStyles(colorScheme).statsContainer}>
-          <View style={getStyles(colorScheme).macroContainer}>
-            <View
-              style={[
-                getStyles(colorScheme).macroBadge,
-                { backgroundColor: "#fcce8d" },
-              ]}
-            >
-              <Text style={getStyles(colorScheme).macroText}>
-                {item.calories}kcal
-              </Text>
-            </View>
-            <View
-              style={[
-                getStyles(colorScheme).macroBadge,
-                { backgroundColor: "#e8f0ff" },
-              ]}
-            >
-              <Text style={getStyles(colorScheme).macroText}>
-                {item.glucides}g G
-              </Text>
-            </View>
-            <View
-              style={[
-                getStyles(colorScheme).macroBadge,
-                { backgroundColor: "#e8fff0" },
-              ]}
-            >
-              <Text style={getStyles(colorScheme).macroText}>
-                {item.proteines}g P
-              </Text>
-            </View>
-            <View
-              style={[
-                getStyles(colorScheme).macroBadge,
-                { backgroundColor: "#fff8e8" },
-              ]}
-            >
-              <Text style={getStyles(colorScheme).macroText}>
-                {item.lipides}g L
-              </Text>
-            </View>
+          <View style={[getStyles(colorScheme).macroItem, {backgroundColor: "#e8f0ff"}]}>
+            <Text style={[getStyles(colorScheme).macroValue, {color: "#4a90e2"}]}>{item.glucides}g G</Text>
+          </View>
+          <View style={[getStyles(colorScheme).macroItem, {backgroundColor: "#e8fff0"}]}>
+            <Text style={[getStyles(colorScheme).macroValue, {color: "#2ecc71"}]}>{item.proteines}g P</Text>
+          </View>
+          <View style={[getStyles(colorScheme).macroItem, {backgroundColor: "#fff8e8"}]}>
+            <Text style={[getStyles(colorScheme).macroValue, {color: "#f1c40f"}]}>{item.lipides}g L</Text>
           </View>
           <TouchableOpacity
             style={getStyles(colorScheme).voirButton}
@@ -284,7 +241,7 @@ export default function FeedScreen() {
             <Ionicons
               name="arrow-forward"
               size={16}
-              color={Colors.light.tint}
+              color={colorScheme === 'dark' ? Colors.dark.primary : Colors.light.primary}
             />
           </TouchableOpacity>
         </View>
@@ -359,9 +316,10 @@ const getStyles = (colorScheme: string) =>
     },
     card: {
       backgroundColor: colorScheme === 'dark' ? Colors.dark.background : Colors.light.background,
-      borderRadius: 15,
+      borderRadius: 12,
       marginBottom: 15,
-      shadowColor: colorScheme === 'dark' ? Colors.dark.text : Colors.light.text,
+      overflow: "hidden",
+      shadowColor: "#000",
       shadowOffset: {
         width: 0,
         height: 2,
@@ -369,17 +327,29 @@ const getStyles = (colorScheme: string) =>
       shadowOpacity: 0.1,
       shadowRadius: 3.84,
       elevation: 5,
-      overflow: "hidden",
     },
-    photo: {
-      width: "100%",
-      height: 200,
+    cardHeader: {
+      flexDirection: "row",
+      justifyContent: "space-between",
+      alignItems: "center",
+      padding: 16,
+      paddingTop: 0,
+      paddingBottom: 8,
     },
-    cardOverlay: {
-      position: "absolute",
-      top: 0,
-      right: 0,
-      padding: 12,
+    userInfo: {
+      flexDirection: "row",
+      alignItems: "center",
+    },
+    userAvatar: {
+      width: 30,
+      height: 30,
+      borderRadius: 15,
+      marginRight: 8,
+    },
+    userName: {
+      fontSize: 14,
+      color: colorScheme === 'dark' ? Colors.dark.text : Colors.light.text,
+      fontWeight: "500",
     },
     typeContainer: {
       backgroundColor: "#E8F5E9",
@@ -390,71 +360,48 @@ const getStyles = (colorScheme: string) =>
     typeText: {
       color: "#2E7D32",
       fontSize: 14,
-      fontWeight: "600",
+      fontWeight: "500",
+    },
+    photo: {
+      width: "100%",
+      height: 200,
+      marginBottom: 16,
     },
     cardContent: {
       padding: 16,
-    },
-    titleContainer: {
-      marginBottom: 12,
-    },
-    titleRow: {
-      flexDirection: "row",
-      justifyContent: "space-between",
-      alignItems: "flex-start",
-    },
-    userName: {
-      fontSize: 14,
-      color: colorScheme === 'dark' ? Colors.dark.text : Colors.light.text,
-      marginBottom: 4,
+      paddingTop: 0,
+      gap: 8,
     },
     cardTitle: {
-      fontSize: 18,
-      fontWeight: "bold",
+      fontSize: 16,
+      fontWeight: "600",
       color: colorScheme === 'dark' ? Colors.dark.text : Colors.light.text,
-      marginBottom: 4,
     },
     cardDescription: {
       fontSize: 14,
-      color: colorScheme === 'dark' ? Colors.dark.text : Colors.light.text,
-      lineHeight: 20,
+      color: colorScheme === 'dark' ? Colors.dark.text : "#666",
+      marginBottom: 12,
     },
-    statsContainer: {
+    macroContainer: {
       flexDirection: "row",
-      justifyContent: "space-between",
       alignItems: "center",
-      marginTop: 8,
-    },
-    macrosContainer: {
-      flexDirection: "row",
+      marginTop: 4,
       gap: 12,
     },
     macroItem: {
-      alignItems: "flex-start",
+      flex: 1,
+      padding: 2,
+      borderRadius: 10,
+      alignItems: "center",
     },
     macroValue: {
-      fontSize: 16,
-      fontWeight: "bold",
+      fontSize: 12,
+      fontWeight: "600",
+      color: colorScheme === 'dark' ? Colors.dark.text : Colors.light.text,
     },
     macroLabel: {
       fontSize: 14,
-      opacity: 0.8,
-    },
-    actionsContainer: {
-      flexDirection: "row",
-      alignItems: "center",
-      gap: 16,
-    },
-    likeButton: {
-      flexDirection: "row",
-      alignItems: "center",
-      gap: 4,
-      paddingTop: 4,
-    },
-    likeCount: {
-      fontSize: 16,
-      color: colorScheme === 'dark' ? Colors.dark.text : Colors.light.text,
-      marginLeft: 4,
+      color: colorScheme === 'dark' ? Colors.dark.text : "#666",
     },
     voirButton: {
       flexDirection: "row",
@@ -462,9 +409,9 @@ const getStyles = (colorScheme: string) =>
       gap: 4,
     },
     voirText: {
-      fontSize: 16,
-      color: colorScheme === 'dark' ? Colors.dark.text : Colors.light.text,
-      fontWeight: "600",
+      fontSize: 14,
+      color: colorScheme === 'dark' ? Colors.dark.primary : Colors.light.primary,
+      fontWeight: "500",
     },
     header: {
       flexDirection: "row",
@@ -479,19 +426,5 @@ const getStyles = (colorScheme: string) =>
       fontSize: 20,
       fontWeight: "bold",
       color: colorScheme === 'dark' ? Colors.dark.text : Colors.light.text,
-    },
-    macroContainer: {
-      flexDirection: "row",
-      gap: 4,
-    },
-    macroBadge: {
-      paddingHorizontal: 8,
-      paddingVertical: 4,
-      borderRadius: 12,
-    },
-    macroText: {
-      fontSize: 10,
-      fontWeight: "600",
-      color: colorScheme === "dark" ? Colors.dark.background : Colors.light.text,
     },
   });

@@ -16,6 +16,7 @@ export interface UserProfile {
   onboarding_completed: boolean;
   created_at: string;
   updated_at: string;
+  avatar_url: string;
 }
 
 export interface AuthState {
