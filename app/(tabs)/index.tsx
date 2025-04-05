@@ -69,7 +69,7 @@ export default function HomeScreen() {
 
       <View style={getStyles(colorScheme).caloriesCard}>
         <View style={getStyles(colorScheme).caloriesHeader}>
-          <Text style={getStyles(colorScheme).caloriesTitle}>Calories aujourd'hui</Text>
+          <Text style={getStyles(colorScheme).caloriesTitle}>Calories aujourd'hui </Text>
           <Text style={getStyles(colorScheme).caloriesTotal}>{totals.calories} / {goals.calories} kcal</Text>
         </View>
 
@@ -78,12 +78,12 @@ export default function HomeScreen() {
           <Text style={getStyles(colorScheme).caloriesValue}>{totals.calories}</Text>
         </View>
 
-        <Text style={getStyles(colorScheme).caloriesRemaining}>{goals.calories - totals.calories} kcal restantes</Text>
+        <Text style={getStyles(colorScheme).caloriesRemaining}>{Math.max(goals.calories - totals.calories, 0)} kcal restantes</Text>
 
         <View style={getStyles(colorScheme).caloriesBar}>
           <LinearGradient
             colors={['#3498db', '#e8f4f8']}
-            style={[getStyles(colorScheme).caloriesProgress, { width: `${(totals.calories / goals.calories) * 100}%` }]}
+            style={[getStyles(colorScheme).caloriesProgress, { width: `${Math.min((totals.calories / goals.calories) * 100, 100)}%` }]}
             start={{ x: 0, y: 0 }}
             end={{ x: 1, y: 0 }}
           />

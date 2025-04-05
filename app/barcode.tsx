@@ -17,6 +17,7 @@ import {
   useCameraPermissions,
 } from "expo-camera";
 import { Ionicons } from '@expo/vector-icons';
+import { Feather } from '@expo/vector-icons';
 import { router } from 'expo-router';
 
 interface NutriScoreData {
@@ -134,7 +135,7 @@ export default function CameraScreen() {
     <SafeAreaView style={styles.productScreen}>
       <View style={styles.header}>
         <TouchableOpacity onPress={handleBackToCapture} style={styles.backButton}>
-          <Ionicons name="arrow-back" size={24} color="#000" />
+          <Feather name="x" size={32} color="#000" />
         </TouchableOpacity>
         <Text style={styles.headerTitle}>Détails du produit</Text>
       </View>
@@ -225,7 +226,7 @@ export default function CameraScreen() {
         </View>
       </ScrollView>
       <TouchableOpacity style={styles.scanButton} onPress={handleRescanProduct}>
-        <Ionicons name="scan" size={24} color="#FFF" style={styles.scanIcon} />
+        <Feather name="camera" size={24} color="#FFF" style={styles.scanIcon} />
         <Text style={styles.scanButtonText}>Scanner un nouveau produit</Text>
       </TouchableOpacity>
     </SafeAreaView>
@@ -244,6 +245,12 @@ export default function CameraScreen() {
           />
           <View style={styles.scannerOverlay}>
             <View style={styles.scannerFrame} />
+            <TouchableOpacity 
+              style={[styles.backButton, { position: 'absolute', top: 50, left: 16 }]} 
+              onPress={() => router.back()}
+            >
+              <Feather name="x" size={32} color="#FFF" />
+            </TouchableOpacity>
           </View>
         </>
       ) : (
