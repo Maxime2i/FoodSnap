@@ -313,14 +313,14 @@ const getStyles = (colorScheme: "light" | "dark") =>
       marginTop: 20,
     },
     card: {
-      backgroundColor: colorScheme === "dark" ? "#2C2C2C" : "#FFFFFF",
+      backgroundColor: colorScheme === "dark" ? Colors.dark.background : Colors.light.background,
       borderRadius: 15,
       padding: 20,
       width: "45%",
       alignItems: "center",
       justifyContent: "center",
       elevation: 3,
-      shadowColor: "#000",
+      shadowColor: colorScheme === "dark" ? Colors.dark.text : Colors.light.text,
       shadowOffset: { width: 0, height: 2 },
       shadowOpacity: 0.25,
       shadowRadius: 3.84,
@@ -337,10 +337,12 @@ const getStyles = (colorScheme: "light" | "dark") =>
     searchWrapper: {
       flexDirection: "row",
       alignItems: "center",
-      backgroundColor: colorScheme === "dark" ? "#2C2C2C" : "#FFFFFF",
+      backgroundColor: colorScheme === "dark" ? Colors.dark.background : Colors.light.background,
       borderRadius: 10,
       borderWidth: 1,
       borderColor: colorScheme === "dark" ? "#404040" : "#E0E0E0",
+      width: "95%",
+      alignSelf: "center",
     },
     searchIcon: {
       padding: 10,
@@ -358,7 +360,7 @@ const getStyles = (colorScheme: "light" | "dark") =>
     },
     suggestionsContainer: {
       marginTop: 10,
-      backgroundColor: colorScheme === "dark" ? "#2C2C2C" : "#FFFFFF",
+      backgroundColor: colorScheme === "dark" ? Colors.dark.background : Colors.light.background,
       borderRadius: 10,
       borderWidth: 1,
       borderColor: colorScheme === "dark" ? "#404040" : "#E0E0E0",
@@ -375,7 +377,7 @@ const getStyles = (colorScheme: "light" | "dark") =>
     },
     suggestionBrand: {
       fontSize: 14,
-      color: colorScheme === "dark" ? "#808080" : "#666666",
+      color: colorScheme === "dark" ? Colors.dark.text : Colors.light.text,
       marginTop: 4,
     },
     foodImage: {
@@ -386,7 +388,7 @@ const getStyles = (colorScheme: "light" | "dark") =>
     },
     selectedFoodsContainer: {
       marginTop: 20,
-      backgroundColor: colorScheme === "dark" ? "#2C2C2C" : "#FFFFFF",
+      backgroundColor: colorScheme === "dark" ? Colors.dark.background : Colors.light.background,
       borderRadius: 10,
       borderWidth: 1,
       borderColor: colorScheme === "dark" ? "#404040" : "#E0E0E0",
@@ -405,7 +407,7 @@ const getStyles = (colorScheme: "light" | "dark") =>
     },
     selectedFoodBrand: {
       fontSize: 16,
-      color: colorScheme === "dark" ? "#808080" : "#666666",
+      color: colorScheme === "dark" ? Colors.dark.text : Colors.light.text,
       marginBottom: 15,
       textAlign: "center",
     },
@@ -433,7 +435,7 @@ const getStyles = (colorScheme: "light" | "dark") =>
     },
     macroLabel: {
       fontSize: 12,
-      color: colorScheme === "dark" ? "#808080" : "#666666",
+      color: colorScheme === "dark" ? Colors.dark.text : Colors.light.text,
       textAlign: "center",
     },
   });

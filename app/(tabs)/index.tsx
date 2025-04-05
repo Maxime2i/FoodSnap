@@ -139,26 +139,15 @@ export default function HomeScreen() {
             <Image source={{ uri: meal.photo_url }} style={getStyles(colorScheme).mealIcon} />
             <View style={getStyles(colorScheme).mealInfo}>
               <Text style={getStyles(colorScheme).mealTitle}>{meal.name}</Text>
-              <View style={getStyles(colorScheme).mealDetails}>
-              <Text style={getStyles(colorScheme).mealDetailsText}>{format(new Date(meal.created_at), 'HH:mm', { locale: fr })} • {meal.calories} kcal</Text>
-
-              <View style={getStyles(colorScheme).macroContainer}>
-                <View style={[getStyles(colorScheme).macroBadge, { backgroundColor: '#e8f0ff' }]}>
-                  <Text style={getStyles(colorScheme).macroText}>{meal.glucides}g G</Text>
-                </View>
-                <View style={[getStyles(colorScheme).macroBadge, { backgroundColor: '#e8fff0' }]}>
-                  <Text style={getStyles(colorScheme).macroText}>{meal.proteines}g P</Text>
-                </View>
-                <View style={[getStyles(colorScheme).macroBadge, { backgroundColor: '#fff8e8' }]}>
-                  <Text style={getStyles(colorScheme).macroText}>{meal.lipides}g L</Text>
-                </View>
-              </View>
-
-                
-              </View>
-             
+              <Text style={getStyles(colorScheme).mealDetailsText}>
+                {format(new Date(meal.created_at), 'HH:mm', { locale: fr })} • {meal.calories} kcal
+              </Text>
             </View>
-           
+            <View style={getStyles(colorScheme).macroColumn}>
+              <Text style={[getStyles(colorScheme).macroValue, { color: '#4a90e2' }]}>{meal.glucides}g G</Text>
+              <Text style={[getStyles(colorScheme).macroValue, { color: '#2ecc71' }]}>{meal.proteines}g P</Text>
+              <Text style={[getStyles(colorScheme).macroValue, { color: '#f1c40f' }]}>{meal.lipides}g L</Text>
+            </View>
           </View>
         ))}
 
@@ -291,11 +280,17 @@ const getStyles = (colorScheme: 'light' | 'dark') => StyleSheet.create({
     color: colorScheme === 'dark' ? Colors.dark.text : Colors.light.text,
     marginBottom: 4,
   },
+  macroColumn: {
+    flexDirection: 'column',
+    justifyContent: 'center',
+    alignItems: 'flex-end',
+    marginLeft: 'auto',
+    gap: 4,
+  },
   macroValue: {
-    fontSize: 20,
-    fontWeight: '600',
+    fontSize: 12,
     color: colorScheme === 'dark' ? Colors.dark.text : Colors.light.text,
-    marginBottom: 2,
+    fontWeight: '500',
   },
   macroGoal: {
     fontSize: 14,
@@ -375,20 +370,6 @@ const getStyles = (colorScheme: 'light' | 'dark') => StyleSheet.create({
     fontSize: 16,
     color: colorScheme === 'dark' ? Colors.dark.text : Colors.light.text,
     marginLeft: 8,
-  },
-  macroContainer: {
-    flexDirection: 'row',
-    gap: 4,
-  },
-  macroBadge: {
-    paddingHorizontal: 8,
-    paddingVertical: 4,
-    borderRadius: 12,
-  },
-  macroText: {
-    fontSize: 10,
-    fontWeight: '600',
-    color: colorScheme === 'dark' ? Colors.dark.background : Colors.light.text,
   },
   mealDetailsText: {
     fontSize: 14,
