@@ -3,6 +3,7 @@ import { useFonts } from 'expo-font';
 import { Stack, useRootNavigationState, useRouter, useSegments } from 'expo-router';
 import * as SplashScreen from 'expo-splash-screen';
 import { StatusBar } from 'expo-status-bar';
+import { Text, View } from 'react-native';
 import { useEffect } from 'react';
 import 'react-native-reanimated';
 
@@ -10,7 +11,8 @@ import { useColorScheme } from '@/hooks/useColorScheme';
 import { supabase } from '@/lib/supabase';
 import { AuthProvider } from './context/AuthContext';
 import { ThemeProvider } from './context/ThemeContext';
-
+import { SafeAreaView } from 'react-native';
+import LoginScreen from './(auth)/login';
 // Prevent the splash screen from auto-hiding before asset loading is complete.
 SplashScreen.preventAutoHideAsync();
 

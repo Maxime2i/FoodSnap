@@ -23,9 +23,17 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
         const { theme: savedTheme, isSystemTheme: savedIsSystemTheme } = JSON.parse(preferences);
         setTheme(savedTheme);
         setIsSystemTheme(savedIsSystemTheme);
+      } else {
+        // Si aucune préférence n'existe, sauvegarder les valeurs par défaut
+        const defaultTheme = deviceTheme ?? 'light';
+        AsyncStorage.setItem(
+          'theme-preferences',
+          JSON.stringify({ theme: defaultTheme, isSystemTheme: true })
+        );
+        setTheme(defaultTheme);
       }
     });
-  }, []);
+  }, [deviceTheme]);
 
   useEffect(() => {
     if (isSystemTheme) {
@@ -72,3 +80,5 @@ export function useTheme() {
   }
   return context;
 } 
+
+export default ThemeProvider;

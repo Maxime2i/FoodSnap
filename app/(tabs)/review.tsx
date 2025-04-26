@@ -16,7 +16,7 @@ import { format, parseISO, subDays } from "date-fns";
 import { fr } from "date-fns/locale";
 import { useColorScheme } from "@/hooks/useColorScheme";
 import { Colors } from "@/constants/Colors";
-import { PieChart, BarChart } from "react-native-chart-kit";
+import { PieChart, BarChart } from "react-native-gifted-charts";
 
 type Tab = "Historique" | "Analyse IA" | "Statistiques";
 type Meal = {
@@ -189,66 +189,49 @@ export default function ReviewScreen() {
 
     const screenWidth = Dimensions.get("window").width;
     const chartWidth = screenWidth - 32;
-    const chartConfig = {
-      backgroundColor: colorScheme === 'dark' ? Colors.dark.background : Colors.light.background,
-      backgroundGradientFrom: colorScheme === 'dark' ? Colors.dark.background : Colors.light.background,
-      backgroundGradientTo: colorScheme === 'dark' ? Colors.dark.background : Colors.light.background,
-      color: (opacity = 1) => colorScheme === 'dark' ? `rgba(255, 255, 255, ${opacity})` : `rgba(0, 0, 0, ${opacity})`,
-      labelColor: (opacity = 1) => colorScheme === 'dark' ? `rgba(255, 255, 255, ${opacity})` : `rgba(0, 0, 0, ${opacity})`,
-      strokeWidth: 2,
-      barPercentage: 0.5,
-    };
 
+    // Données pour le graphique en camembert
     const pieData = calculateStatistics.macroDistribution.map(item => ({
-      name: item.x,
       value: item.y,
+      text: `${Math.round(item.y)}g`,
       color: item.color,
-      legendFontColor: colorScheme === 'dark' ? Colors.dark.text : Colors.light.text,
-      legendFontSize: 12,
+      label: item.x,
     }));
 
-    const barData = {
-      labels: Object.keys(calculateStatistics.caloriesPerDay).map(date => 
-        format(parseISO(date), "dd/MM")
-      ),
-      datasets: [{
-        data: Object.values(calculateStatistics.caloriesPerDay),
-      }],
-    };
+    // Données pour le graphique en barres
+    const barData = Object.entries(calculateStatistics.caloriesPerDay).map(([date, calories]) => ({
+      value: calories,
+      label: format(parseISO(date), 'dd/MM'),
+      frontColor: '#4a90e2',
+    }));
 
     return (
       <ScrollView style={getStyles(colorScheme).statisticsContainer}>
-        <View style={getStyles(colorScheme).chartCard}>
-          <Text style={getStyles(colorScheme).chartTitle}>
-            Distribution moyenne des macronutriments
-          </Text>
+        <Text style={getStyles(colorScheme).chartTitle}>Distribution des macronutriments (moyenne sur 7 jours)</Text>
+        <View style={getStyles(colorScheme).chartContainer}>
           <PieChart
             data={pieData}
-            width={chartWidth}
-            height={220}
-            chartConfig={chartConfig}
-            accessor="value"
-            backgroundColor="transparent"
-            paddingLeft="15"
-            absolute
+            donut
+            radius={120}
+            innerRadius={80}
+            centerLabelComponent={() => (
+              <Text style={getStyles(colorScheme).centerLabel}>Macros</Text>
+            )}
           />
         </View>
 
-        <View style={getStyles(colorScheme).chartCard}>
-          <Text style={getStyles(colorScheme).chartTitle}>
-            Calories par jour (7 derniers jours)
-          </Text>
+        <Text style={getStyles(colorScheme).chartTitle}>Calories par jour (7 derniers jours)</Text>
+        <View style={getStyles(colorScheme).chartContainer}>
           <BarChart
             data={barData}
             width={chartWidth}
             height={220}
-            yAxisLabel=""
-            yAxisSuffix=" cal"
-            chartConfig={chartConfig}
-            style={{
-              marginVertical: 8,
-              borderRadius: 16,
-            }}
+            barWidth={30}
+            spacing={20}
+            hideRules
+            xAxisLabelTextStyle={getStyles(colorScheme).axisText}
+            yAxisTextStyle={getStyles(colorScheme).axisText}
+            noOfSections={5}
           />
         </View>
       </ScrollView>
@@ -418,28 +401,27 @@ const getStyles = (colorScheme: 'light' | 'dark') => StyleSheet.create({
     fontWeight: '500',
   },
   statisticsContainer: {
-    flex: 1,
     padding: 16,
   },
-  chartCard: {
-    backgroundColor: colorScheme === 'dark' ? Colors.dark.card : Colors.light.card,
-    borderRadius: 16,
-    padding: 16,
-    marginBottom: 16,
-    shadowColor: "#000",
-    shadowOffset: {
-      width: 0,
-      height: 2,
-    },
-    shadowOpacity: 0.25,
-    shadowRadius: 3.84,
-    elevation: 5,
+  chartContainer: {
+    alignItems: 'center',
+    marginVertical: 20,
   },
   chartTitle: {
     fontSize: 16,
-    fontWeight: "600",
-    marginBottom: 16,
-    textAlign: "center",
+    fontWeight: '600',
+    marginBottom: 10,
+    color: colorScheme === 'dark' ? Colors.dark.text : Colors.light.text,
+    textAlign: 'center',
+  },
+  centerLabel: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: colorScheme === 'dark' ? Colors.dark.text : Colors.light.text,
+  },
+  axisText: {
+    fontSize: 12,
     color: colorScheme === 'dark' ? Colors.dark.text : Colors.light.text,
   },
 });
+
