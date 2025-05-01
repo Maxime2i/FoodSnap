@@ -50,7 +50,7 @@ const AuthContext = createContext<AuthContextType>({
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<AuthContextType['user']>(null);
   const [loading, setLoading] = useState(true);
-console.log(user)
+
   const fetchUserProfile = async (userId: string) => {
     const { data, error } = await supabase
       .from('profiles')

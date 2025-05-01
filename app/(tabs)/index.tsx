@@ -218,7 +218,7 @@ export default function HomeScreen() {
         ) : (
           <TouchableOpacity 
             style={getStyles(colorScheme).setObjectiveButton}
-            onPress={() => router.push('/profilEdit')}
+            onPress={() => router.push('/nutritional-goals')}
           >
             <Text style={getStyles(colorScheme).setObjectiveText}>Définir un objectif</Text>
           </TouchableOpacity>

@@ -101,14 +101,14 @@ export default function ProfilScreen() {
 
       <Text style={getStyles(colorScheme).sectionTitle}>Objectifs nutritionnels</Text>
 
-      <Pressable style={getStyles(colorScheme).menuItem}>
+      <Pressable style={getStyles(colorScheme).menuItem} onPress={() => router.push('/nutritional-goals')}>
         <View style={getStyles(colorScheme).menuItemLeft}>
           <View style={[getStyles(colorScheme).iconContainer, { backgroundColor: '#E8FFE8' }]}>
             <Ionicons name="stats-chart" size={24} color="#4CAF50" />
           </View>
           <View>
             <Text style={getStyles(colorScheme).menuItemTitle}>Objectifs personnalisés</Text>
-            <Text style={getStyles(colorScheme).menuItemSubtitle}>Calories, macronutriments, hydratation</Text>
+            <Text style={getStyles(colorScheme).menuItemSubtitle}>Calories, macronutriments</Text>
           </View>
         </View>
         <Ionicons name="chevron-forward" size={24} color="#999" />
@@ -164,7 +164,7 @@ export default function ProfilScreen() {
         </View>
       </View>
 
-      <View style={getStyles(colorScheme).menuItem}>
+      {/* <View style={getStyles(colorScheme).menuItem}>
         <View style={getStyles(colorScheme).menuItemLeft}>
           <View style={[getStyles(colorScheme).iconContainer, { backgroundColor: '#FFE8E8' }]}>
             <Ionicons name="notifications-outline" size={24} color="#F44336" />
@@ -179,7 +179,7 @@ export default function ProfilScreen() {
           onValueChange={setNotifications}
           trackColor={{ false: '#D1D1D6', true: '#4A90E2' }}
         />
-      </View>
+      </View> */}
 
       <Pressable style={getStyles(colorScheme).menuItem} onPress={() => router.push('/help')}>
         <View style={getStyles(colorScheme).menuItemLeft}>
