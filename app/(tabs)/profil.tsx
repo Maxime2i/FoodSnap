@@ -114,7 +114,7 @@ export default function ProfilScreen() {
         <Ionicons name="chevron-forward" size={24} color="#999" />
       </Pressable>
 
-      <Pressable style={getStyles(colorScheme).menuItem}>
+      {/* <Pressable style={getStyles(colorScheme).menuItem}>
         <View style={getStyles(colorScheme).menuItemLeft}>
           <View style={[getStyles(colorScheme).iconContainer, { backgroundColor: '#F8E8FF' }]}>
             <MaterialIcons name="person-outline" size={24} color="#9C27B0" />
@@ -125,9 +125,9 @@ export default function ProfilScreen() {
           </View>
         </View>
         <Ionicons name="chevron-forward" size={24} color="#999" />
-      </Pressable>
+      </Pressable> */}
 
-      <Pressable style={getStyles(colorScheme).menuItem} onPress={() => router.push('/liked-meals')}>
+      {/* <Pressable style={getStyles(colorScheme).menuItem} onPress={() => router.push('/liked-meals')}>
         <View style={getStyles(colorScheme).menuItemLeft}>
           <View style={[getStyles(colorScheme).iconContainer, { backgroundColor: '#E8F1FF' }]}>
             <Ionicons name="heart-outline" size={24} color="#4A90E2" />
@@ -138,7 +138,7 @@ export default function ProfilScreen() {
           </View>
         </View>
         <Ionicons name="chevron-forward" size={24} color="#999" />
-      </Pressable>
+      </Pressable> */}
 
       <Text style={getStyles(colorScheme).sectionTitle}>Paramètres de l'application</Text>
 
