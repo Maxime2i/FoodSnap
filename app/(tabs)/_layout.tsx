@@ -84,8 +84,7 @@ export default function TabLayout() {
             <></>
           )
         }}
-        
-       
+        swipeEnabled={false}
         navigationState={{ index, routes }}
         renderScene={renderScene}
         renderTabBar={renderTabBar}

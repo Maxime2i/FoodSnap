@@ -286,7 +286,11 @@ export default function HomeScreen() {
           </View>
         ))}
 
-        <TouchableOpacity style={getStyles(colorScheme).addMealButton} onPress={() => router.push('/capture')}>
+
+        <TouchableOpacity style={getStyles(colorScheme).addMealButton} onPress={() => router.push({
+                pathname: '/create-meal',
+               
+              })}>
           <Ionicons name="add" size={24} color="#4a90e2" />
           <Text style={getStyles(colorScheme).addMealText}>Ajouter un repas</Text>
         </TouchableOpacity>

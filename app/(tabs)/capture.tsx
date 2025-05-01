@@ -18,6 +18,16 @@ import { MaterialIcons } from "@expo/vector-icons";
 import { router } from "expo-router";
 import { useState } from "react";
 
+interface SearchResult {
+  food_name: string;
+  tag_id: number;
+  photo: {
+    thumb: string;
+  };
+  serving_qty: number;
+  serving_unit: string;
+}
+
 interface FoodItem {
   food_id: string;
   food_name: string;
@@ -33,27 +43,32 @@ interface FoodItem {
 export default function CaptureScreen() {
   const colorScheme = useColorScheme();
   const [searchQuery, setSearchQuery] = useState("");
-  const [suggestions, setSuggestions] = useState<FoodItem[]>([]);
+  const [suggestions, setSuggestions] = useState<SearchResult[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [selectedFood, setSelectedFood] = useState<FoodItem | null>(null);
 
   const searchFood = async (query: string) => {
-    if (query.length < 2) {
+    if (query.trim() === '') {
       setSuggestions([]);
       return;
     }
-
+    
     setIsLoading(true);
     try {
-      const response = await fetch(
-        `http://13.60.13.92:3000/food-data?search=${encodeURIComponent(query)}`
-      );
+      const response = await fetch(`https://food-snap.vercel.app/api/search?query=${encodeURIComponent(query)}`);
       const data = await response.json();
-
-      setSuggestions(data.foods.food);
+      setSuggestions(data.common || []);
     } catch (error) {
-      console.error("Erreur lors de la recherche:", error);
-      Alert.alert("Erreur", "Impossible de récupérer les suggestions");
+      console.error('Erreur lors de la recherche:', error);
+      setSuggestions([{
+        tag_id: 0,
+        food_name: 'Erreur de connexion au serveur',
+        photo: {
+          thumb: 'https://d2eawub7utcl6.cloudfront.net/images/nix-apple-grey.png'
+        },
+        serving_qty: 0,
+        serving_unit: ''
+      }]);
     } finally {
       setIsLoading(false);
     }
@@ -202,18 +217,35 @@ export default function CaptureScreen() {
           <View style={getStyles(colorScheme).suggestionsContainer}>
             {suggestions.slice(0, 4).map((item) => (
               <TouchableOpacity
-                key={item.food_id}
+                key={item.tag_id}
                 style={getStyles(colorScheme).suggestionItem}
-                onPress={() => handleSelectFood(item)}
+                onPress={() => {
+                  router.push({
+                    pathname: '/food-details',
+                    params: {
+                      food_name: item.food_name,
+                      photo_url: item.photo.thumb,
+                      tag_id: item.tag_id.toString()
+                    }
+                  });
+                  setSearchQuery('');
+                  setSuggestions([]);
+                }}
               >
-                <Text style={getStyles(colorScheme).suggestionTitle}>
-                  {item.food_name}
-                </Text>
-                {item.brand_name && (
-                  <Text style={getStyles(colorScheme).suggestionBrand}>
-                    {item.brand_name}
-                  </Text>
-                )}
+                <View style={getStyles(colorScheme).suggestionContent}>
+                  <Image 
+                    source={{ uri: item.photo.thumb }} 
+                    style={getStyles(colorScheme).suggestionImage} 
+                  />
+                  <View style={getStyles(colorScheme).suggestionTextContainer}>
+                    <Text style={getStyles(colorScheme).suggestionTitle}>
+                      {item.food_name}
+                    </Text>
+                    <Text style={getStyles(colorScheme).suggestionSubtext}>
+                      {item.serving_qty} {item.serving_unit}
+                    </Text>
+                  </View>
+                </View>
               </TouchableOpacity>
             ))}
           </View>
@@ -365,20 +397,34 @@ const getStyles = (colorScheme: "light" | "dark") =>
       borderWidth: 1,
       borderColor: colorScheme === "dark" ? "#404040" : "#E0E0E0",
       maxHeight: 300,
+      zIndex: 1000,
     },
     suggestionItem: {
-      padding: 15,
+      padding: 12,
       borderBottomWidth: 1,
       borderBottomColor: colorScheme === "dark" ? "#404040" : "#E0E0E0",
+    },
+    suggestionContent: {
+      flexDirection: "row",
+      alignItems: "center",
+    },
+    suggestionImage: {
+      width: 40,
+      height: 40,
+      borderRadius: 20,
+      marginRight: 12,
+    },
+    suggestionTextContainer: {
+      flex: 1,
     },
     suggestionTitle: {
       fontSize: 16,
       color: colorScheme === "dark" ? Colors.dark.text : Colors.light.text,
     },
-    suggestionBrand: {
+    suggestionSubtext: {
       fontSize: 14,
       color: colorScheme === "dark" ? Colors.dark.text : Colors.light.text,
-      marginTop: 4,
+      opacity: 0.7,
     },
     foodImage: {
       width: "100%",
