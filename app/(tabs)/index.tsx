@@ -1,4 +1,4 @@
-import { StyleSheet, View, Text, ScrollView, TouchableOpacity, Image } from 'react-native';
+import { StyleSheet, View, Text, ScrollView, TouchableOpacity, Image, TextInput, ActivityIndicator } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useAuth } from '../context/AuthContext';
@@ -9,10 +9,23 @@ import { useColorScheme } from "@/hooks/useColorScheme";
 import { Colors } from "@/constants/Colors";
 import { useState, useCallback } from 'react';
 
+interface SearchResult {
+  food_name: string;
+  tag_id: number;
+  photo: {
+    thumb: string;
+  };
+  serving_qty: number;
+  serving_unit: string;
+}
+
 export default function HomeScreen() {
   const { user, refreshUser } = useAuth();
   const colorScheme = useColorScheme();
   const [loading, setLoading] = useState(false);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [searchResults, setSearchResults] = useState<SearchResult[]>([]);
+  const [isSearching, setIsSearching] = useState(false);
   const currentDate = new Date();
   const options: Intl.DateTimeFormatOptions = { 
     weekday: 'long', 
@@ -60,11 +73,90 @@ export default function HomeScreen() {
     lipides: 65
   };
 
+  const handleSearch = async (query: string) => {
+    setSearchQuery(query);
+    if (query.trim() === '') {
+      setSearchResults([]);
+      return;
+    }
+    
+    setIsSearching(true);
+    try {
+      const response = await fetch(`https://food-snap.vercel.app/api/search?query=${encodeURIComponent(query)}`);
+      const data = await response.json();
+      setSearchResults(data.common || []);
+    } catch (error) {
+      console.error('Erreur lors de la recherche:', error);
+      setSearchResults([{
+        tag_id: 0,
+        food_name: 'Erreur de connexion au serveur',
+        photo: {
+          thumb: 'https://d2eawub7utcl6.cloudfront.net/images/nix-apple-grey.png'
+        },
+        serving_qty: 0,
+        serving_unit: ''
+      }]);
+    } finally {
+      setIsSearching(false);
+    }
+  };
+
   return (
     <ScrollView style={getStyles(colorScheme).container}>
       <View style={getStyles(colorScheme).header}>
         <Text style={getStyles(colorScheme).greeting}>Bonjour, {user?.first_name || 'Utilisateur'}</Text>
         <Text style={getStyles(colorScheme).date}>{formattedDate}</Text>
+      </View>
+
+      <View style={getStyles(colorScheme).searchContainer}>
+        <View style={getStyles(colorScheme).searchInputContainer}>
+          <Ionicons name="search-outline" size={20} color={colorScheme === 'dark' ? Colors.dark.text : Colors.light.text} />
+          <TextInput
+            style={getStyles(colorScheme).searchInput}
+            placeholder="Rechercher..."
+            placeholderTextColor={colorScheme === 'dark' ? Colors.dark.text : Colors.light.text}
+            value={searchQuery}
+            onChangeText={handleSearch}
+          />
+          {isSearching && (
+            <ActivityIndicator size="small" color="#4a90e2" />
+          )}
+        </View>
+        {searchResults.length > 0 && (
+          <View style={getStyles(colorScheme).searchResults}>
+            {searchResults.map((result, index) => (
+              <TouchableOpacity 
+                key={result.tag_id + result.food_name || index}
+                style={getStyles(colorScheme).searchResultItem}
+                onPress={() => {
+                  router.push({
+                    pathname: '/food-details',
+                    params: {
+                      food_name: result.food_name,
+                      photo_url: result.photo.thumb,
+                      tag_id: result.tag_id.toString()
+                    }
+                  });
+                  setSearchQuery('');
+                  setSearchResults([]);
+                }}
+              >
+                <View style={getStyles(colorScheme).searchResultContent}>
+                  <Image 
+                    source={{ uri: result.photo.thumb }} 
+                    style={getStyles(colorScheme).searchResultImage} 
+                  />
+                  <View style={getStyles(colorScheme).searchResultTextContainer}>
+                    <Text style={getStyles(colorScheme).searchResultText}>{result.food_name}</Text>
+                    <Text style={getStyles(colorScheme).searchResultSubtext}>
+                      {result.serving_qty} {result.serving_unit}
+                    </Text>
+                  </View>
+                </View>
+              </TouchableOpacity>
+            ))}
+          </View>
+        )}
       </View>
 
       <View style={getStyles(colorScheme).caloriesCard}>
@@ -374,5 +466,70 @@ const getStyles = (colorScheme: 'light' | 'dark') => StyleSheet.create({
   mealDetailsText: {
     fontSize: 14,
     color: colorScheme === 'dark' ? Colors.dark.text : Colors.light.text,
+  },
+  searchContainer: {
+    paddingHorizontal: 20,
+    paddingBottom: 10,
+  },
+  searchInputContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: colorScheme === 'dark' ? Colors.dark.background : Colors.light.background,
+    borderRadius: 12,
+    paddingHorizontal: 12,
+    paddingVertical: 8,
+    shadowColor: colorScheme === 'dark' ? Colors.dark.text : Colors.light.text,
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 3,
+  },
+  searchInput: {
+    flex: 1,
+    marginLeft: 8,
+    fontSize: 16,
+    color: colorScheme === 'dark' ? Colors.dark.text : Colors.light.text,
+  },
+  searchResults: {
+    position: 'absolute',
+    top: '100%',
+    left: 20,
+    right: 20,
+    backgroundColor: colorScheme === 'dark' ? Colors.dark.background : Colors.light.background,
+    borderRadius: 12,
+    marginTop: 4,
+    shadowColor: colorScheme === 'dark' ? Colors.dark.text : Colors.light.text,
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 3,
+    zIndex: 1000,
+  },
+  searchResultItem: {
+    padding: 12,
+    borderBottomWidth: 1,
+    borderBottomColor: colorScheme === 'dark' ? Colors.dark.buttonInactive : Colors.light.buttonInactive,
+  },
+  searchResultContent: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  searchResultImage: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    marginRight: 12,
+  },
+  searchResultTextContainer: {
+    flex: 1,
+  },
+  searchResultText: {
+    fontSize: 16,
+    color: colorScheme === 'dark' ? Colors.dark.text : Colors.light.text,
+  },
+  searchResultSubtext: {
+    fontSize: 14,
+    color: colorScheme === 'dark' ? Colors.dark.text : Colors.light.text,
+    opacity: 0.7,
   },
 });
