@@ -1,4 +1,4 @@
-import { StyleSheet, View, Text, FlatList, Image, ActivityIndicator, TouchableOpacity, RefreshControl } from 'react-native';
+import { StyleSheet, View, Text, FlatList, ActivityIndicator, TouchableOpacity, RefreshControl, Image, ScrollView } from 'react-native';
 import { useState, useEffect, useCallback } from 'react';
 import { supabase } from '@/lib/supabase';
 import { Colors } from '@/constants/Colors';
@@ -6,60 +6,62 @@ import { router } from 'expo-router';
 import { useAuth } from '@/hooks/useAuth';
 import { Ionicons } from '@expo/vector-icons';
 import { useColorScheme } from '@/hooks/useColorScheme';
+import { format } from 'date-fns';
+import { fr } from 'date-fns/locale';
 
-interface Plat {
-  id: string;
-  photo_url: string;
+interface FoodItem {
   name: string;
-  description: string;
+  quantity: number;
   calories: number;
-  proteines: number;
-  glucides: number;
-  lipides: number;
+  carbs: number;
+  proteins: number;
+  fats: number;
+  glycemicImpact: number;
+  photo?: string;
+}
+
+interface Meal {
+  id: string;
+  user_id: string;
+  name: string;
   created_at: string;
-  likes_count: number;
-  type: string;
+  total_calories: number;
+  total_carbs: number;
+  total_proteins: number;
+  total_fats: number;
+  glycemic_index: number;
+  glycemic_load: number;
+  foods: FoodItem[];
 }
 
 const MacroColors = {
-  calories: '#FF6B6B',  // Rouge
-  glucides: '#4ECDC4', // Turquoise
-  proteines: '#45B7D1', // Bleu
-  lipides: '#96C93D',  // Vert
+  calories: '#FF6B6B',
+  glucides: '#4a90e2',
+  proteines: '#2ecc71',
+  lipides: '#f1c40f',
 };
 
 export default function MyMealsScreen() {
   const { user } = useAuth();
-  const [plats, setPlats] = useState<Plat[]>([]);
+  const [meals, setMeals] = useState<Meal[]>([]);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
   const colorScheme = useColorScheme();
   
-  const fetchPlats = async () => {
+  const fetchMeals = async () => {
     if (!user) return;
 
     try {
-      // Récupérer les plats de l'utilisateur connecté
-      const { data: platsData, error: platsError } = await supabase
-        .from('plats')
-        .select(`
-          *,
-          likes:likes(count)
-        `)
+      const { data: mealsData, error: mealsError } = await supabase
+        .from('meals')
+        .select('*')
         .eq('user_id', user.id)
         .order('created_at', { ascending: false });
 
-      if (platsError) throw platsError;
-
-      // Transformer les données pour inclure le nombre de likes
-      const platsWithLikes = (platsData || []).map(plat => ({
-        ...plat,
-        likes_count: plat.likes?.[0]?.count || 0
-      }));
-
-      setPlats(platsWithLikes);
+      if (mealsError) throw mealsError;
+      setMeals(mealsData || []);
     } catch (error) {
-      console.error('Erreur lors de la récupération des plats:', error);
+      console.error('Erreur lors de la récupération des repas:', error);
     } finally {
       setLoading(false);
       setRefreshing(false);
@@ -67,64 +69,65 @@ export default function MyMealsScreen() {
   };
 
   useEffect(() => {
-    fetchPlats();
+    fetchMeals();
   }, [user]);
 
   const onRefresh = useCallback(() => {
     setRefreshing(true);
-    fetchPlats();
+    fetchMeals();
   }, [user]);
 
-  const renderPlat = ({ item }: { item: Plat }) => (
+  const renderMeal = ({ item }: { item: Meal }) => (
     <TouchableOpacity 
       style={getStyles(colorScheme).card}
       onPress={() => router.push(`/meal-detail?id=${item.id}`)}
       activeOpacity={0.8}
     >
-      <Image 
-        source={{ uri: item.photo_url }} 
-        style={getStyles(colorScheme).photo}
-        resizeMode="cover"
-      />
-      {item.type && (
-        <View style={getStyles(colorScheme).cardOverlay}>
-          <View style={getStyles(colorScheme).typeContainer}>
-            <Text style={getStyles(colorScheme).typeText}>{item.type}</Text>
-          </View>
-        </View>
-      )}
       <View style={getStyles(colorScheme).cardContent}>
         <View style={getStyles(colorScheme).titleContainer}>
-          <View>
+          <View style={getStyles(colorScheme).headerRow}>
             <Text style={getStyles(colorScheme).cardTitle}>{item.name}</Text>
-            {item.description && <Text style={getStyles(colorScheme).cardDescription}>{item.description}</Text>}
+            <Text style={getStyles(colorScheme).timeText}>
+              {format(new Date(item.created_at), 'HH:mm', { locale: fr })}
+            </Text>
           </View>
         </View>
+        
+        {item.foods && item.foods.length > 0 && (
+          <ScrollView 
+            horizontal 
+            showsHorizontalScrollIndicator={false}
+            style={getStyles(colorScheme).foodsScroll}
+          >
+            {item.foods.map((food, index) => (
+              <View key={index} style={getStyles(colorScheme).foodImageContainer}>
+                <Image
+                  source={{ uri: food.photo || 'https://d2eawub7utcl6.cloudfront.net/images/nix-apple-grey.png' }}
+                  style={getStyles(colorScheme).foodImage}
+                />
+                <Text numberOfLines={1} style={getStyles(colorScheme).foodName}>
+                  {food.name}
+                </Text>
+                <Text style={[getStyles(colorScheme).carbsText, { color: MacroColors.glucides }]}>
+                  {food.carbs.toFixed(1)}g
+                </Text>
+              </View>
+            ))}
+          </ScrollView>
+        )}
+
         <View style={getStyles(colorScheme).statsContainer}>
           <View style={getStyles(colorScheme).macrosContainer}>
-            <View style={getStyles(colorScheme).macroItem}>
-              <Text style={[getStyles(colorScheme).macroValue, { color: MacroColors.calories }]}>{item.calories}</Text>
-              <Text style={[getStyles(colorScheme).macroLabel, { color: MacroColors.calories }]}>calories</Text>
-            </View>
-            <View style={getStyles(colorScheme).macroItem}>
-              <Text style={[getStyles(colorScheme).macroValue, { color: MacroColors.glucides }]}>{item.glucides}g</Text>
-              <Text style={[getStyles(colorScheme).macroLabel, { color: MacroColors.glucides }]}>glucides</Text>
-            </View>
-            <View style={getStyles(colorScheme).macroItem}>
-              <Text style={[getStyles(colorScheme).macroValue, { color: MacroColors.proteines }]}>{item.proteines}g</Text>
-              <Text style={[getStyles(colorScheme).macroLabel, { color: MacroColors.proteines }]}>protéines</Text>
-            </View>
-            <View style={getStyles(colorScheme).macroItem}>
-              <Text style={[getStyles(colorScheme).macroValue, { color: MacroColors.lipides }]}>{item.lipides}g</Text>
-              <Text style={[getStyles(colorScheme).macroLabel, { color: MacroColors.lipides }]}>lipides</Text>
-            </View>
+            <Text style={[getStyles(colorScheme).totalCarbsText, { color: MacroColors.glucides }]}>
+              Total glucides : {item.total_carbs.toFixed(1)}g
+            </Text>
           </View>
           <TouchableOpacity 
             style={getStyles(colorScheme).voirButton}
             onPress={() => router.push(`/meal-detail?id=${item.id}`)}
           >
             <Text style={getStyles(colorScheme).voirText}>Voir</Text>
-            <Ionicons name="arrow-forward" size={16} color={Colors.light.tint} />
+            <Ionicons name="arrow-forward" size={16} color={Colors.light.text} />
           </TouchableOpacity>
         </View>
       </View>
@@ -139,7 +142,7 @@ export default function MyMealsScreen() {
     );
   }
 
-  if (plats.length === 0) {
+  if (meals.length === 0) {
     return (
       <View style={[getStyles(colorScheme).container, getStyles(colorScheme).emptyContainer]}>
         <View style={getStyles(colorScheme).header}>
@@ -149,7 +152,7 @@ export default function MyMealsScreen() {
           <Text style={getStyles(colorScheme).title}>Mes Repas</Text>
           <View style={getStyles(colorScheme).backButton} />
         </View>
-        <Text style={getStyles(colorScheme).emptyText}>Vous n'avez pas encore publié de plats</Text>
+        <Text style={getStyles(colorScheme).emptyText}>Vous n'avez pas encore enregistré de repas</Text>
       </View>
     );
   }
@@ -164,8 +167,8 @@ export default function MyMealsScreen() {
         <View style={getStyles(colorScheme).backButton} />
       </View>
       <FlatList
-        data={plats}
-        renderItem={renderPlat}
+        data={meals}
+        renderItem={renderMeal}
         keyExtractor={(item) => item.id}
         contentContainerStyle={getStyles(colorScheme).list}
         showsVerticalScrollIndicator={false}
@@ -233,43 +236,25 @@ const getStyles = (colorScheme: 'light' | 'dark') => StyleSheet.create({
     elevation: 5,
     overflow: 'hidden',
   },
-  photo: {
-    width: '100%',
-    height: 200,
-  },
-  cardOverlay: {
-    position: 'absolute',
-    top: 0,
-    right: 0,
-    padding: 12,
-  },
-  typeContainer: {
-    backgroundColor: colorScheme === 'dark' ? '#121212' : '#E8F5E9',
-    paddingHorizontal: 12,
-    paddingVertical: 6,
-    borderRadius: 20,
-  },
-  typeText: {
-    color: colorScheme === 'dark' ? '#2E7D32' : '#2E7D32',
-    fontSize: 14,
-    fontWeight: '600',
-  },
   cardContent: {
     padding: 16,
   },
   titleContainer: {
     marginBottom: 12,
   },
+  headerRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+  },
   cardTitle: {
     fontSize: 18,
     fontWeight: 'bold',
     color: colorScheme === 'dark' ? '#fff' : '#000',
-    marginBottom: 4,
   },
-  cardDescription: {
+  timeText: {
     fontSize: 14,
-    color: colorScheme === 'dark' ? '#666' : '#000',
-    lineHeight: 20,
+    color: '#666',
   },
   statsContainer: {
     flexDirection: 'row',
@@ -279,18 +264,11 @@ const getStyles = (colorScheme: 'light' | 'dark') => StyleSheet.create({
   },
   macrosContainer: {
     flexDirection: 'row',
-    gap: 12,
+    alignItems: 'center',
   },
-  macroItem: {
-    alignItems: 'flex-start',
-  },
-  macroValue: {
+  totalCarbsText: {
     fontSize: 16,
-    fontWeight: 'bold',
-  },
-  macroLabel: {
-    fontSize: 14,
-    opacity: 0.8,
+    fontWeight: '600',
   },
   voirButton: {
     flexDirection: 'row',
@@ -299,7 +277,32 @@ const getStyles = (colorScheme: 'light' | 'dark') => StyleSheet.create({
   },
   voirText: {
     fontSize: 16,
-    color: Colors.light.tint,
+    color: Colors.light.text,
+    fontWeight: '600',
+  },
+  foodsScroll: {
+    marginBottom: 12,
+  },
+  foodImageContainer: {
+    marginRight: 12,
+    alignItems: 'center',
+    width: 60,
+  },
+  foodImage: {
+    width: 50,
+    height: 50,
+    borderRadius: 25,
+    marginBottom: 4,
+  },
+  foodName: {
+    fontSize: 12,
+    color: colorScheme === 'dark' ? '#fff' : '#000',
+    textAlign: 'center',
+    width: '100%',
+    marginBottom: 2,
+  },
+  carbsText: {
+    fontSize: 12,
     fontWeight: '600',
   },
 });

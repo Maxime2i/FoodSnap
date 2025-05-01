@@ -89,14 +89,16 @@ export default function FoodDetailsScreen() {
           <TouchableOpacity onPress={() => router.back()} style={styles.backButton}>
             <Ionicons name="arrow-back" size={24} color="#fff" />
           </TouchableOpacity>
-          <Text style={styles.headerText}>{food_name}</Text>
+          <Text numberOfLines={1} style={styles.headerText}>
+            {food_name}
+          </Text>
         </View>
       </View>
 
       <ScrollView style={styles.scrollView} contentContainerStyle={styles.scrollContent}>
         <View style={styles.infoCard}>
           <View style={styles.igContainer}>
-            <View>
+            <View style={styles.igTitleContainer}>
               <View style={[
                 styles.igBadge,
                 { backgroundColor: ig <= 55 ? '#4CAF50' : ig <= 70 ? '#FFC107' : '#FF5722' }
@@ -105,9 +107,27 @@ export default function FoodDetailsScreen() {
                   {ig <= 55 ? 'IG Bas' : ig <= 70 ? 'IG Moyen' : 'IG Élevé'}
                 </Text>
               </View>
-              <Text style={styles.categorySubtext}>{foodData?.index_glycemique?.aliment || food?.food_name}</Text>
+              <Text style={styles.categorySubtext} numberOfLines={2}>
+                {foodData?.index_glycemique?.aliment || food?.food_name}
+              </Text>
             </View>
-            <TouchableOpacity style={styles.createButton} onPress={() => {}}>
+            <TouchableOpacity 
+              style={styles.createButton} 
+              onPress={() => router.push({
+                pathname: '/create-meal',
+                params: {
+                  initial_food: JSON.stringify({
+                    name: food?.food_name,
+                    quantity: quantity,
+                    calories: nutritionInfo.calories,
+                    carbs: nutritionInfo.glucides,
+                    proteins: nutritionInfo.proteines,
+                    fats: nutritionInfo.lipides,
+                    glycemicImpact: nutritionInfo.cg
+                  })
+                }
+              })}
+            >
               <Ionicons name="add" size={20} color="#fff" />
               <Text style={styles.createButtonText}>Créer un repas</Text>
             </TouchableOpacity>
@@ -235,6 +255,8 @@ const styles = StyleSheet.create({
     fontWeight: '600',
     color: '#fff',
     marginLeft: 16,
+    flex: 1,
+    marginRight: 16,
   },
   backButton: {
     padding: 8,
@@ -254,6 +276,10 @@ const styles = StyleSheet.create({
     marginBottom: 20,
     marginTop: 12,
   },
+  igTitleContainer: {
+    flex: 1,
+    marginRight: 12,
+  },
   igBadge: {
     paddingHorizontal: 10,
     paddingVertical: 4,
@@ -269,6 +295,7 @@ const styles = StyleSheet.create({
   categorySubtext: {
     fontSize: 16,
     color: '#666',
+    flexShrink: 1,
   },
   createButton: {
     backgroundColor: '#4a90e2',

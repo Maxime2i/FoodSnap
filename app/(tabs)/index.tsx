@@ -8,6 +8,7 @@ import { router, useFocusEffect } from 'expo-router';
 import { useColorScheme } from "@/hooks/useColorScheme";
 import { Colors } from "@/constants/Colors";
 import { useState, useCallback } from 'react';
+import React from 'react';
 
 interface SearchResult {
   food_name: string;
@@ -17,6 +18,31 @@ interface SearchResult {
   };
   serving_qty: number;
   serving_unit: string;
+}
+
+interface FoodItem {
+  name: string;
+  quantity: number;
+  calories: number;
+  carbs: number;
+  proteins: number;
+  fats: number;
+  glycemicImpact: number;
+  photo?: string;
+}
+
+interface Meal {
+  id: string;
+  user_id: string;
+  name: string;
+  created_at: string;
+  total_calories: number;
+  total_carbs: number;
+  total_proteins: number;
+  total_fats: number;
+  glycemic_index: number;
+  glycemic_load: number;
+  foods: FoodItem[];
 }
 
 export default function HomeScreen() {
@@ -60,10 +86,10 @@ export default function HomeScreen() {
   }) || [];
 
   const totals = todayMeals.reduce((acc, meal) => ({
-    calories: acc.calories + (meal.calories || 0),
-    glucides: acc.glucides + (meal.glucides || 0),
-    proteines: acc.proteines + (meal.proteines || 0),
-    lipides: acc.lipides + (meal.lipides || 0),
+    calories: acc.calories + (meal.total_calories || 0),
+    glucides: acc.glucides + (meal.total_carbs || 0),
+    proteines: acc.proteines + (meal.total_proteins || 0),
+    lipides: acc.lipides + (meal.total_fats || 0),
   }), { calories: 0, glucides: 0, proteines: 0, lipides: 0 });
 
   const goals = {
@@ -159,43 +185,56 @@ export default function HomeScreen() {
         )}
       </View>
 
-      <View style={getStyles(colorScheme).caloriesCard}>
-        <View style={getStyles(colorScheme).caloriesHeader}>
-          <Text style={getStyles(colorScheme).caloriesTitle}>Calories aujourd'hui </Text>
-          <Text style={getStyles(colorScheme).caloriesTotal}>{totals.calories} / {goals.calories} kcal</Text>
+      <View style={getStyles(colorScheme).carbsCard}>
+        <View style={getStyles(colorScheme).carbsHeader}>
+          <Text style={getStyles(colorScheme).carbsTitle}>Glucides aujourd'hui </Text>
+          {(user?.glucides || 0) > 0 ? (
+            <Text style={getStyles(colorScheme).carbsTotal}>{totals.glucides} / {user?.glucides}g</Text>
+          ) : null}
         </View>
 
-        <View style={getStyles(colorScheme).caloriesMain}>
-          <Ionicons name="flame-outline" size={32} color="#ff9500" />
-          <Text style={getStyles(colorScheme).caloriesValue}>{totals.calories}</Text>
+        <View style={getStyles(colorScheme).carbsMain}>
+          <Ionicons name="pizza-outline" size={32} color="#4a90e2" />
+          <Text style={getStyles(colorScheme).carbsValue}>{totals.glucides}g</Text>
         </View>
 
-        <Text style={getStyles(colorScheme).caloriesRemaining}>{Math.max(goals.calories - totals.calories, 0)} kcal restantes</Text>
+        {(user?.glucides || 0) > 0 ? (
+          <>
+            <Text style={getStyles(colorScheme).carbsRemaining}>{Math.max((user?.glucides || 0) - totals.glucides, 0)}g restants</Text>
 
-        <View style={getStyles(colorScheme).caloriesBar}>
-          <LinearGradient
-            colors={['#3498db', '#e8f4f8']}
-            style={[getStyles(colorScheme).caloriesProgress, { width: `${Math.min((totals.calories / goals.calories) * 100, 100)}%` }]}
-            start={{ x: 0, y: 0 }}
-            end={{ x: 1, y: 0 }}
-          />
-        </View>
-        <View style={getStyles(colorScheme).caloriesRange}>
-          <Text style={getStyles(colorScheme).caloriesRangeText}>{totals.calories} kcal</Text>
-          <Text style={getStyles(colorScheme).caloriesRangeText}>{goals.calories} kcal</Text>
-        </View>
+            <View style={getStyles(colorScheme).carbsBar}>
+              <LinearGradient
+                colors={['#4a90e2', '#e8f4f8']}
+                style={[getStyles(colorScheme).carbsProgress, { width: `${Math.min((totals.glucides / (user?.glucides || 1)) * 100, 100)}%` }]}
+                start={{ x: 0, y: 0 }}
+                end={{ x: 1, y: 0 }}
+              />
+            </View>
+            <View style={getStyles(colorScheme).carbsRange}>
+              <Text style={getStyles(colorScheme).carbsRangeText}>{totals.glucides}g</Text>
+              <Text style={getStyles(colorScheme).carbsRangeText}>{user?.glucides}g</Text>
+            </View>
+          </>
+        ) : (
+          <TouchableOpacity 
+            style={getStyles(colorScheme).setObjectiveButton}
+            onPress={() => router.push('/profilEdit')}
+          >
+            <Text style={getStyles(colorScheme).setObjectiveText}>Définir un objectif</Text>
+          </TouchableOpacity>
+        )}
       </View>
 
       <View style={getStyles(colorScheme).macrosSection}>
         <Text style={getStyles(colorScheme).macrosTitle}>Macronutriments</Text>
         <View style={getStyles(colorScheme).macrosGrid}>
           <View style={getStyles(colorScheme).macroCard}>
-            <View style={[getStyles(colorScheme).macroIcon, { backgroundColor: '#e8f0ff' }]}>
-              <Ionicons name="pizza-outline" size={24} color="#4a90e2" />
+            <View style={[getStyles(colorScheme).macroIcon, { backgroundColor: '#fff8e8' }]}>
+              <Ionicons name="flame-outline" size={24} color="#ff9500" />
             </View>
-            <Text style={getStyles(colorScheme).macroLabel}>Glucides</Text>
-            <Text style={getStyles(colorScheme).macroValue}>{totals.glucides}g</Text>
-            <Text style={getStyles(colorScheme).macroGoal}>sur {goals.glucides}g</Text>
+            <Text style={getStyles(colorScheme).macroLabel}>Calories</Text>
+            <Text style={getStyles(colorScheme).macroValue}>{totals.calories}kcal</Text>
+            {user?.calories && <Text style={getStyles(colorScheme).macroGoal}>sur {user?.calories}kcal</Text>}
           </View>
 
           <View style={getStyles(colorScheme).macroCard}>
@@ -204,7 +243,7 @@ export default function HomeScreen() {
             </View>
             <Text style={getStyles(colorScheme).macroLabel}>Protéines</Text>
             <Text style={getStyles(colorScheme).macroValue}>{totals.proteines}g</Text>
-            <Text style={getStyles(colorScheme).macroGoal}>sur {goals.proteines}g</Text>
+            {user?.proteines && <Text style={getStyles(colorScheme).macroGoal}>sur {user?.proteines}g</Text>}
           </View>
 
           <View style={getStyles(colorScheme).macroCard}>
@@ -213,7 +252,7 @@ export default function HomeScreen() {
             </View>
             <Text style={getStyles(colorScheme).macroLabel}>Lipides</Text>
             <Text style={getStyles(colorScheme).macroValue}>{totals.lipides}g</Text>
-            <Text style={getStyles(colorScheme).macroGoal}>sur {goals.lipides}g</Text>
+            {user?.lipides && <Text style={getStyles(colorScheme).macroGoal}>sur {user?.lipides}g</Text>}
           </View>
         </View>
       </View>
@@ -228,17 +267,21 @@ export default function HomeScreen() {
 
         {user?.meals?.slice(0, 2).map((meal) => (
           <View key={meal.id} style={getStyles(colorScheme).mealCard}>
-            <Image source={{ uri: meal.photo_url }} style={getStyles(colorScheme).mealIcon} />
             <View style={getStyles(colorScheme).mealInfo}>
-              <Text style={getStyles(colorScheme).mealTitle}>{meal.name}</Text>
-              <Text style={getStyles(colorScheme).mealDetailsText}>
-                {format(new Date(meal.created_at), 'HH:mm', { locale: fr })} • {meal.calories} kcal
-              </Text>
-            </View>
-            <View style={getStyles(colorScheme).macroColumn}>
-              <Text style={[getStyles(colorScheme).macroValue, { color: '#4a90e2' }]}>{meal.glucides}g G</Text>
-              <Text style={[getStyles(colorScheme).macroValue, { color: '#2ecc71' }]}>{meal.proteines}g P</Text>
-              <Text style={[getStyles(colorScheme).macroValue, { color: '#f1c40f' }]}>{meal.lipides}g L</Text>
+              <View style={getStyles(colorScheme).mealHeader}>
+                <Text style={getStyles(colorScheme).mealTitle}>{meal.name}</Text>
+                <Text style={getStyles(colorScheme).mealTime}>
+                  {format(new Date(meal.created_at), 'HH:mm', { locale: fr })}
+                </Text>
+              </View>
+              <View style={getStyles(colorScheme).macroRow}>
+                <Text style={getStyles(colorScheme).caloriesText}>{meal.total_calories.toFixed(0)} kcal</Text>
+                <View style={getStyles(colorScheme).macrosGroup}>
+                  <Text style={[getStyles(colorScheme).macroValue, { color: '#4a90e2' }]}>{meal.total_carbs.toFixed(1)}g G</Text>
+                  <Text style={[getStyles(colorScheme).macroValue, { color: '#2ecc71' }]}>{meal.total_proteins.toFixed(1)}g P</Text>
+                  <Text style={[getStyles(colorScheme).macroValue, { color: '#f1c40f' }]}>{meal.total_fats.toFixed(1)}g L</Text>
+                </View>
+              </View>
             </View>
           </View>
         ))}
@@ -271,7 +314,7 @@ const getStyles = (colorScheme: 'light' | 'dark') => StyleSheet.create({
     color: colorScheme === 'dark' ? Colors.dark.text : Colors.light.text,
     marginTop: 4,
   },
-  caloriesCard: {
+  carbsCard: {
     backgroundColor: colorScheme === 'dark' ? Colors.dark.background : Colors.light.background,
     margin: 16,
     borderRadius: 16,
@@ -282,54 +325,54 @@ const getStyles = (colorScheme: 'light' | 'dark') => StyleSheet.create({
     shadowRadius: 8,
     elevation: 3,
   },
-  caloriesHeader: {
+  carbsHeader: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
   },
-  caloriesTitle: {
+  carbsTitle: {
     fontSize: 18,
     fontWeight: '600',
     color: colorScheme === 'dark' ? Colors.dark.text : Colors.light.text,
   },
-  caloriesTotal: {
+  carbsTotal: {
     fontSize: 16,
     fontWeight: '600',
     color: colorScheme === 'dark' ? Colors.dark.text : Colors.light.text,
   },
-  caloriesMain: {
+  carbsMain: {
     flexDirection: 'row',
     alignItems: 'center',
     marginTop: 20,
   },
-  caloriesValue: {
+  carbsValue: {
     fontSize: 48,
     fontWeight: 'bold',
     color: colorScheme === 'dark' ? Colors.dark.text : Colors.light.text,
     marginLeft: 16,
   },
-  caloriesRemaining: {
+  carbsRemaining: {
     fontSize: 16,
     color: colorScheme === 'dark' ? Colors.dark.text : Colors.light.text,
     marginTop: 4,
   },
-  caloriesBar: {
+  carbsBar: {
     height: 8,
     borderRadius: 4,
     backgroundColor: colorScheme === 'dark' ? Colors.dark.background : Colors.light.background,
     marginTop: 20,
   },
-  caloriesProgress: {
+  carbsProgress: {
     height: 8,
     borderRadius: 4,
     backgroundColor: colorScheme === 'dark' ? Colors.dark.background : Colors.light.background,
   },
-  caloriesRange: {
+  carbsRange: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     marginTop: 4,
   },
-  caloriesRangeText: {
+  carbsRangeText: {
     fontSize: 14,
     color: colorScheme === 'dark' ? Colors.dark.text : Colors.light.text,
   },
@@ -411,40 +454,43 @@ const getStyles = (colorScheme: 'light' | 'dark') => StyleSheet.create({
     borderRadius: 16,
     padding: 16,
     marginBottom: 12,
-    flexDirection: 'row',
-    alignItems: 'center',
     shadowColor: colorScheme === 'dark' ? Colors.dark.text : Colors.light.text,
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.1,
     shadowRadius: 8,
     elevation: 3,
   },
-  mealIcon: {
-    width: 48,
-    height: 48,
-    borderRadius: 24,
-    backgroundColor: colorScheme === 'dark' ? Colors.dark.background : Colors.light.background,
-    marginRight: 16,
-  },
   mealInfo: {
     flex: 1,
+  },
+  mealHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 8,
   },
   mealTitle: {
     fontSize: 16,
     fontWeight: '600',
     color: colorScheme === 'dark' ? Colors.dark.text : Colors.light.text,
   },
-  mealDetails: {
+  mealTime: {
     fontSize: 14,
-    color: colorScheme === 'dark' ? Colors.dark.text : Colors.light.text,
-    marginTop: 4,
+    color: '#666',
+  },
+  macroRow: {
     flexDirection: 'row',
     justifyContent: 'space-between',
+    alignItems: 'center',
   },
-  glucoseChange: {
+  caloriesText: {
     fontSize: 16,
-    fontWeight: '600',
+    fontWeight: '500',
     color: colorScheme === 'dark' ? Colors.dark.text : Colors.light.text,
+  },
+  macrosGroup: {
+    flexDirection: 'row',
+    gap: 12,
   },
   addMealButton: {
     flexDirection: 'row',
@@ -462,10 +508,6 @@ const getStyles = (colorScheme: 'light' | 'dark') => StyleSheet.create({
     fontSize: 16,
     color: colorScheme === 'dark' ? Colors.dark.text : Colors.light.text,
     marginLeft: 8,
-  },
-  mealDetailsText: {
-    fontSize: 14,
-    color: colorScheme === 'dark' ? Colors.dark.text : Colors.light.text,
   },
   searchContainer: {
     paddingHorizontal: 20,
@@ -531,5 +573,21 @@ const getStyles = (colorScheme: 'light' | 'dark') => StyleSheet.create({
     fontSize: 14,
     color: colorScheme === 'dark' ? Colors.dark.text : Colors.light.text,
     opacity: 0.7,
+  },
+  setObjectiveButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: colorScheme === 'dark' ? Colors.dark.background : Colors.light.background,
+    borderRadius: 16,
+    padding: 16,
+    marginTop: 12,
+    borderWidth: 1,
+    borderColor: colorScheme === 'dark' ? Colors.dark.buttonInactive : Colors.light.buttonInactive,
+    borderStyle: 'dashed',
+  },
+  setObjectiveText: {
+    fontSize: 16,
+    color: colorScheme === 'dark' ? Colors.dark.text : Colors.light.text,
   },
 });

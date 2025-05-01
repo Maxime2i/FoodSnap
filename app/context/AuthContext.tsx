@@ -1,15 +1,29 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { supabase } from '@/lib/supabase';
 
+type FoodItem = {
+  name: string;
+  quantity: number;
+  calories: number;
+  carbs: number;
+  proteins: number;
+  fats: number;
+  glycemicImpact: number;
+  photo?: string;
+};
+
 type Meal = {
   id: string;
+  user_id: string;
   name: string;
-  calories: number;
-  proteines: number;
-  glucides: number;
-  lipides: number;
   created_at: string;
-  photo_url?: string;
+  total_calories: number;
+  total_carbs: number;
+  total_proteins: number;
+  total_fats: number;
+  glycemic_index: number;
+  glycemic_load: number;
+  foods: FoodItem[];
 };
 
 type AuthContextType = {
@@ -17,6 +31,10 @@ type AuthContextType = {
     id: string; 
     email: string; 
     first_name: string;
+    glucides: number;
+    calories: number;
+    proteines: number;
+    lipides: number;
     meals: Meal[];
   } | null;
   loading: boolean;
@@ -32,11 +50,11 @@ const AuthContext = createContext<AuthContextType>({
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<AuthContextType['user']>(null);
   const [loading, setLoading] = useState(true);
-
+console.log(user)
   const fetchUserProfile = async (userId: string) => {
     const { data, error } = await supabase
       .from('profiles')
-      .select('first_name')
+      .select('first_name, glucides, calories, proteines, lipides')
       .eq('id', userId)
       .single();
 
@@ -45,12 +63,12 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       return null;
     }
 
-    return data?.first_name;
+    return data;
   };
   
   const fetchUserMeals = async (userId: string) => {
     const { data, error } = await supabase
-      .from('plats')
+      .from('meals')
       .select('*')
       .eq('user_id', userId)
       .order('created_at', { ascending: false })
@@ -66,7 +84,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const updateUserState = async (session: any) => {
     if (session?.user) {
-      const [first_name, meals] = await Promise.all([
+      const [data, meals] = await Promise.all([
         fetchUserProfile(session.user.id),
         fetchUserMeals(session.user.id)
       ]);
@@ -74,7 +92,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       setUser({
         id: session.user.id,
         email: session.user.email || '',
-        first_name: first_name || 'Utilisateur',
+        first_name: data?.first_name || 'Utilisateur',
+        glucides: data?.glucides || 0,
+        calories: data?.calories || 0,
+        proteines: data?.proteines || 0,
+        lipides: data?.lipides || 0,
         meals: meals
       });
     } else {
@@ -85,13 +107,17 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const refreshUser = async () => {
     if (!user) return;
-    const [first_name, meals] = await Promise.all([
+    const [data, meals] = await Promise.all([
       fetchUserProfile(user.id),
       fetchUserMeals(user.id)
     ]);
     setUser(prev => prev ? {
       ...prev,
-      first_name: first_name || prev.first_name,
+      first_name: data?.first_name || prev.first_name,
+      glucides: data?.glucides || 0,
+      calories: data?.calories || 0,
+      proteines: data?.proteines || 0,
+      lipides: data?.lipides || 0,
       meals
     } : null);
   };
