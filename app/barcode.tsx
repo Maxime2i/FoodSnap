@@ -1,24 +1,16 @@
-import React, { useState, useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import {
   StyleSheet,
   Text,
   View,
   TouchableOpacity,
-  ActivityIndicator,
   Image,
   SafeAreaView,
   ScrollView,
   Dimensions,
 } from "react-native";
-import {
-  Camera,
-  CameraView,
-  CameraType,
-  useCameraPermissions,
-} from "expo-camera";
-import { Ionicons } from '@expo/vector-icons';
 import { Feather } from '@expo/vector-icons';
-import { router } from 'expo-router';
+import { router, useLocalSearchParams } from 'expo-router';
 
 interface NutriScoreData {
   grade: string;
@@ -70,52 +62,23 @@ interface ProductData {
   status: number;
 }
 
-export default function CameraScreen() {
-  const [hasPermission, setHasPermission] = useState<boolean | null>(null);
-  const [scanned, setScanned] = useState(false);
-  const [loading, setLoading] = useState(false);
+export default function ProductScreen() {
+  const { code } = useLocalSearchParams();
   const [productData, setProductData] = useState<ProductData | null>(null);
-  const [showScanner, setShowScanner] = useState(true);
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
-    const getCameraPermissions = async () => {
-      const { status } = await Camera.requestCameraPermissionsAsync();
-      setHasPermission(status === "granted");
-    };
-
-    getCameraPermissions();
-  }, []);
-
-  const fetchProductData = async (barcode: string) => {
-    try {
-      setLoading(true);
-      const response = await fetch(
-        `https://world.openfoodfacts.org/api/v0/product/${barcode}.json`
-      );
-      const data: ProductData = await response.json();
-      setProductData(data);
-    } catch (error) {
-      console.error("Erreur lors de la récupération des données:", error);
-      alert("Impossible de récupérer les informations du produit");
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const handleBarcodeScanned = ({ type, data }: { type: string; data: string }) => {
-    setScanned(true);
-    setShowScanner(false);
-    fetchProductData(data);
-  };
+    if (!code) return;
+    setLoading(true);
+    fetch(`https://world.openfoodfacts.org/api/v0/product/${code}.json`)
+      .then(res => res.json())
+      .then(data => setProductData(data))
+      .catch(() => setProductData(null))
+      .finally(() => setLoading(false));
+  }, [code]);
 
   const handleBackToCapture = () => {
     router.push('/(tabs)/capture');
-  };
-
-  const handleRescanProduct = () => {
-    setShowScanner(true);
-    setScanned(false);
-    setProductData(null);
   };
 
   const getMostRecentNutriScore = (nutriscore: NutriScore) => {
@@ -124,14 +87,10 @@ export default function CameraScreen() {
     return years.length > 0 ? { year: years[0], data: nutriscore[years[0]] } : null;
   };
 
-  if (hasPermission === null) {
-    return <Text>Demande d'autorisation de la caméra</Text>;
-  }
-  if (hasPermission === false) {
-    return <Text>Pas d'accès à la caméra</Text>;
-  }
+  if (loading) return <Text>Chargement...</Text>;
+  if (!productData || productData.status !== 1) return <Text>Produit non trouvé</Text>;
 
-  const renderProductScreen = () => (
+  return (
     <SafeAreaView style={styles.productScreen}>
       <View style={styles.header}>
         <TouchableOpacity onPress={handleBackToCapture} style={styles.backButton}>
@@ -169,7 +128,7 @@ export default function CameraScreen() {
                       <Text style={styles.nutriscoreTitle}>
                         Nutri-Score ({nutriscoreInfo.year})
                       </Text>
-                      <Text style={[styles.nutriscoreGrade, { color: gradeColor }]}>
+                      <Text style={[styles.nutriscoreGrade, { color: gradeColor }]}> 
                         {nutriscoreInfo.data.grade.toUpperCase()}
                       </Text>
                     </>
@@ -225,56 +184,18 @@ export default function CameraScreen() {
           </View>
         </View>
       </ScrollView>
-      <TouchableOpacity style={styles.scanButton} onPress={handleRescanProduct}>
+
+       <TouchableOpacity style={styles.scanButton} onPress={() => router.push('/camera')}>
         <Feather name="camera" size={24} color="#FFF" style={styles.scanIcon} />
         <Text style={styles.scanButtonText}>Scanner un nouveau produit</Text>
       </TouchableOpacity>
-    </SafeAreaView>
-  );
 
-  return (
-    <View style={styles.container}>
-      {showScanner ? (
-        <>
-          <CameraView
-            onBarcodeScanned={scanned ? undefined : handleBarcodeScanned}
-            barcodeScannerSettings={{
-              barcodeTypes: ["ean13", "ean8", "upc_a", "upc_e"],
-            }}
-            style={StyleSheet.absoluteFillObject}
-          />
-          <View style={styles.scannerOverlay}>
-            <View style={styles.scannerFrame} />
-            <TouchableOpacity 
-              style={[styles.backButton, { position: 'absolute', top: 50, left: 16 }]} 
-              onPress={() => router.back()}
-            >
-              <Feather name="x" size={32} color="#FFF" />
-            </TouchableOpacity>
-          </View>
-        </>
-      ) : (
-        <>
-          {loading ? (
-            <View style={styles.loadingContainer}>
-              <ActivityIndicator size="large" color="#007AFF" />
-              <Text style={styles.loadingText}>Chargement des données...</Text>
-            </View>
-          ) : (
-            productData && productData.status === 1 && renderProductScreen()
-          )}
-        </>
-      )}
-    </View>
+    </SafeAreaView>
   );
 }
 
-const { width, height } = Dimensions.get('window');
+const { width } = Dimensions.get('window');
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#fff',
-  },
   productScreen: {
     flex: 1,
     backgroundColor: '#fff',
@@ -342,23 +263,6 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     marginBottom: 16,
   },
-  scoreDetails: {
-    flexDirection: 'row',
-    justifyContent: 'space-around',
-  },
-  scoreItem: {
-    alignItems: 'center',
-  },
-  scoreValue: {
-    fontSize: 20,
-    fontWeight: '600',
-    color: '#1a1a1a',
-  },
-  scoreLabel: {
-    fontSize: 12,
-    color: '#666',
-    marginTop: 4,
-  },
   section: {
     marginBottom: 24,
   },
@@ -397,7 +301,7 @@ const styles = StyleSheet.create({
     color: '#666',
     marginTop: 4,
   },
-  scanButton: {
+   scanButton: {
     position: 'absolute',
     bottom: 32,
     left: 16,
@@ -422,27 +326,5 @@ const styles = StyleSheet.create({
   },
   scanIcon: {
     marginRight: 8,
-  },
-  loadingContainer: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  loadingText: {
-    marginTop: 16,
-    fontSize: 16,
-    color: '#666',
-  },
-  scannerOverlay: {
-    ...StyleSheet.absoluteFillObject,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  scannerFrame: {
-    width: width * 0.7,
-    height: width * 0.7,
-    borderWidth: 2,
-    borderColor: '#fff',
-    borderRadius: 12,
   },
 });

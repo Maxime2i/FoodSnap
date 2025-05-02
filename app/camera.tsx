@@ -233,8 +233,6 @@ const extractNutritionValues = (foodDescription: string): NutritionValues => {
   }
 };
 
-
-
 export default function CameraScreen() {
   const { user } = useAuth();
   const [facing, setFacing] = useState<CameraType>('back');
@@ -270,6 +268,11 @@ export default function CameraScreen() {
   const [showQuantityModal, setShowQuantityModal] = useState(false);
   const [selectedIngredient, setSelectedIngredient] = useState<Ingredient | null>(null);
   const [tempQuantity, setTempQuantity] = useState("");
+
+  // Ajout des états pour le scan de code-barres
+  const [scanned, setScanned] = useState(false);
+  const [barcodeProduct, setBarcodeProduct] = useState<any | null>(null);
+  const [loadingBarcode, setLoadingBarcode] = useState(false);
 
   // Fonction pour gérer l'édition de la quantité
   const handleEditQuantity = (ingredient: Ingredient) => {
@@ -547,6 +550,18 @@ export default function CameraScreen() {
     setIngredients(updatedIngredients);
     setMacros(calculateTotalMacros(updatedIngredients));
   };
+
+  // Fonction de gestion du scan de code-barres
+  const handleBarcodeScanned = ({ type, data }: { type: string; data: string }) => {
+    if (scanned) return;
+    setScanned(true);
+    router.push({ pathname: '/barcode', params: { code: data } });
+  };
+
+  // Réinitialise le scan à chaque focus de l'écran
+  useEffect(() => {
+    setScanned(false);
+  }, []);
 
   if (!permission?.granted) {
     return (
@@ -889,6 +904,10 @@ export default function CameraScreen() {
           ref={cameraRef}
           style={styles.camera} 
           facing={facing}
+          onBarcodeScanned={scanned ? undefined : handleBarcodeScanned}
+          barcodeScannerSettings={{
+            barcodeTypes: ["ean13", "ean8", "upc_a", "upc_e"],
+          }}
         >
           <View style={styles.framingGuide}>
             <View style={[styles.framingCorner, { borderTopWidth: 4, borderLeftWidth: 4 }]} />
@@ -908,6 +927,9 @@ export default function CameraScreen() {
                 <Text style={styles.analyzeButtonText}>Analyser ce plat</Text>
               </TouchableOpacity>
             </View>
+            <Text style={{ color: 'white', textAlign: 'center', marginTop: 16, fontSize: 16, fontWeight: '500', textShadowColor: 'rgba(0,0,0,0.3)', textShadowOffset: {width: 0, height: 1}, textShadowRadius: 2 }}>
+              ou scanner un code-barres
+            </Text>
             <TouchableOpacity style={styles.flipButton} onPress={() => setFacing(current => (current === 'back' ? 'front' : 'back'))}>
               <Feather name="refresh-ccw" size={24} color="white" />
             </TouchableOpacity>
