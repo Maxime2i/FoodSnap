@@ -6,6 +6,7 @@ import { router } from 'expo-router';
 import { useAuth } from '@/hooks/useAuth';
 import { Ionicons } from '@expo/vector-icons';
 import { useColorScheme } from '@/hooks/useColorScheme';
+import HeaderTitle from '@/components/headerTitle';
 
 export default function HelpScreen() {
   const colorScheme = useColorScheme();
@@ -45,13 +46,7 @@ export default function HelpScreen() {
 
   return (
     <View style={getStyles(colorScheme).container}>
-      <View style={getStyles(colorScheme).header}>
-        <TouchableOpacity onPress={() => router.back()} style={getStyles(colorScheme).backButton}>
-          <Ionicons name="arrow-back" size={24} color={colorScheme === 'dark' ? Colors.dark.text : Colors.light.text} />
-        </TouchableOpacity>
-        <Text style={getStyles(colorScheme).title}>Aide et Support</Text>
-        <View style={getStyles(colorScheme).backButton} />
-      </View>
+      <HeaderTitle title="Aide et Support" showBackArrow/>
 
       <View style={getStyles(colorScheme).feedbackContainer}>
         <Text style={getStyles(colorScheme).feedbackTitle}>Envoyez-nous votre feedback</Text>

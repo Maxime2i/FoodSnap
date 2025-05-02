@@ -4,6 +4,7 @@ import { router, useLocalSearchParams } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import { useState } from 'react';
 import { supabase } from '@/lib/supabase';
+import HeaderTitle from '@/components/headerTitle';
 
 interface SearchResult {
   food_name: string;
@@ -211,13 +212,7 @@ export default function CreateMealScreen() {
 
   return (
     <View style={styles.container}>
-      {/* Header */}
-      <View style={styles.header}>
-        <TouchableOpacity onPress={() => router.back()} style={styles.backButton}>
-          <Ionicons name="arrow-back" size={24} color="#000" />
-        </TouchableOpacity>
-        <Text style={styles.headerTitle}>Créer un repas</Text>
-      </View>
+      <HeaderTitle title="Créer un repas" showBackArrow/>
 
       <ScrollView style={styles.content} keyboardShouldPersistTaps="handled">
         {/* Nom du repas */}

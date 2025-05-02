@@ -8,6 +8,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { useColorScheme } from '@/hooks/useColorScheme';
 import { format } from 'date-fns';
 import { fr } from 'date-fns/locale';
+import HeaderTitle from '@/components/headerTitle';
 
 interface FoodItem {
   name: string;
@@ -159,13 +160,8 @@ export default function MyMealsScreen() {
 
   return (
     <View style={getStyles(colorScheme).container}>
-      <View style={getStyles(colorScheme).header}>
-        <TouchableOpacity onPress={() => router.back()} style={getStyles(colorScheme).backButton}>
-          <Ionicons name="arrow-back" size={24} color={colorScheme === 'dark' ? Colors.dark.text : Colors.light.text} />
-        </TouchableOpacity>
-        <Text style={getStyles(colorScheme).title}>Mes Repas</Text>
-        <View style={getStyles(colorScheme).backButton} />
-      </View>
+      <HeaderTitle title="Mes repas" showBackArrow/>
+     
       <FlatList
         data={meals}
         renderItem={renderMeal}

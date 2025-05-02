@@ -10,6 +10,7 @@ import * as FileSystem from 'expo-file-system';
 import { Ionicons } from '@expo/vector-icons';
 import { useColorScheme } from '@/hooks/useColorScheme';
 import { Colors } from '@/constants/Colors';
+import HeaderTitle from '@/components/headerTitle';
 
 type Profile = Database['public']['Tables']['profiles']['Row'] & {
   avatar_url?: string | null;
@@ -220,22 +221,7 @@ export default function ProfileEdit() {
         headerStyle: { backgroundColor: '#f5f5f5' }
       }} />
 
-      <View style={getStyles(colorScheme).tabs}>
-        <TouchableOpacity 
-          style={[getStyles(colorScheme).tab, activeTab === 'informations' && getStyles(colorScheme).activeTab]}
-          onPress={() => setActiveTab('informations')}>
-          <Text style={[getStyles(colorScheme).tabText, activeTab === 'informations' && getStyles(colorScheme).activeTabText]}>
-            Informations
-          </Text>
-        </TouchableOpacity>
-        {/* <TouchableOpacity 
-          style={[getStyles(colorScheme).tab, activeTab === 'preferences' && getStyles(colorScheme).activeTab]}
-          onPress={() => setActiveTab('preferences')}>
-          <Text style={[getStyles(colorScheme).tabText, activeTab === 'preferences' && getStyles(colorScheme).activeTabText]}>
-            Préférences
-          </Text>
-        </TouchableOpacity> */}
-      </View>
+      <HeaderTitle title="Modifier le profil" showBackArrow/>
 
       <View style={getStyles(colorScheme).photoSection}>
         <View style={getStyles(colorScheme).avatarContainer}>

@@ -5,6 +5,7 @@ import { useColorScheme } from "@/hooks/useColorScheme";
 import { Colors } from "@/constants/Colors";
 import { useState, useEffect } from 'react';
 import Slider from '@react-native-community/slider';
+import HeaderTitle from '@/components/headerTitle';
 
 type FoodInfo = {
   food_name: string;
@@ -86,12 +87,7 @@ export default function FoodDetailsScreen() {
           resizeMode="cover"
         />
         <View style={styles.headerOverlay}>
-          <TouchableOpacity onPress={() => router.back()} style={styles.backButton}>
-            <Ionicons name="arrow-back" size={24} color="#fff" />
-          </TouchableOpacity>
-          <Text numberOfLines={1} style={styles.headerText}>
-            {food_name}
-          </Text>
+          <HeaderTitle title={food_name as string} showBackArrow/>
         </View>
       </View>
 
@@ -244,11 +240,7 @@ const styles = StyleSheet.create({
     left: 0,
     right: 0,
     height: 80,
-    flexDirection: 'row',
-    alignItems: 'center',
-    paddingHorizontal: 16,
-    paddingTop: 30,
-    backgroundColor: 'rgba(0,0,0,0.3)',
+    justifyContent: 'center',
   },
   headerText: {
     fontSize: 20,

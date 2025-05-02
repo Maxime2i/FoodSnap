@@ -44,6 +44,7 @@ const getStyles = (colorScheme: string) =>
     backButton: {
       fontSize: 24,
       marginRight: 12,
+      marginBottom: -4,
     },
     title: {
       fontSize: 24,

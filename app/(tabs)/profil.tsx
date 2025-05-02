@@ -8,6 +8,7 @@ import { Colors } from '@/constants/Colors';
 import { Ionicons, MaterialIcons } from '@expo/vector-icons';
 import { useTheme } from '@/app/context/ThemeContext';
 import { useColorScheme } from "@/hooks/useColorScheme";
+import HeaderTitle from '@/components/headerTitle';
 
 export default function ProfilScreen() {
   const { user } = useAuth();
@@ -79,9 +80,7 @@ export default function ProfilScreen() {
 
   return (
     <ScrollView style={getStyles(colorScheme).container}>
-      <View style={getStyles(colorScheme).titleContainer}>
-        <Text style={getStyles(colorScheme).titleText}>Profil</Text>
-      </View>
+      <HeaderTitle title="Profil" />
 
       <View style={getStyles(colorScheme).header}>
         <View style={getStyles(colorScheme).profileImageContainer}>

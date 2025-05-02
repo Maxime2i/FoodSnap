@@ -6,6 +6,7 @@ import { Picker } from '@react-native-picker/picker';
 import { supabase } from '@/lib/supabase';
 import { useAuth } from '@/hooks/useAuth';
 import { router } from 'expo-router';
+import HeaderTitle from '@/components/headerTitle';
 
 type NutritionalGoal = {
   calories: {
@@ -143,9 +144,7 @@ export default function NutritionalGoalsScreen() {
 
   return (
     <ScrollView style={getStyles(colorScheme).container}>
-      <View style={getStyles(colorScheme).header}>
-        <Text style={getStyles(colorScheme).title}>Objectifs Nutritionnels</Text>
-      </View>
+      <HeaderTitle title="Objectifs nutritionnels" showBackArrow/>
 
       <View style={getStyles(colorScheme).section}>
         <Text style={getStyles(colorScheme).sectionTitle}>Objectif Global</Text>
