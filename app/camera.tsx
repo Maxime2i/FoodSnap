@@ -233,6 +233,8 @@ const extractNutritionValues = (foodDescription: string): NutritionValues => {
   }
 };
 
+
+
 export default function CameraScreen() {
   const { user } = useAuth();
   const [facing, setFacing] = useState<CameraType>('back');
@@ -901,11 +903,13 @@ export default function CameraScreen() {
             <Feather name="x" size={32} color="white" />
           </TouchableOpacity>
           <View style={styles.buttonContainer}>
-            <TouchableOpacity style={styles.captureButton} onPress={takePicture}>
-              <View style={styles.captureButtonInner} />
-            </TouchableOpacity>
+            <View style={styles.analyzeButtonWrapper}>
+              <TouchableOpacity style={styles.analyzeButton} onPress={takePicture}>
+                <Text style={styles.analyzeButtonText}>Analyser ce plat</Text>
+              </TouchableOpacity>
+            </View>
             <TouchableOpacity style={styles.flipButton} onPress={() => setFacing(current => (current === 'back' ? 'front' : 'back'))}>
-              <Feather name="refresh-ccw" size={28} color="white" />
+              <Feather name="refresh-ccw" size={24} color="white" />
             </TouchableOpacity>
           </View>
         </CameraView>
@@ -938,32 +942,42 @@ const styles = StyleSheet.create({
     bottom: 40,
     left: 0,
     right: 0,
-    flexDirection: 'row',
-    justifyContent: 'center',
-    alignItems: 'center',
-    paddingHorizontal: 20,
-  },
-  captureButton: {
-    width: 80,
-    height: 80,
-    borderRadius: 40,
-    backgroundColor: 'rgba(255, 255, 255, 0.3)',
+    height: 44,
     justifyContent: 'center',
     alignItems: 'center',
   },
-  captureButtonInner: {
-    width: 70,
-    height: 70,
-    borderRadius: 35,
-    backgroundColor: 'white',
+  analyzeButtonWrapper: {
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  analyzeButton: {
+    backgroundColor: '#31AFF0',
+    paddingVertical: 12,
+    paddingHorizontal: 24,
+    borderRadius: 30,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginBottom: 0,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.25,
+    shadowRadius: 3.84,
+    elevation: 5,
+    height: 50,
+  },
+  analyzeButtonText: {
+    color: 'white',
+    fontSize: 18,
+    fontWeight: 'bold',
+    letterSpacing: 1,
   },
   flipButton: {
     position: 'absolute',
     right: 30,
-    bottom: 20,
-    width: 50,
-    height: 50,
-    borderRadius: 25,
+    bottom: 0,
+    width: 44,
+    height: 44,
+    borderRadius: 22,
     backgroundColor: 'rgba(0, 0, 0, 0.2)',
     justifyContent: 'center',
     alignItems: 'center',
