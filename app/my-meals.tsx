@@ -88,7 +88,7 @@ export default function MyMealsScreen() {
           <View style={getStyles(colorScheme).headerRow}>
             <Text style={getStyles(colorScheme).cardTitle}>{item.name}</Text>
             <Text style={getStyles(colorScheme).timeText}>
-              {format(new Date(item.created_at), 'HH:mm', { locale: fr })}
+              {format(new Date(item.created_at), 'dd/MM/yyyy', { locale: fr })}
             </Text>
           </View>
         </View>

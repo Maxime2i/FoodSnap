@@ -17,6 +17,8 @@ import { fr } from "date-fns/locale";
 import { useColorScheme } from "@/hooks/useColorScheme";
 import { Colors } from "@/constants/Colors";
 import { PieChart, BarChart } from "react-native-gifted-charts";
+import HeaderTitle from "@/components/headerTitle";
+import TabSelector from "@/components/tabSelector";
 
 type Tab = "Historique" | "Analyse IA" | "Statistiques";
 type Meal = {
@@ -250,31 +252,15 @@ export default function ReviewScreen() {
 
   return (
     <View style={getStyles(colorScheme).container}>
-      <View style={getStyles(colorScheme).header}>
-        <Text style={getStyles(colorScheme).headerTitle}>Review</Text>
-      </View>
-      <View style={getStyles(colorScheme).tabContainer}>
-        <View style={getStyles(colorScheme).tabBackground}>
-          {(["Historique", "Analyse IA", "Statistiques"] as Tab[]).map(
-            (tab) => (
-              <TouchableOpacity
-                key={tab}
-                style={[getStyles(colorScheme).tab, activeTab === tab && getStyles(colorScheme).activeTab]}
-                onPress={() => setActiveTab(tab)}
-              >
-                <Text
-                  style={[
-                    getStyles(colorScheme).tabText,
-                    activeTab === tab && getStyles(colorScheme).activeTabText,
-                  ]}
-                >
-                  {tab}
-                </Text>
-              </TouchableOpacity>
-            )
-          )}
-        </View>
-      </View>
+      
+      <HeaderTitle title="Review" />
+      <TabSelector
+        tabs={["Historique", "Analyse IA", "Statistiques"]}
+        selectedTab={activeTab}
+        onSelectTab={(tab) => setActiveTab(tab as Tab)}
+      />
+
+   
 
       <ScrollView style={getStyles(colorScheme).content}>
         {activeTab === "Historique" &&

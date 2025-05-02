@@ -10,6 +10,7 @@ import ReviewScreen from "./review";
 import FeedScreen from "./feed";
 import Feather from '@expo/vector-icons/Feather';
 import { Colors } from "@/constants/Colors";
+import { router } from 'expo-router';
 
 type TabRoute = {
   key: string;
@@ -85,6 +86,7 @@ export default function TabLayout() {
           )
         }}
         swipeEnabled={false}
+        animationEnabled={false}
         navigationState={{ index, routes }}
         renderScene={renderScene}
         renderTabBar={renderTabBar}
@@ -120,7 +122,7 @@ export default function TabLayout() {
               elevation: 5
             }} 
             activeOpacity={1}
-            onPress={() => setIndex(2)}
+            onPress={() => router.push('/camera')}
           >
             <Feather name="camera" color="white" size={32} />
           </TouchableOpacity>

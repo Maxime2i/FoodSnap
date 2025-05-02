@@ -2,13 +2,14 @@ import { StyleSheet, View, Text, ScrollView, TouchableOpacity, Image, TextInput,
 import { Ionicons } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useAuth } from '../context/AuthContext';
-import { format } from 'date-fns';
+import { format, formatDistanceToNow } from 'date-fns';
 import { fr } from 'date-fns/locale';
 import { router, useFocusEffect } from 'expo-router';
 import { useColorScheme } from "@/hooks/useColorScheme";
 import { Colors } from "@/constants/Colors";
 import { useState, useCallback } from 'react';
 import React from 'react';
+import SearchBar from '../components/SearchBar';
 
 interface SearchResult {
   food_name: string;
@@ -134,56 +135,20 @@ export default function HomeScreen() {
         <Text style={getStyles(colorScheme).date}>{formattedDate}</Text>
       </View>
 
-      <View style={getStyles(colorScheme).searchContainer}>
-        <View style={getStyles(colorScheme).searchInputContainer}>
-          <Ionicons name="search-outline" size={20} color={colorScheme === 'dark' ? Colors.dark.text : Colors.light.text} />
-          <TextInput
-            style={getStyles(colorScheme).searchInput}
-            placeholder="Rechercher..."
-            placeholderTextColor={colorScheme === 'dark' ? Colors.dark.text : Colors.light.text}
-            value={searchQuery}
-            onChangeText={handleSearch}
-          />
-          {isSearching && (
-            <ActivityIndicator size="small" color="#4a90e2" />
-          )}
-        </View>
-        {searchResults.length > 0 && (
-          <View style={getStyles(colorScheme).searchResults}>
-            {searchResults.map((result, index) => (
-              <TouchableOpacity 
-                key={result.tag_id + result.food_name || index}
-                style={getStyles(colorScheme).searchResultItem}
-                onPress={() => {
-                  router.push({
-                    pathname: '/food-details',
-                    params: {
-                      food_name: result.food_name,
-                      photo_url: result.photo.thumb,
-                      tag_id: result.tag_id.toString()
-                    }
-                  });
-                  setSearchQuery('');
-                  setSearchResults([]);
-                }}
-              >
-                <View style={getStyles(colorScheme).searchResultContent}>
-                  <Image 
-                    source={{ uri: result.photo.thumb }} 
-                    style={getStyles(colorScheme).searchResultImage} 
-                  />
-                  <View style={getStyles(colorScheme).searchResultTextContainer}>
-                    <Text style={getStyles(colorScheme).searchResultText}>{result.food_name}</Text>
-                    <Text style={getStyles(colorScheme).searchResultSubtext}>
-                      {result.serving_qty} {result.serving_unit}
-                    </Text>
-                  </View>
-                </View>
-              </TouchableOpacity>
-            ))}
-          </View>
-        )}
-      </View>
+      <SearchBar
+        colorScheme={colorScheme}
+        getStyles={getStyles}
+        onResultSelect={(result) => {
+          router.push({
+            pathname: '/food-details',
+            params: {
+              food_name: result.food_name,
+              photo_url: result.photo.thumb,
+              tag_id: result.tag_id.toString(),
+            },
+          });
+        }}
+      />
 
       <View style={getStyles(colorScheme).carbsCard}>
         <View style={getStyles(colorScheme).carbsHeader}>
@@ -200,7 +165,7 @@ export default function HomeScreen() {
 
         {(user?.glucides || 0) > 0 ? (
           <>
-            <Text style={getStyles(colorScheme).carbsRemaining}>{Math.max((user?.glucides || 0) - totals.glucides, 0)}g restants</Text>
+            <Text style={getStyles(colorScheme).carbsRemaining}>{Math.max((user?.glucides || 0) - totals.glucides, 0).toFixed(2)}g restants</Text>
 
             <View style={getStyles(colorScheme).carbsBar}>
               <LinearGradient
@@ -234,7 +199,8 @@ export default function HomeScreen() {
             </View>
             <Text style={getStyles(colorScheme).macroLabel}>Calories</Text>
             <Text style={getStyles(colorScheme).macroValue}>{totals.calories}kcal</Text>
-            {user?.calories && <Text style={getStyles(colorScheme).macroGoal}>sur {user?.calories}kcal</Text>}
+            {user?.calories && <Text style={getStyles(colorScheme).macroGoal}>sur </Text>}
+            {user?.calories && <Text style={getStyles(colorScheme).macroGoal}>{user?.calories}kcal</Text>}
           </View>
 
           <View style={getStyles(colorScheme).macroCard}>
@@ -266,26 +232,42 @@ export default function HomeScreen() {
         </View>
 
         {user?.meals?.slice(0, 2).map((meal) => (
-          <View key={meal.id} style={getStyles(colorScheme).mealCard}>
+          <TouchableOpacity
+            key={meal.id}
+            style={getStyles(colorScheme).mealCard}
+            onPress={() => router.push(`/meal-detail?id=${meal.id}`)}
+            activeOpacity={0.85}
+          >
             <View style={getStyles(colorScheme).mealInfo}>
               <View style={getStyles(colorScheme).mealHeader}>
                 <Text style={getStyles(colorScheme).mealTitle}>{meal.name}</Text>
-                <Text style={getStyles(colorScheme).mealTime}>
-                  {format(new Date(meal.created_at), 'HH:mm', { locale: fr })}
-                </Text>
-              </View>
-              <View style={getStyles(colorScheme).macroRow}>
-                <Text style={getStyles(colorScheme).caloriesText}>{meal.total_calories.toFixed(0)} kcal</Text>
-                <View style={getStyles(colorScheme).macrosGroup}>
-                  <Text style={[getStyles(colorScheme).macroValue, { color: '#4a90e2' }]}>{meal.total_carbs.toFixed(1)}g G</Text>
-                  <Text style={[getStyles(colorScheme).macroValue, { color: '#2ecc71' }]}>{meal.total_proteins.toFixed(1)}g P</Text>
-                  <Text style={[getStyles(colorScheme).macroValue, { color: '#f1c40f' }]}>{meal.total_fats.toFixed(1)}g L</Text>
+                <View style={{ alignItems: 'flex-end' }}>
+                  <Text style={getStyles(colorScheme).mealTime}>
+                    {formatDistanceToNow(new Date(meal.created_at), { locale: fr, addSuffix: true })}
+                  </Text>
                 </View>
               </View>
+              {meal.foods && meal.foods.length > 0 && (
+                <>
+                  <View style={{ flexDirection: 'row', marginBottom: 0, marginTop: 2 }}>
+                    {meal.foods.map((food, idx) => (
+                      food.photo ? (
+                        <Image
+                          key={idx}
+                          source={{ uri: food.photo }}
+                          style={{ width: 22, height: 22, borderRadius: 11, marginRight: 4 }}
+                        />
+                      ) : null
+                    ))}
+                  </View>
+                  <View style={{ flexDirection: 'row', justifyContent: 'flex-end', marginBottom: 8 }}>
+                    <Text style={[getStyles(colorScheme).macroValue, { color: '#4a90e2', fontSize: 14 }]}>Glucides : <Text style={{ fontWeight: 'bold', fontSize: 20 }}>{meal.total_carbs.toFixed(1)}g</Text></Text>
+                  </View>
+                </>
+              )}
             </View>
-          </View>
+          </TouchableOpacity>
         ))}
-
 
         <TouchableOpacity style={getStyles(colorScheme).addMealButton} onPress={() => router.push({
                 pathname: '/create-meal',
