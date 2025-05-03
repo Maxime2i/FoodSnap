@@ -52,13 +52,13 @@ export default function LikedMealsScreen() {
       // 1. Récupérer les IDs des plats likés par l'utilisateur
       const { data: likedPlatsData, error: likesError } = await supabase
         .from("likes")
-        .select("plat_id")
+        .select("post_id")
         .eq("user_id", user.id);
 
       if (likesError) throw likesError;
 
-      const likedPlatsIds = likedPlatsData.map(like => like.plat_id);
-
+      const likedPlatsIds = likedPlatsData.map(like => like.post_id);
+      
       if (likedPlatsIds.length === 0) {
         setPlats([]);
         return;
@@ -66,7 +66,7 @@ export default function LikedMealsScreen() {
 
       // 2. Récupérer les détails des plats likés
       const { data: platsData, error: platsError } = await supabase
-        .from("plats")
+        .from("posts")
         .select(`
           *,
           likes:likes(count)

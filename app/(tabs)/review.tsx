@@ -60,7 +60,7 @@ export default function ReviewScreen() {
 
     try {
       const { data, error } = await supabase
-        .from("plats")
+        .from("posts")
         .select('*')
         .eq("user_id", user.id)
         .order("created_at", { ascending: false });

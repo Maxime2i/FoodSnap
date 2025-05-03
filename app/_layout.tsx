@@ -69,6 +69,7 @@ function LayoutContent() {
           <Stack.Screen name="food-details" options={{ headerShown: false }} />
           <Stack.Screen name="create-meal" options={{ headerShown: false }} />
           <Stack.Screen name="nutritional-goals" options={{ headerShown: false }} />
+          <Stack.Screen name="article" options={{ headerShown: false }} />
           <Stack.Screen name="+not-found" options={{ title: 'Oops!' }} />
         </Stack>
         <StatusBar style="auto" />
