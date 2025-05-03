@@ -65,6 +65,8 @@ const MacroColors = {
 export default function FeedScreen() {
   const { user } = useAuth();
   const userId = user?.id;
+
+  const colorScheme = useColorScheme();
   
   const [selectedTab, setSelectedTab] = useState("Actualités");
   const [articles, setArticles] = useState<Article[]>([]);
@@ -160,7 +162,7 @@ export default function FeedScreen() {
   };
 
   return (
-    <View>
+    <View style={{ flex: 1, position: 'relative' }}>
       <HeaderTitle title="Actualités & Communauté" />
       <TabSelector
         tabs={["Actualités", "Communauté"]}
@@ -207,32 +209,41 @@ export default function FeedScreen() {
         postsLoading ? (
           <ActivityIndicator style={{ marginTop: 20 }} />
         ) : (
-          <FlatList
-            style={{ marginTop: 10 }}
-            contentContainerStyle={{ paddingBottom: 150 }}
-            data={posts}
-            keyExtractor={(item) => item.id}
-            renderItem={({ item }) => (
-              <PostCard
-                id={item.id}
-                name={
-                  item.profiles
-                    ? `${item.profiles.first_name} ${item.profiles.last_name}`
-                    : "utilisateur inconnu"
-                }
-                image={item.profiles ? item.profiles.avatar_url : undefined}
-                title={item.name}
-                description={item.description}
-                time={formatDate(item.created_at)}
-                likes={item.likes[0].count}
-                liked={item.user_liked.some((like: { user_id: string }) => like.user_id === userId)}
-                onLikePress={() => handleLikePress(item.id, item.user_liked.some((like: { user_id: string }) => like.user_id === userId))}
-              />
-            )}
-            refreshControl={
-              <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
-            }
-          />
+          <>
+            <FlatList
+              style={{ marginTop: 10 }}
+              contentContainerStyle={{ paddingBottom: 150 }}
+              data={posts}
+              keyExtractor={(item) => item.id}
+              renderItem={({ item }) => (
+                <PostCard
+                  id={item.id}
+                  name={
+                    item.profiles
+                      ? `${item.profiles.first_name} ${item.profiles.last_name}`
+                      : "utilisateur inconnu"
+                  }
+                  image={item.profiles ? item.profiles.avatar_url : undefined}
+                  title={item.name}
+                  description={item.description}
+                  time={formatDate(item.created_at)}
+                  likes={item.likes[0].count}
+                  liked={item.user_liked.some((like: { user_id: string }) => like.user_id === userId)}
+                  onLikePress={() => handleLikePress(item.id, item.user_liked.some((like: { user_id: string }) => like.user_id === userId))}
+                />
+              )}
+              refreshControl={
+                <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+              }
+            />
+            <TouchableOpacity
+              style={getStyles(colorScheme).fab}
+              onPress={() => router.push({ pathname: '/create-post' })}
+              activeOpacity={0.8}
+            >
+              <Ionicons name="create-outline" size={28} color="#fff" />
+            </TouchableOpacity>
+          </>
         )
       )}
     </View>
@@ -252,5 +263,21 @@ function formatDate(dateString: string) {
 
 const getStyles = (colorScheme: string) =>
   StyleSheet.create({
-    
-  });
+    fab: {
+      position: 'absolute',
+      right: 16,
+      bottom: 20,
+      backgroundColor: colorScheme === 'dark' ? Colors.dark.primary : Colors.light.primary,
+      width: 60,
+      height: 60,
+      borderRadius: 30,
+      alignItems: 'center',
+      justifyContent: 'center',
+      elevation: 5,
+      shadowColor: '#000',
+      shadowOffset: { width: 0, height: 2 },
+      shadowOpacity: 0.3,
+      shadowRadius: 4,
+      zIndex: 100,
+  },
+});
