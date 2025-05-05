@@ -22,27 +22,6 @@ import ActuCard from "@/components/actuCard";
 import LargeActuCard from "@/components/largeActuCard";
 import PostCard from "@/components/post";
 
-interface Profile {
-  first_name: string;
-  last_name: string;
-  avatar_url: string;
-}
-
-interface Plat {
-  id: string;
-  photo_url: string;
-  name: string;
-  description: string;
-  calories: number;
-  proteines: number;
-  glucides: number;
-  lipides: number;
-  created_at: string;
-  user_id: string;
-  user_profile?: Profile;
-  type: string;
-  likes_count: number;
-}
 
 interface Article {
   id: string;
@@ -229,6 +208,7 @@ export default function FeedScreen() {
                   time={formatDate(item.created_at)}
                   likes={item.likes[0].count}
                   liked={item.user_liked.some((like: { user_id: string }) => like.user_id === userId)}
+                  categorie={item.categorie}
                   onLikePress={() => handleLikePress(item.id, item.user_liked.some((like: { user_id: string }) => like.user_id === userId))}
                 />
               )}

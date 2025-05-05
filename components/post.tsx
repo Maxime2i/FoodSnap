@@ -12,12 +12,37 @@ interface PostCardProps {
   likes: number;
   liked: boolean;
   onLikePress: () => void;
+  categorie: string;
 }
 
-const PostCard: React.FC<PostCardProps> = ({ id, name, image, title, description, time, likes, liked, onLikePress }) => {
+const getBadgeStyle = (categorie: string) => {
+  switch (categorie?.toLowerCase()) {
+    case "question":
+      return { backgroundColor: '#FFD600' };
+    case "conseil":
+      return { backgroundColor: '#2196F3' };
+    case "experience":
+      return { backgroundColor: '#4CAF50' };
+    case "recette":
+      return { backgroundColor: '#9C27B0' };
+    default:
+      return { backgroundColor: '#CCCCCC' };
+  }
+};
+
+const PostCard: React.FC<PostCardProps> = ({ id, name, image, title, description, time, likes, liked, onLikePress, categorie }) => {
 
     return (
     <View style={styles.card}>
+      {/* Badge catégorie */}
+      {categorie && (
+        <View style={[styles.badgeContainer]}>
+          <View style={[styles.badge, getBadgeStyle(categorie)]}>
+            <Text style={styles.badgeText}>{categorie}</Text>
+          </View>
+        </View>
+      )}
+      {/* Fin badge */}
       <View style={styles.header}>
         <Image source={{ uri: image }} style={styles.avatar} />
         <View style={{ flex: 1 }}>
@@ -56,6 +81,27 @@ const styles = StyleSheet.create({
     shadowRadius: 8,
     elevation: 2,
     maxWidth: 400,
+    position: 'relative',
+  },
+  badgeContainer: {
+    position: 'absolute',
+    top: 8,
+    right: 8,
+    zIndex: 10,
+  },
+  badge: {
+    borderRadius: 12,
+    paddingHorizontal: 10,
+    paddingVertical: 4,
+    alignItems: 'center',
+    justifyContent: 'center',
+    minWidth: 60,
+  },
+  badgeText: {
+    color: '#fff',
+    fontWeight: 'bold',
+    fontSize: 12,
+    textTransform: 'capitalize',
   },
   header: {
     flexDirection: 'row',

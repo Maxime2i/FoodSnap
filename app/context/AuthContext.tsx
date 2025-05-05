@@ -31,6 +31,8 @@ type AuthContextType = {
     id: string; 
     email: string; 
     first_name: string;
+    last_name: string;
+    avatar_url: string;
     glucides: number;
     calories: number;
     proteines: number;
@@ -54,7 +56,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const fetchUserProfile = async (userId: string) => {
     const { data, error } = await supabase
       .from('profiles')
-      .select('first_name, glucides, calories, proteines, lipides')
+      .select('first_name, last_name, avatar_url, glucides, calories, proteines, lipides')
       .eq('id', userId)
       .single();
 
@@ -93,10 +95,12 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         id: session.user.id,
         email: session.user.email || '',
         first_name: data?.first_name || 'Utilisateur',
+        last_name: data?.last_name || 'Utilisateur',
         glucides: data?.glucides || 0,
         calories: data?.calories || 0,
         proteines: data?.proteines || 0,
         lipides: data?.lipides || 0,
+        avatar_url: data?.avatar_url || '',
         meals: meals
       });
     } else {
