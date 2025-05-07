@@ -99,8 +99,12 @@ export default function FeedScreen() {
 
   const onRefresh = useCallback(() => {
     setRefreshing(true);
-    fetchArticles().then(() => setRefreshing(false));
-  }, []);
+    if (selectedTab === "Actualités") {
+      fetchArticles().then(() => setRefreshing(false));
+    } else if (selectedTab === "Communauté") {
+      fetchPosts().then(() => setRefreshing(false));
+    }
+  }, [selectedTab]);
 
   const handleLikePress = async (postId: string, liked: boolean) => {
     if (!userId) return;
