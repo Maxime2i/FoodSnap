@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, TextInput, ActivityIndicator, TouchableOpacity, Image, Text, StyleSheet } from 'react-native';
+import { View, TextInput, ActivityIndicator, TouchableOpacity, Image, Text, StyleSheet, ScrollView } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 
 interface SearchResult {
@@ -25,6 +25,10 @@ const SearchBar: React.FC<SearchBarProps> = ({ colorScheme, getStyles, onResultS
 
   const handleSearch = async (query: string) => {
     setSearchQuery(query);
+    if (query.trim().length < 2) {
+      setSearchResults([]);
+      return;
+    }
     if (query.trim() === '') {
       setSearchResults([]);
       return;
@@ -62,10 +66,25 @@ const SearchBar: React.FC<SearchBarProps> = ({ colorScheme, getStyles, onResultS
           value={searchQuery}
           onChangeText={handleSearch}
         />
+        {searchQuery.length > 0 && !isSearching && (
+          <TouchableOpacity
+            onPress={() => {
+              setSearchQuery('');
+              setSearchResults([]);
+            }}
+            style={{ marginLeft: 8 }}
+          >
+            <Ionicons name="close-circle" size={20} color={colorScheme === 'dark' ? '#fff' : '#000'} />
+          </TouchableOpacity>
+        )}
         {isSearching && <ActivityIndicator size="small" color="#4a90e2" />}
       </View>
       {searchResults.length > 0 && (
-        <View style={getStyles(colorScheme).searchResults}>
+        <ScrollView
+          style={[getStyles(colorScheme).searchResults, { maxHeight: 350 }]}
+          keyboardShouldPersistTaps="handled"
+          nestedScrollEnabled={true}
+        >
           {searchResults.map((result, index) => (
             <TouchableOpacity
               key={result.tag_id + result.food_name || index}
@@ -90,7 +109,7 @@ const SearchBar: React.FC<SearchBarProps> = ({ colorScheme, getStyles, onResultS
               </View>
             </TouchableOpacity>
           ))}
-        </View>
+        </ScrollView>
       )}
     </View>
   );
