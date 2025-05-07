@@ -10,6 +10,7 @@ import { Colors } from "@/constants/Colors";
 import { useState, useCallback } from 'react';
 import React from 'react';
 import SearchBar from '../components/SearchBar';
+import MealCard from '@/components/mealCard';
 
 interface SearchResult {
   food_name: string;
@@ -232,41 +233,9 @@ export default function HomeScreen() {
         </View>
 
         {user?.meals?.slice(0, 2).map((meal) => (
-          <TouchableOpacity
-            key={meal.id}
-            style={getStyles(colorScheme).mealCard}
-            onPress={() => router.push(`/meal-detail?id=${meal.id}`)}
-            activeOpacity={0.85}
-          >
-            <View style={getStyles(colorScheme).mealInfo}>
-              <View style={getStyles(colorScheme).mealHeader}>
-                <Text style={getStyles(colorScheme).mealTitle}>{meal.name}</Text>
-                <View style={{ alignItems: 'flex-end' }}>
-                  <Text style={getStyles(colorScheme).mealTime}>
-                    {formatDistanceToNow(new Date(meal.created_at), { locale: fr, addSuffix: true })}
-                  </Text>
-                </View>
-              </View>
-              {meal.foods && meal.foods.length > 0 && (
-                <>
-                  <View style={{ flexDirection: 'row', marginBottom: 0, marginTop: 2 }}>
-                    {meal.foods.map((food, idx) => (
-                      food.photo ? (
-                        <Image
-                          key={idx}
-                          source={{ uri: food.photo }}
-                          style={{ width: 22, height: 22, borderRadius: 11, marginRight: 4 }}
-                        />
-                      ) : null
-                    ))}
-                  </View>
-                  <View style={{ flexDirection: 'row', justifyContent: 'flex-end', marginBottom: 8 }}>
-                    <Text style={[getStyles(colorScheme).macroValue, { color: '#4a90e2', fontSize: 14 }]}>Glucides : <Text style={{ fontWeight: 'bold', fontSize: 20 }}>{meal.total_carbs.toFixed(1)}g</Text></Text>
-                  </View>
-                </>
-              )}
-            </View>
-          </TouchableOpacity>
+          <MealCard
+            meal={meal}
+        />
         ))}
 
         <TouchableOpacity style={getStyles(colorScheme).addMealButton} onPress={() => router.push({

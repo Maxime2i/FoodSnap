@@ -19,19 +19,34 @@ import { Colors } from "@/constants/Colors";
 import { PieChart, BarChart } from "react-native-gifted-charts";
 import HeaderTitle from "@/components/headerTitle";
 import TabSelector from "@/components/tabSelector";
+import MealCard from "@/components/mealCard";
 
 type Tab = "Historique" | "Analyse IA" | "Statistiques";
+
+
+type FoodItem = {
+  name: string;
+  quantity: number;
+  calories: number;
+  carbs: number;
+  proteins: number;
+  fats: number;
+  glycemicImpact: number;
+  photo?: string;
+};
+
 type Meal = {
   id: string;
-  type: string;
-  time: string;
-  calories: number;
-  proteines: number;
-  glucides: number;
-  lipides: number;
-  created_at: string;
+  user_id: string;
   name: string;
-  photo_url: string;
+  created_at: string;
+  total_calories: number;
+  total_carbs: number;
+  total_proteins: number;
+  total_fats: number;
+  glycemic_index: number;
+  glycemic_load: number;
+  foods: FoodItem[];
 };
 
 interface CaloriesPerDay {
@@ -60,28 +75,14 @@ export default function ReviewScreen() {
 
     try {
       const { data, error } = await supabase
-        .from("posts")
+        .from("meals")
         .select('*')
         .eq("user_id", user.id)
         .order("created_at", { ascending: false });
 
       if (error) throw error;
 
-      // Transformer les données pour correspondre à notre structure Meal
-      const transformedMeals = (data || []).map(plat => ({
-        id: plat.id,
-        type: determineType(parseISO(plat.created_at)),
-        time: format(parseISO(plat.created_at), 'HH:mm'),
-        calories: plat.calories || 0,
-        proteines: plat.proteines || 0,
-        glucides: plat.glucides || 0,
-        lipides: plat.lipides || 0,
-        created_at: format(parseISO(plat.created_at), 'yyyy-MM-dd'),
-        name: plat.name || '',
-        photo_url: plat.photo_url || ''
-      }));
-
-      setMeals(transformedMeals);
+      setMeals(data);
     } catch (error) {
       console.error("Erreur lors de la récupération des repas:", error);
     } finally {
@@ -126,20 +127,7 @@ export default function ReviewScreen() {
   };
 
   const renderMeal = (meal: Meal) => (
-    <View key={meal.id} style={getStyles(colorScheme).mealCard}>
-    <Image source={{ uri: meal.photo_url }} style={getStyles(colorScheme).mealIcon} />
-    <View style={getStyles(colorScheme).mealInfo}>
-      <Text style={getStyles(colorScheme).mealTitle}>{meal.name}</Text>
-      <Text style={getStyles(colorScheme).mealDetailsText}>
-        {format(new Date(meal.created_at), 'HH:mm', { locale: fr })} • {meal.calories} kcal
-      </Text>
-    </View>
-    <View style={getStyles(colorScheme).macroColumn}>
-      <Text style={[getStyles(colorScheme).macroValue, { color: '#4a90e2' }]}>{meal.glucides}g G</Text>
-      <Text style={[getStyles(colorScheme).macroValue, { color: '#2ecc71' }]}>{meal.proteines}g P</Text>
-      <Text style={[getStyles(colorScheme).macroValue, { color: '#f1c40f' }]}>{meal.lipides}g L</Text>
-    </View>
-  </View>
+    <MealCard meal={meal} />
   );
 
   const renderDaySection = (date: string, dayMeals: Meal[]) => (
