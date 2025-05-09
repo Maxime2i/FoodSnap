@@ -200,8 +200,7 @@ export default function HomeScreen() {
             </View>
             <Text style={getStyles(colorScheme).macroLabel}>Calories</Text>
             <Text style={getStyles(colorScheme).macroValue}>{totals.calories}kcal</Text>
-            {user?.calories && <Text style={getStyles(colorScheme).macroGoal}>sur </Text>}
-            {user?.calories && <Text style={getStyles(colorScheme).macroGoal}>{user?.calories}kcal</Text>}
+            {user?.calories && <Text style={getStyles(colorScheme).macroGoal}>sur {user?.calories}kcal</Text>}
           </View>
 
           <View style={getStyles(colorScheme).macroCard}>
@@ -235,6 +234,7 @@ export default function HomeScreen() {
         {user?.meals?.slice(0, 2).map((meal) => (
           <MealCard
             meal={meal}
+            key={meal.id}
         />
         ))}
 
@@ -385,6 +385,7 @@ const getStyles = (colorScheme: 'light' | 'dark') => StyleSheet.create({
   macroGoal: {
     fontSize: 14,
     color: colorScheme === 'dark' ? Colors.dark.text : Colors.light.text,
+    textAlign: 'center',
   },
   mealsSection: {
     padding: 16,

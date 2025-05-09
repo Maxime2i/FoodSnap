@@ -20,6 +20,8 @@ import { PieChart, BarChart } from "react-native-gifted-charts";
 import HeaderTitle from "@/components/headerTitle";
 import TabSelector from "@/components/tabSelector";
 import MealCard from "@/components/mealCard";
+import MacroPieChart from '../components/MacroPieChart';
+import BarChartCalories from '../components/BarChartCalories';
 
 type Tab = "Historique" | "Analyse IA" | "Statistiques";
 
@@ -65,6 +67,7 @@ export default function ReviewScreen() {
   const [activeTab, setActiveTab] = useState<Tab>("Historique");
   const [meals, setMeals] = useState<Meal[]>([]);
   const [loading, setLoading] = useState(true);
+  const [selectedRange, setSelectedRange] = useState<7 | 14 | 30>(7);
 
   useEffect(() => {
     fetchMeals();
@@ -131,7 +134,7 @@ export default function ReviewScreen() {
   );
 
   const renderDaySection = (date: string, dayMeals: Meal[]) => (
-    <View key={date} style={getStyles(colorScheme).daySection}>
+    <View key={date + Math.random()} style={getStyles(colorScheme).daySection}>
       <Text style={getStyles(colorScheme).dayTitle}>{formatDate(date)}</Text>
       {dayMeals.map(renderMeal)}
     </View>
@@ -140,25 +143,25 @@ export default function ReviewScreen() {
   const calculateStatistics = useMemo(() => {
     if (!meals.length) return null;
 
-    // Moyennes des macros sur 7 jours
-    const last7Days = meals.filter(meal => {
+    // Moyennes des macros sur la plage sélectionnée
+    const lastXDays = meals.filter(meal => {
       const mealDate = parseISO(meal.created_at);
-      const sevenDaysAgo = subDays(new Date(), 7);
-      return mealDate >= sevenDaysAgo;
+      const xDaysAgo = subDays(new Date(), selectedRange);
+      return mealDate >= xDaysAgo;
     });
 
-    const macroAverages = last7Days.reduce(
+    const macroAverages = lastXDays.reduce(
       (acc, meal) => {
-        acc.proteines += meal.proteines;
-        acc.glucides += meal.glucides;
-        acc.lipides += meal.lipides;
-        acc.calories += meal.calories;
+        acc.proteines += meal.total_proteins;
+        acc.glucides += meal.total_carbs;
+        acc.lipides += meal.total_fats;
+        acc.calories += meal.total_calories;
         return acc;
       },
       { proteines: 0, glucides: 0, lipides: 0, calories: 0 }
     );
 
-    const daysCount = last7Days.length || 1;
+    const daysCount = lastXDays.length || 1;
     
     return {
       macroDistribution: [
@@ -166,19 +169,19 @@ export default function ReviewScreen() {
         { x: "Glucides", y: macroAverages.glucides / daysCount, color: "#4a90e2" },
         { x: "Lipides", y: macroAverages.lipides / daysCount, color: "#f1c40f" },
       ] as MacroData[],
-      caloriesPerDay: last7Days.reduce((acc: CaloriesPerDay, meal) => {
-        const date = meal.created_at;
-        acc[date] = (acc[date] || 0) + meal.calories;
+      caloriesPerDay: lastXDays.reduce((acc: CaloriesPerDay, meal) => {
+        const date = format(parseISO(meal.created_at), 'yyyy-MM-dd');
+        acc[date] = (acc[date] || 0) + meal.total_calories;
         return acc;
       }, {}),
     };
-  }, [meals]);
+  }, [meals, selectedRange]);
 
   const renderStatistics = () => {
     if (!calculateStatistics) return null;
 
     const screenWidth = Dimensions.get("window").width;
-    const chartWidth = screenWidth - 32;
+    const chartWidth = screenWidth - 132;
 
     // Données pour le graphique en camembert
     const pieData = calculateStatistics.macroDistribution.map(item => ({
@@ -189,41 +192,52 @@ export default function ReviewScreen() {
     }));
 
     // Données pour le graphique en barres
-    const barData = Object.entries(calculateStatistics.caloriesPerDay).map(([date, calories]) => ({
-      value: calories,
+    // Générer toutes les dates de la période sélectionnée
+    const today = new Date();
+    const daysArray = Array.from({ length: selectedRange }, (_, i) => {
+      const d = subDays(today, selectedRange - 1 - i);
+      return format(d, 'yyyy-MM-dd');
+    });
+
+    const barData = daysArray.map(date => ({
+      value: calculateStatistics.caloriesPerDay[date] || 0,
       label: format(parseISO(date), 'dd/MM'),
       frontColor: '#4a90e2',
     }));
 
     return (
       <ScrollView style={getStyles(colorScheme).statisticsContainer}>
-        <Text style={getStyles(colorScheme).chartTitle}>Distribution des macronutriments (moyenne sur 7 jours)</Text>
-        <View style={getStyles(colorScheme).chartContainer}>
-          <PieChart
-            data={pieData}
-            donut
-            radius={120}
-            innerRadius={80}
-            centerLabelComponent={() => (
-              <Text style={getStyles(colorScheme).centerLabel}>Macros</Text>
-            )}
-          />
+        <View style={{flexDirection: 'row', justifyContent: 'flex-end', alignItems: 'center', marginBottom: 8, gap: 8}}>
+          {[7, 14, 30].map((range) => {
+            const isSelected = selectedRange === range;
+            return (
+              <TouchableOpacity
+                key={range}
+                style={{
+                  paddingVertical: 2,
+                  paddingHorizontal: 8,
+                  borderRadius: 12,
+                  backgroundColor: isSelected ? '#e8f0fe' : 'transparent',
+                }}
+                onPress={() => setSelectedRange(range as 7 | 14 | 30)}
+              >
+                <Text style={{
+                  color: isSelected ? '#2563eb' : '#111',
+                  fontWeight: isSelected ? 'bold' : 'normal',
+                  fontSize: 14,
+                }}>{range}j</Text>
+              </TouchableOpacity>
+            );
+          })}
         </View>
+        <MacroPieChart pieData={pieData} colorScheme={colorScheme} />
 
-        <Text style={getStyles(colorScheme).chartTitle}>Calories par jour (7 derniers jours)</Text>
-        <View style={getStyles(colorScheme).chartContainer}>
-          <BarChart
-            data={barData}
-            width={chartWidth}
-            height={220}
-            barWidth={30}
-            spacing={20}
-            hideRules
-            xAxisLabelTextStyle={getStyles(colorScheme).axisText}
-            yAxisTextStyle={getStyles(colorScheme).axisText}
-            noOfSections={5}
-          />
-        </View>
+        <BarChartCalories
+          barData={barData}
+          colorScheme={colorScheme}
+          axisTextStyle={getStyles(colorScheme).axisText}
+          selectedRange={selectedRange}
+        />
       </ScrollView>
     );
   };
@@ -243,14 +257,14 @@ export default function ReviewScreen() {
       
       <HeaderTitle title="Review" />
       <TabSelector
-        tabs={["Historique", "Analyse IA", "Statistiques"]}
+        tabs={["Historique", "Statistiques"]}
         selectedTab={activeTab}
         onSelectTab={(tab) => setActiveTab(tab as Tab)}
       />
 
    
 
-      <ScrollView style={getStyles(colorScheme).content}>
+      <ScrollView style={getStyles(colorScheme).content} key={activeTab}>
         {activeTab === "Historique" &&
           Object.entries(groupedMeals).map(([created_at, dayMeals]) =>
             renderDaySection(created_at, dayMeals)
