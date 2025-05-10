@@ -11,6 +11,7 @@ import {
 } from "react-native";
 import { Feather } from '@expo/vector-icons';
 import { router, useLocalSearchParams } from 'expo-router';
+import NutritionTable from './components/NutritionTable';
 
 interface NutriScoreData {
   grade: string;
@@ -147,40 +148,15 @@ export default function ProductScreen() {
           <View style={styles.section}>
             <Text style={styles.sectionTitle}>Valeurs nutritionnelles</Text>
             <Text style={styles.sectionSubtitle}>(pour 100g)</Text>
-            <View style={styles.nutrientsGrid}>
-              <View style={styles.nutrientItem}>
-                <Text style={styles.nutrientValue}>{productData?.product.nutriments['energy-kcal_100g']}</Text>
-                <Text style={styles.nutrientLabel}>kcal</Text>
-              </View>
-              <View style={styles.nutrientItem}>
-                <Text style={styles.nutrientValue}>{productData?.product.nutriments.proteins_100g}g</Text>
-                <Text style={styles.nutrientLabel}>Protéines</Text>
-              </View>
-              <View style={styles.nutrientItem}>
-                <Text style={styles.nutrientValue}>{productData?.product.nutriments.carbohydrates_100g}g</Text>
-                <Text style={styles.nutrientLabel}>Glucides</Text>
-              </View>
-              <View style={styles.nutrientItem}>
-                <Text style={styles.nutrientValue}>{productData?.product.nutriments.sugars_100g}g</Text>
-                <Text style={styles.nutrientLabel}>dont Sucres</Text>
-              </View>
-              <View style={styles.nutrientItem}>
-                <Text style={styles.nutrientValue}>{productData?.product.nutriments.fat_100g}g</Text>
-                <Text style={styles.nutrientLabel}>Lipides</Text>
-              </View>
-              <View style={styles.nutrientItem}>
-                <Text style={styles.nutrientValue}>{productData?.product.nutriments['saturated-fat_100g']}g</Text>
-                <Text style={styles.nutrientLabel}>dont Saturés</Text>
-              </View>
-              <View style={styles.nutrientItem}>
-                <Text style={styles.nutrientValue}>{productData?.product.nutriments.fiber_100g}g</Text>
-                <Text style={styles.nutrientLabel}>Fibres</Text>
-              </View>
-              <View style={styles.nutrientItem}>
-                <Text style={styles.nutrientValue}>{productData?.product.nutriments.salt_100g}g</Text>
-                <Text style={styles.nutrientLabel}>Sel</Text>
-              </View>
-            </View>
+            <NutritionTable
+              calories={productData?.product.nutriments['energy-kcal_100g'] || 0}
+              glucides={productData?.product.nutriments.carbohydrates_100g || 0}
+              sucres={productData?.product.nutriments.sugars_100g || 0}
+              fibres={productData?.product.nutriments.fiber_100g || 0}
+              proteines={productData?.product.nutriments.proteins_100g || 0}
+              lipides={productData?.product.nutriments.fat_100g || 0}
+              satures={productData?.product.nutriments['saturated-fat_100g'] || 0}
+            />
           </View>
         </View>
       </ScrollView>
