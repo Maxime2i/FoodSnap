@@ -117,14 +117,14 @@ const getStyles = (colorScheme: 'light' | 'dark') => StyleSheet.create({
     textAlignVertical: 'top',
   },
   submitButton: {
-    backgroundColor: Colors.light.tint,
+    backgroundColor: colorScheme === 'dark' ? Colors.dark.primary : Colors.light.primary,
     padding: 15,
     borderRadius: 8,
     alignItems: 'center',
     marginTop: 15,
   },
   submitButtonText: {
-    color: '#fff',
+    color: colorScheme === 'dark' ? Colors.dark.white : Colors.light.white,
     fontWeight: '600',
     fontSize: 16,
   },

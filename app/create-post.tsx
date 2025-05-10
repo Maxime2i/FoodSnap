@@ -100,6 +100,7 @@ export default function CreerPublication() {
           value={titre}
           onChangeText={setTitre}
           maxLength={100}
+          placeholderTextColor={colorScheme === 'dark' ? Colors.dark.text : Colors.light.text}
         />
         <TextInput
           style={getStyles(colorScheme).input}
@@ -108,6 +109,7 @@ export default function CreerPublication() {
           scrollEnabled={true}
           value={contenu}
           onChangeText={setContenu}
+          placeholderTextColor={colorScheme === 'dark' ? Colors.dark.text : Colors.light.text}
         />
         <TouchableOpacity
           style={getStyles(colorScheme).button}
@@ -130,46 +132,49 @@ export default function CreerPublication() {
 
 const getStyles = (colorScheme: string) =>
   StyleSheet.create({
-    container: { flex: 1, backgroundColor: "#fff" },
+    container: { flex: 1, backgroundColor: colorScheme === 'dark' ? Colors.dark.background : Colors.light.background },
     userRow: { flexDirection: "row", alignItems: "center", marginBottom: 10 },
     avatar: {
       width: 40,
       height: 40,
       borderRadius: 20,
-      backgroundColor: "#e0e0e0",
+      backgroundColor: colorScheme === 'dark' ? Colors.dark.border : Colors.light.border,
       marginRight: 10,
     },
     content: {
       padding: 20,
     },
-    username: { fontWeight: "bold", fontSize: 16 },
-    picker: { height: 50, width: 140, color: "#222" },
+    username: { fontWeight: "bold", fontSize: 16, color: colorScheme === 'dark' ? Colors.dark.text : Colors.light.text },
+    picker: { height: 50, width: 140, color: colorScheme === 'dark' ? Colors.dark.text : Colors.light.text, backgroundColor: colorScheme === 'dark' ? Colors.dark.background : Colors.light.background },
     pickerWrapper: {
       borderWidth: 1,
-      borderColor: "#d0d0d0",
+      borderColor: colorScheme === 'dark' ? Colors.dark.border : Colors.light.border,
       borderRadius: 8,
       marginTop: 4,
       height: 50,
       width: 140,
+      color: colorScheme === 'dark' ? Colors.dark.text : Colors.light.text,
     },
-    pickerItem: { color: "#222", fontSize: 13 },
+    pickerItem: { color: colorScheme === 'dark' ? Colors.dark.text : Colors.light.text, fontSize: 13, backgroundColor: colorScheme === 'dark' ? Colors.dark.background : Colors.light.background },
     titleInput: {
       borderWidth: 1,
-      borderColor: "#e0e0e0",
+      borderColor: colorScheme === 'dark' ? Colors.dark.border : Colors.light.border,
       borderRadius: 10,
       padding: 12,
       marginBottom: 0,
       fontWeight: "bold",
       fontSize: 16,
+      color: colorScheme === 'dark' ? Colors.dark.text : Colors.light.text,
     },
     input: {
       borderWidth: 1,
-      borderColor: "#e0e0e0",
+      borderColor: colorScheme === 'dark' ? Colors.dark.border : Colors.light.border,
       borderRadius: 10,
       padding: 12,
       height: 160,
       marginVertical: 15,
       textAlignVertical: "top",
+      color: colorScheme === 'dark' ? Colors.dark.text : Colors.light.text,
     },
     iconsRow: {
       flexDirection: "row",
@@ -177,19 +182,19 @@ const getStyles = (colorScheme: string) =>
       marginBottom: 15,
     },
     button: {
-      backgroundColor: "#7daaff",
+      backgroundColor: colorScheme === 'dark' ? Colors.dark.primary : Colors.light.primary,
       borderRadius: 20,
       alignItems: "center",
       padding: 12,
       marginBottom: 15,
     },
-    buttonText: { color: "#fff", fontWeight: "bold", fontSize: 16 },
+    buttonText: { color: colorScheme === 'dark' ? Colors.dark.white : Colors.light.white, fontWeight: "bold", fontSize: 16 },
     reminderBox: {
-      backgroundColor: "#fffbe6",
+      backgroundColor: colorScheme === 'dark' ? Colors.dark.background : Colors.light.background,
       borderRadius: 10,
       padding: 12,
       borderWidth: 1,
-      borderColor: "#fff3cd",
+      borderColor: colorScheme === 'dark' ? Colors.dark.border : Colors.light.border,
     },
     reminderTitle: { fontWeight: "bold", color: "#a05a00" },
     reminderText: { color: "#a05a00", marginTop: 4 },

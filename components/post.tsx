@@ -1,6 +1,8 @@
 import React from "react";
 import { View, Text, Image, StyleSheet, TouchableOpacity } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
+import { useColorScheme } from "@/hooks/useColorScheme";
+import { Colors } from "@/constants/Colors";
 
 interface PostCardProps {
   id: string;
@@ -31,36 +33,37 @@ const getBadgeStyle = (categorie: string) => {
 };
 
 const PostCard: React.FC<PostCardProps> = ({ id, name, image, title, description, time, likes, liked, onLikePress, categorie }) => {
+  const colorScheme = useColorScheme();
 
     return (
-    <View style={styles.card}>
+    <View style={styles(colorScheme).card}>
       {/* Badge catégorie */}
       {categorie && (
-        <View style={[styles.badgeContainer]}>
-          <View style={[styles.badge, getBadgeStyle(categorie)]}>
-            <Text style={styles.badgeText}>{categorie}</Text>
+        <View style={[styles(colorScheme).badgeContainer]}>
+          <View style={[styles(colorScheme).badge, getBadgeStyle(categorie)]}>
+            <Text style={styles(colorScheme).badgeText}>{categorie}</Text>
           </View>
         </View>
       )}
       {/* Fin badge */}
-      <View style={styles.header}>
-        <Image source={{ uri: image }} style={styles.avatar} />
+      <View style={styles(colorScheme).header}>
+        <Image source={{ uri: image }} style={styles(colorScheme).avatar} />
         <View style={{ flex: 1 }}>
-          <Text style={styles.name}>{name}</Text>
-          <Text style={styles.subtext}>{time}</Text>
+          <Text style={styles(colorScheme).name}>{name}</Text>
+          <Text style={styles(colorScheme).subtext}>{time}</Text>
         </View>
       </View>
-      <Text style={styles.title}>{title}</Text>
-      <Text style={styles.description}>{description}</Text>
-      <View style={styles.footer}>
+      <Text style={styles(colorScheme).title}>{title}</Text>
+      <Text style={styles(colorScheme).description}>{description}</Text>
+      <View style={styles(colorScheme).footer}>
         <TouchableOpacity onPress={onLikePress}>
           <Ionicons
             name={liked ? "heart" : "heart-outline"}
             size={24}
-            color={liked ? "red" : "black"}
+            color={liked ? colorScheme === 'dark' ? Colors.dark.primary : Colors.light.primary : colorScheme === 'dark' ? Colors.dark.text : Colors.light.text}
           />
         </TouchableOpacity>
-        <Text style={styles.footerText}>{likes}</Text>
+        <Text style={styles(colorScheme).footerText}>{likes}</Text>
         {/* <Text style={[styles.icon, { marginLeft: 16 }]}>💬</Text>
         <Text style={styles.footerText}>8</Text> */}
         {/* <Text style={[styles.icon, { marginLeft: 16 }]}>⤴️</Text>
@@ -70,9 +73,9 @@ const PostCard: React.FC<PostCardProps> = ({ id, name, image, title, description
   );
 };
 
-const styles = StyleSheet.create({
+const styles = (colorScheme: string) => StyleSheet.create({
   card: {
-    backgroundColor: '#fff',
+    backgroundColor: colorScheme === 'dark' ? Colors.dark.background : Colors.light.background,
     borderRadius: 16,
     padding: 16,
     margin: 8,
@@ -98,7 +101,7 @@ const styles = StyleSheet.create({
     minWidth: 60,
   },
   badgeText: {
-    color: '#fff',
+    color: colorScheme === 'dark' ? Colors.dark.white : Colors.light.white,
     fontWeight: 'bold',
     fontSize: 12,
     textTransform: 'capitalize',
@@ -113,20 +116,22 @@ const styles = StyleSheet.create({
     height: 40,
     borderRadius: 20,
     marginRight: 12,
-    backgroundColor: '#eee',
+    backgroundColor: colorScheme === 'dark' ? Colors.dark.border : Colors.light.border,
   },
   name: {
     fontWeight: 'bold',
     fontSize: 15,
+    color: colorScheme === 'dark' ? Colors.dark.text : Colors.light.text,
   },
   subtext: {
-    color: '#888',
+    color: colorScheme === 'dark' ? Colors.dark.text : Colors.light.text,
     fontSize: 12,
   },
   description: {
     fontSize: 14,
     marginBottom: 12,
     marginTop: 4,
+    color: colorScheme === 'dark' ? Colors.dark.text : Colors.light.text,
   },
   footer: {
     flexDirection: 'row',
@@ -135,17 +140,18 @@ const styles = StyleSheet.create({
   },
   icon: {
     fontSize: 16,
-    color: '#888',
+    color: colorScheme === 'dark' ? Colors.dark.text : Colors.light.text,
   },
   footerText: {
     fontSize: 14,
-    color: '#444',
+    color: colorScheme === 'dark' ? Colors.dark.text : Colors.light.text,
     marginLeft: 4,
   },
   title: {
     fontSize: 16,
     fontWeight: 'bold',
     marginBottom: 4,
+    color: colorScheme === 'dark' ? Colors.dark.text : Colors.light.text,
   },
 });
 

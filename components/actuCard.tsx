@@ -58,7 +58,7 @@ const styles = (colorScheme: 'light' | 'dark') => StyleSheet.create({
     width: 100,
     height: 100,
     resizeMode: "cover",
-    backgroundColor: "#eee",
+    backgroundColor: colorScheme === 'dark' ? Colors.dark.border : Colors.light.border,
   },
   content: {
     padding: 6,
@@ -69,8 +69,8 @@ const styles = (colorScheme: 'light' | 'dark') => StyleSheet.create({
   },
   badge: {
     alignSelf: "flex-start",
-    backgroundColor: "#e3f0ff",
-    color: "#1976d2",
+    backgroundColor: colorScheme === 'dark' ? Colors.dark.primary : Colors.light.primary,
+    color: colorScheme === 'dark' ? Colors.dark.primary : Colors.light.primary,
     borderRadius: 8,
     fontSize: 8,
     fontWeight: "600",
@@ -83,9 +83,10 @@ const styles = (colorScheme: 'light' | 'dark') => StyleSheet.create({
     fontWeight: "600",
     fontSize: 14,
     marginBottom: 0,
+    color: colorScheme === 'dark' ? Colors.dark.text : Colors.light.text,
   },
   date: {
-    color: "#888",
+    color: colorScheme === 'dark' ? Colors.dark.text : Colors.light.text,
     fontSize: 12,
   },
   arrowContainer: {

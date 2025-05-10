@@ -12,6 +12,9 @@ import {
 import { Feather } from '@expo/vector-icons';
 import { router, useLocalSearchParams } from 'expo-router';
 import NutritionTable from './components/NutritionTable';
+import { Colors } from '@/constants/Colors';
+import { useColorScheme } from "@/hooks/useColorScheme";
+import HeaderTitle from "@/components/headerTitle";
 
 interface NutriScoreData {
   grade: string;
@@ -67,7 +70,7 @@ export default function ProductScreen() {
   const { code } = useLocalSearchParams();
   const [productData, setProductData] = useState<ProductData | null>(null);
   const [loading, setLoading] = useState(false);
-
+  const colorScheme = useColorScheme();
   useEffect(() => {
     if (!code) return;
     setLoading(true);
@@ -92,27 +95,24 @@ export default function ProductScreen() {
   if (!productData || productData.status !== 1) return <Text>Produit non trouvé</Text>;
 
   return (
-    <SafeAreaView style={styles.productScreen}>
-      <View style={styles.header}>
-        <TouchableOpacity onPress={handleBackToCapture} style={styles.backButton}>
-          <Feather name="x" size={32} color="#000" />
-        </TouchableOpacity>
-        <Text style={styles.headerTitle}>Détails du produit</Text>
+    <SafeAreaView style={getStyles(colorScheme).productScreen}>
+      <View style={getStyles(colorScheme).header}>
+        <HeaderTitle title="Détails du produit" showBackArrow/>
       </View>
-      <ScrollView style={styles.scrollView} contentContainerStyle={styles.scrollContent}>
+      <ScrollView style={getStyles(colorScheme).scrollView} contentContainerStyle={getStyles(colorScheme).scrollContent}>
         {productData?.product.image_url && (
           <Image
             source={{ uri: productData.product.image_url }}
-            style={styles.productImage}
+            style={getStyles(colorScheme).productImage}
             resizeMode="contain"
           />
         )}
-        <View style={styles.contentContainer}>
-          <Text style={styles.productTitle}>{productData?.product.product_name}</Text>
-          <Text style={styles.brandText}>Marque: {productData?.product.brands}</Text>
+        <View style={getStyles(colorScheme).contentContainer}>
+          <Text style={getStyles(colorScheme).productTitle}>{productData?.product.product_name}</Text>
+          <Text style={getStyles(colorScheme).brandText}>Marque: {productData?.product.brands}</Text>
 
           {productData?.product.nutriscore && (
-            <View style={styles.nutriscoreContainer}>
+            <View style={getStyles(colorScheme).nutriscoreContainer}>
               {(() => {
                 const nutriscoreInfo = getMostRecentNutriScore(productData.product.nutriscore);
                 if (nutriscoreInfo) {
@@ -126,10 +126,10 @@ export default function ProductScreen() {
 
                   return (
                     <>
-                      <Text style={styles.nutriscoreTitle}>
+                      <Text style={getStyles(colorScheme).nutriscoreTitle}>
                         Nutri-Score ({nutriscoreInfo.year})
                       </Text>
-                      <Text style={[styles.nutriscoreGrade, { color: gradeColor }]}> 
+                      <Text style={[getStyles(colorScheme).nutriscoreGrade, { color: gradeColor }]}> 
                         {nutriscoreInfo.data.grade.toUpperCase()}
                       </Text>
                     </>
@@ -140,14 +140,14 @@ export default function ProductScreen() {
             </View>
           )}
 
-          <View style={styles.section}>
-            <Text style={styles.sectionTitle}>Ingrédients</Text>
-            <Text style={styles.sectionText}>{productData?.product.ingredients_text}</Text>
+          <View style={getStyles(colorScheme).section}>
+            <Text style={getStyles(colorScheme).sectionTitle}>Ingrédients</Text>
+            <Text style={getStyles(colorScheme).sectionText}>{productData?.product.ingredients_text}</Text>
           </View>
 
-          <View style={styles.section}>
-            <Text style={styles.sectionTitle}>Valeurs nutritionnelles</Text>
-            <Text style={styles.sectionSubtitle}>(pour 100g)</Text>
+          <View style={getStyles(colorScheme).section}>
+            <Text style={getStyles(colorScheme).sectionTitle}>Valeurs nutritionnelles</Text>
+            <Text style={getStyles(colorScheme).sectionSubtitle}>(pour 100g)</Text>
             <NutritionTable
               calories={productData?.product.nutriments['energy-kcal_100g'] || 0}
               glucides={productData?.product.nutriments.carbohydrates_100g || 0}
@@ -161,9 +161,9 @@ export default function ProductScreen() {
         </View>
       </ScrollView>
 
-       <TouchableOpacity style={styles.scanButton} onPress={() => router.push('/camera')}>
-        <Feather name="camera" size={24} color="#FFF" style={styles.scanIcon} />
-        <Text style={styles.scanButtonText}>Scanner un nouveau produit</Text>
+       <TouchableOpacity style={getStyles(colorScheme).scanButton} onPress={() => router.push('/camera')}>
+        <Feather name="camera" size={24} color={colorScheme === 'dark' ? Colors.dark.text : Colors.light.text} style={getStyles(colorScheme).scanIcon} />
+        <Text style={getStyles(colorScheme).scanButtonText}>Scanner un nouveau produit</Text>
       </TouchableOpacity>
 
     </SafeAreaView>
@@ -171,18 +171,19 @@ export default function ProductScreen() {
 }
 
 const { width } = Dimensions.get('window');
-const styles = StyleSheet.create({
-  productScreen: {
+
+const getStyles = (colorScheme: string) => StyleSheet.create({
+productScreen: {
     flex: 1,
-    backgroundColor: '#fff',
+    backgroundColor: colorScheme === 'dark' ? Colors.dark.background : Colors.light.background,
   },
   header: {
     flexDirection: 'row',
     alignItems: 'center',
     padding: 16,
     borderBottomWidth: 1,
-    borderBottomColor: '#f0f0f0',
-    backgroundColor: '#fff',
+    borderBottomColor: colorScheme === 'dark' ? Colors.dark.background : Colors.light.background,
+    backgroundColor: colorScheme === 'dark' ? Colors.dark.background : Colors.light.background,
   },
   backButton: {
     padding: 8,
@@ -204,21 +205,21 @@ const styles = StyleSheet.create({
   productImage: {
     width: '100%',
     height: 300,
-    backgroundColor: '#f8f8f8',
+    backgroundColor: colorScheme === 'dark' ? Colors.dark.background : Colors.light.background,
   },
   productTitle: {
     fontSize: 24,
     fontWeight: 'bold',
     marginBottom: 8,
-    color: '#1a1a1a',
+    color: colorScheme === 'dark' ? Colors.dark.text : Colors.light.text,
   },
   brandText: {
     fontSize: 16,
-    color: '#666',
+    color: colorScheme === 'dark' ? Colors.dark.text : Colors.light.text,
     marginBottom: 24,
   },
   nutriscoreContainer: {
-    backgroundColor: '#fff',
+    backgroundColor: colorScheme === 'dark' ? Colors.dark.background : Colors.light.background,
     borderRadius: 12,
     padding: 16,
     marginBottom: 24,
@@ -232,6 +233,7 @@ const styles = StyleSheet.create({
     fontSize: 18,
     fontWeight: '600',
     marginBottom: 16,
+    color: colorScheme === 'dark' ? Colors.dark.text : Colors.light.text,
   },
   nutriscoreGrade: {
     fontSize: 48,
@@ -246,16 +248,16 @@ const styles = StyleSheet.create({
     fontSize: 18,
     fontWeight: '600',
     marginBottom: 8,
-    color: '#1a1a1a',
+    color: colorScheme === 'dark' ? Colors.dark.text : Colors.light.text,
   },
   sectionSubtitle: {
     fontSize: 14,
-    color: '#666',
+    color: colorScheme === 'dark' ? Colors.dark.text : Colors.light.text,
     marginBottom: 16,
   },
   sectionText: {
     fontSize: 16,
-    color: '#444',
+    color: colorScheme === 'dark' ? Colors.dark.text : Colors.light.text,
     lineHeight: 24,
   },
   nutrientsGrid: {
@@ -270,11 +272,11 @@ const styles = StyleSheet.create({
   nutrientValue: {
     fontSize: 20,
     fontWeight: '600',
-    color: '#1a1a1a',
+    color: colorScheme === 'dark' ? Colors.dark.text : Colors.light.text,
   },
   nutrientLabel: {
     fontSize: 14,
-    color: '#666',
+    color: colorScheme === 'dark' ? Colors.dark.text : Colors.light.text,
     marginTop: 4,
   },
    scanButton: {
@@ -282,7 +284,7 @@ const styles = StyleSheet.create({
     bottom: 32,
     left: 16,
     right: 16,
-    backgroundColor: '#007AFF',
+    backgroundColor: colorScheme === 'dark' ? Colors.dark.primary : Colors.light.primary,
     borderRadius: 12,
     padding: 16,
     flexDirection: 'row',
@@ -295,7 +297,7 @@ const styles = StyleSheet.create({
     elevation: 3,
   },
   scanButtonText: {
-    color: '#FFF',
+    color: colorScheme === 'dark' ? Colors.dark.text : Colors.light.text,
     fontSize: 16,
     fontWeight: '600',
     marginLeft: 8,

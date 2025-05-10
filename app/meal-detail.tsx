@@ -8,6 +8,7 @@ import { useColorScheme } from '@/hooks/useColorScheme';
 import { format } from 'date-fns';
 import { fr } from 'date-fns/locale';
 import HeaderTitle from '@/components/headerTitle';
+import NutritionTable from './components/NutritionTable';
 
 interface FoodItem {
   name: string;
@@ -31,6 +32,9 @@ interface Meal {
   total_fats: number;
   glycemic_index: number;
   glycemic_load: number;
+  total_sugars: number;
+  total_fibers: number;
+  total_saturated_fats: number;
   foods: FoodItem[];
 }
 
@@ -106,24 +110,16 @@ export default function MealDetailScreen() {
 
         <View style={getStyles(colorScheme).nutritionSummary}>
           <Text style={getStyles(colorScheme).sectionTitle}>Résumé nutritionnel</Text>
-          <View style={getStyles(colorScheme).nutritionTable}>
-            <View style={getStyles(colorScheme).nutritionRow}>
-              <Text style={getStyles(colorScheme).nutritionLabel}>Calories</Text>
-              <Text style={getStyles(colorScheme).nutritionValue}>{meal.total_calories.toFixed(0)} kcal</Text>
-            </View>
-            <View style={getStyles(colorScheme).nutritionRow}>
-              <Text style={getStyles(colorScheme).nutritionLabel}>Glucides</Text>
-              <Text style={getStyles(colorScheme).nutritionValue}>{meal.total_carbs.toFixed(1)}g</Text>
-            </View>
-            <View style={getStyles(colorScheme).nutritionRow}>
-              <Text style={getStyles(colorScheme).nutritionLabel}>Protéines</Text>
-              <Text style={getStyles(colorScheme).nutritionValue}>{meal.total_proteins.toFixed(1)}g</Text>
-            </View>
-            <View style={getStyles(colorScheme).nutritionRow}>
-              <Text style={getStyles(colorScheme).nutritionLabel}>Lipides</Text>
-              <Text style={getStyles(colorScheme).nutritionValue}>{meal.total_fats.toFixed(1)}g</Text>
-            </View>
-          </View>
+          <NutritionTable
+            calories={meal.total_calories}
+            glucides={meal.total_carbs}
+            sucres={meal.total_sugars}
+            fibres={meal.total_fibers}
+            proteines={meal.total_proteins}
+            lipides={meal.total_fats}
+            satures={meal.total_saturated_fats}
+            style={{ marginTop: 8 }}
+          />
         </View>
 
        

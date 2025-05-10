@@ -6,6 +6,8 @@ import { useState } from 'react';
 import { supabase } from '@/lib/supabase';
 import HeaderTitle from '@/components/headerTitle';
 import NutritionTable from './components/NutritionTable';
+import { useColorScheme } from '@/hooks/useColorScheme';
+import { Colors } from '@/constants/Colors';
 
 interface SearchResult {
   food_name: string;
@@ -32,6 +34,7 @@ type FoodItem = {
 };
 
 export default function CreateMealScreen() {
+  const colorScheme = useColorScheme();
   const { initial_food } = useLocalSearchParams();
   const [mealName, setMealName] = useState('Nouveau repas');
   const [searchQuery, setSearchQuery] = useState('');
@@ -242,6 +245,9 @@ export default function CreateMealScreen() {
           total_carbs: nutritionSummary.carbs,
           total_proteins: nutritionSummary.proteins,
           total_fats: nutritionSummary.fats,
+          total_sugars: nutritionSummary.sugars,
+          total_fibers: nutritionSummary.fibers,
+          total_saturated_fats: nutritionSummary.saturatedFats,
           glycemic_index: glycemicSummary.weightedIG,
           glycemic_load: glycemicSummary.glycemicLoad,
           foods: foods
@@ -273,52 +279,52 @@ export default function CreateMealScreen() {
   };
 
   return (
-    <View style={styles.container}>
+    <View style={getStyles(colorScheme).container}>
       <HeaderTitle title="Créer un repas" showBackArrow/>
 
-      <ScrollView style={styles.content} keyboardShouldPersistTaps="handled">
+      <ScrollView style={getStyles(colorScheme).content} keyboardShouldPersistTaps="handled">
         {/* Nom du repas */}
-        <Text style={styles.label}>Nom du repas</Text>
+        <Text style={getStyles(colorScheme).label}>Nom du repas</Text>
         <TextInput
-          style={styles.input}
+          style={getStyles(colorScheme).input}
           value={mealName}
           onChangeText={setMealName}
           placeholder="Nouveau repas"
         />
 
         {/* Barre de recherche */}
-        <View style={styles.searchContainer}>
-          <Ionicons name="search" size={20} color="#666" style={styles.searchIcon} />
+        <View style={getStyles(colorScheme).searchContainer}>
+          <Ionicons name="search" size={20} color="#666" style={getStyles(colorScheme).searchIcon} />
           <TextInput
-            style={styles.searchInput}
+            style={getStyles(colorScheme).searchInput}
             placeholder="Ajouter un aliment..."
             placeholderTextColor="#666"
             value={searchQuery}
             onChangeText={handleSearch}
           />
           {isSearching && (
-            <ActivityIndicator size="small" color="#4a90e2" style={styles.loadingIcon} />
+            <ActivityIndicator size="small" color="#4a90e2" style={getStyles(colorScheme).loadingIcon} />
           )}
         </View>
 
         {/* Liste des aliments */}
-        <View style={styles.foodsList}>
-          <Text style={styles.sectionTitle}>Aliments dans ce repas</Text>
+        <View style={getStyles(colorScheme).foodsList}>
+          <Text style={getStyles(colorScheme).sectionTitle}>Aliments dans ce repas</Text>
           {foods.map((food, index) => (
-            <View key={index} style={styles.foodItem}>
+            <View key={index} style={getStyles(colorScheme).foodItem}>
               <Image 
                 source={{ uri: food.photo || 'https://d2eawub7utcl6.cloudfront.net/images/nix-apple-grey.png' }}
-                style={styles.foodImage}
+                style={getStyles(colorScheme).foodImage}
               />
-              <View style={styles.foodInfo}>
-                <Text style={styles.foodName}>{food.name}</Text>
-                <View style={styles.quantityControl}>
+              <View style={getStyles(colorScheme).foodInfo}>
+                <Text style={getStyles(colorScheme).foodName}>{food.name}</Text>
+                <View style={getStyles(colorScheme).quantityControl}>
                   <TouchableOpacity onPress={() => handleUpdateQuantity(index, -10)}>
                     <Ionicons name="remove" size={20} color="#4a90e2" />
                   </TouchableOpacity>
                   {editingQuantityIndex === index ? (
                     <TextInput
-                      style={styles.quantityInput}
+                      style={getStyles(colorScheme).quantityInput}
                       value={editingQuantityValue}
                       onChangeText={handleQuantityChange}
                       onBlur={() => handleQuantitySubmit(index)}
@@ -328,19 +334,19 @@ export default function CreateMealScreen() {
                     />
                   ) : (
                     <TouchableOpacity onPress={() => handleQuantityInput(index)}>
-                      <Text style={styles.quantityText}>{food.quantity}g</Text>
+                      <Text style={getStyles(colorScheme).quantityText}>{food.quantity}g</Text>
                     </TouchableOpacity>
                   )}
                   <TouchableOpacity onPress={() => handleUpdateQuantity(index, 10)}>
                     <Ionicons name="add" size={20} color="#4a90e2" />
                   </TouchableOpacity>
-                  <TouchableOpacity onPress={() => { setSelectedFood(food); setMacroModalVisible(true); }} style={styles.infoButton}>
+                  <TouchableOpacity onPress={() => { setSelectedFood(food); setMacroModalVisible(true); }} style={getStyles(colorScheme).infoButton}>
                     <Ionicons name="information-circle-outline" size={22} color="#4a90e2" />
                   </TouchableOpacity>
                 </View>
               </View>
               <TouchableOpacity 
-                style={styles.deleteButton}
+                style={getStyles(colorScheme).deleteButton}
                 onPress={() => handleRemoveFood(index)}
               >
                 <Ionicons name="trash-outline" size={20} color="#FF3B30" />
@@ -350,8 +356,8 @@ export default function CreateMealScreen() {
         </View>
 
         {/* Résumé nutritionnel */}
-        <View style={styles.nutritionSummary}>
-          <Text style={styles.sectionTitle}>Résumé nutritionnel</Text>
+        <View style={getStyles(colorScheme).nutritionSummary}>
+          <Text style={getStyles(colorScheme).sectionTitle}>Résumé nutritionnel</Text>
           <NutritionTable
             calories={Number(nutritionSummary.calories.toFixed(2))}
             glucides={Number(nutritionSummary.carbs.toFixed(2))}
@@ -366,24 +372,24 @@ export default function CreateMealScreen() {
 
       {/* Résultats de recherche en overlay */}
       {searchResults.length > 0 && (
-        <View style={styles.searchResultsOverlay}>
-          <ScrollView style={styles.searchResults} bounces={false}>
+        <View style={getStyles(colorScheme).searchResultsOverlay}>
+          <ScrollView style={getStyles(colorScheme).searchResults} bounces={false}>
             {searchResults.map((result, index) => (
               <TouchableOpacity 
                 key={result.tag_id + result.food_name || index}
                 style={[
-                  styles.searchResultItem,
-                  index === searchResults.length - 1 && styles.searchResultItemLast
+                  getStyles(colorScheme).searchResultItem,
+                  index === searchResults.length - 1 && getStyles(colorScheme).searchResultItemLast
                 ]}
                 onPress={() => handleSelectFood(result)}
               >
                 <Image 
                   source={{ uri: result.photo.thumb }}
-                  style={styles.searchResultImage}
+                  style={getStyles(colorScheme).searchResultImage}
                 />
-                <View style={styles.searchResultContent}>
-                  <Text style={styles.searchResultText}>{result.food_name}</Text>
-                  <Text style={styles.searchResultSubtext}>
+                <View style={getStyles(colorScheme).searchResultContent}>
+                  <Text style={getStyles(colorScheme).searchResultText}>{result.food_name}</Text>
+                  <Text style={getStyles(colorScheme).searchResultSubtext}>
                     {result.serving_qty} {result.serving_unit}
                   </Text>
                 </View>
@@ -394,16 +400,16 @@ export default function CreateMealScreen() {
       )}
 
       {/* Boutons d'action */}
-      <View style={styles.actions}>
+      <View style={getStyles(colorScheme).actions}>
         <TouchableOpacity 
-          style={[styles.button, styles.cancelButton]} 
+          style={[getStyles(colorScheme).button, getStyles(colorScheme).cancelButton]} 
           onPress={() => router.back()}
           disabled={isSaving}
         >
-          <Text style={styles.cancelButtonText}>Annuler</Text>
+          <Text style={getStyles(colorScheme).cancelButtonText}>Annuler</Text>
         </TouchableOpacity>
         <TouchableOpacity 
-          style={[styles.button, styles.saveButton]}
+          style={[getStyles(colorScheme).button, getStyles(colorScheme).saveButton]}
           onPress={handleSaveMeal}
           disabled={isSaving}
         >
@@ -412,7 +418,7 @@ export default function CreateMealScreen() {
           ) : (
             <>
               <Ionicons name="save-outline" size={20} color="#fff" />
-              <Text style={styles.saveButtonText}>Enregistrer le repas</Text>
+              <Text style={getStyles(colorScheme).saveButtonText}>Enregistrer le repas</Text>
             </>
           )}
         </TouchableOpacity>
@@ -425,9 +431,9 @@ export default function CreateMealScreen() {
         animationType="fade"
         onRequestClose={() => setMacroModalVisible(false)}
       >
-        <View style={styles.modalOverlay}>
-          <View style={styles.modalContent}>
-            <Text style={styles.modalTitle}>Macros de l'aliment: {selectedFood?.name}</Text>
+        <View style={getStyles(colorScheme).modalOverlay}>
+          <View style={getStyles(colorScheme).modalContent}>
+            <Text style={getStyles(colorScheme).modalTitle}>Macros de l'aliment: {selectedFood?.name}</Text>
             {selectedFood && (
               <NutritionTable
                 calories={selectedFood.calories}
@@ -437,11 +443,11 @@ export default function CreateMealScreen() {
                 proteines={selectedFood.proteins}
                 lipides={selectedFood.fats}
                 satures={selectedFood.saturatedFats}
-                style={styles.nutritionTableModal}
+                style={getStyles(colorScheme).nutritionTableModal}
               />
             )}
-            <TouchableOpacity style={styles.closeModalButton} onPress={() => setMacroModalVisible(false)}>
-              <Text style={styles.closeModalButtonText}>Fermer</Text>
+            <TouchableOpacity style={getStyles(colorScheme).closeModalButton} onPress={() => setMacroModalVisible(false)}>
+              <Text style={getStyles(colorScheme).closeModalButtonText}>Fermer</Text>
             </TouchableOpacity>
           </View>
         </View>
@@ -450,10 +456,11 @@ export default function CreateMealScreen() {
   );
 }
 
-const styles = StyleSheet.create({
+
+const getStyles = (colorScheme: string) => StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#fff',
+    backgroundColor: colorScheme === 'dark' ? Colors.dark.background : Colors.light.background,
   },
   header: {
     flexDirection: 'row',
@@ -461,9 +468,9 @@ const styles = StyleSheet.create({
     paddingTop: 60,
     paddingBottom: 20,
     paddingHorizontal: 16,
-    backgroundColor: '#fff',
+    backgroundColor: colorScheme === 'dark' ? Colors.dark.background : Colors.light.background,
     borderBottomWidth: 1,
-    borderBottomColor: '#eee',
+    borderBottomColor: colorScheme === 'dark' ? Colors.dark.border : Colors.light.border,
   },
   backButton: {
     padding: 8,
@@ -481,21 +488,22 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: '500',
     marginBottom: 8,
-    color: '#333',
+    color: colorScheme === 'dark' ? Colors.dark.text : Colors.light.text,
   },
   input: {
     borderWidth: 1,
-    borderColor: '#ddd',
+    borderColor: colorScheme === 'dark' ? Colors.dark.border : Colors.light.border,
     borderRadius: 8,
     padding: 12,
     fontSize: 16,
     marginBottom: 16,
+    color: colorScheme === 'dark' ? Colors.dark.text : Colors.light.text,
   },
   searchContainer: {
     flexDirection: 'row',
     alignItems: 'center',
     borderWidth: 1,
-    borderColor: '#ddd',
+    borderColor: colorScheme === 'dark' ? Colors.dark.border : Colors.light.border,
     borderRadius: 8,
     padding: 12,
     marginBottom: 24,
@@ -514,13 +522,14 @@ const styles = StyleSheet.create({
     fontSize: 18,
     fontWeight: '600',
     marginBottom: 16,
+    color: colorScheme === 'dark' ? Colors.dark.text : Colors.light.text,
   },
   foodItem: {
     flexDirection: 'row',
     alignItems: 'center',
     paddingVertical: 12,
     borderBottomWidth: 1,
-    borderBottomColor: '#eee',
+    borderBottomColor: colorScheme === 'dark' ? Colors.dark.border : Colors.light.border,
   },
   foodImage: {
     width: 48,
@@ -534,6 +543,7 @@ const styles = StyleSheet.create({
   foodName: {
     fontSize: 16,
     marginBottom: 4,
+    color: colorScheme === 'dark' ? Colors.dark.text : Colors.light.text,
   },
   nutritionValues: {
     flexDirection: 'row',
@@ -543,13 +553,13 @@ const styles = StyleSheet.create({
     padding: 8,
   },
   nutritionSummary: {
-    backgroundColor: '#fff',
+    backgroundColor: colorScheme === 'dark' ? Colors.dark.background : Colors.light.background,
     borderRadius: 12,
     padding: 16,
     marginBottom: 24,
   },
   nutritionTable: {
-    backgroundColor: '#f8f8f8',
+    backgroundColor: colorScheme === 'dark' ? Colors.dark.background : Colors.light.background,
     borderRadius: 12,
     padding: 16,
     marginBottom: 20,
@@ -559,7 +569,7 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     paddingVertical: 8,
     borderBottomWidth: 1,
-    borderBottomColor: '#eee',
+    borderBottomColor: colorScheme === 'dark' ? Colors.dark.border : Colors.light.border,
   },
   nutritionLabel: {
     fontSize: 16,
@@ -583,7 +593,7 @@ const styles = StyleSheet.create({
   },
   metricLabel: {
     fontSize: 14,
-    color: '#666',
+    color: colorScheme === 'dark' ? Colors.dark.text : Colors.light.text,
     marginBottom: 8,
   },
   metricValue: {
@@ -596,11 +606,11 @@ const styles = StyleSheet.create({
     fontWeight: '600',
   },
   impactCard: {
-    backgroundColor: '#fff',
+    backgroundColor: colorScheme === 'dark' ? Colors.dark.background : Colors.light.background,
     borderRadius: 16,
     padding: 16,
     borderWidth: 1,
-    borderColor: '#e0e0e0',
+    borderColor: colorScheme === 'dark' ? Colors.dark.border : Colors.light.border,
     shadowColor: '#000',
     shadowOffset: {
       width: 0,
@@ -614,7 +624,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     padding: 16,
     borderTopWidth: 1,
-    borderTopColor: '#eee',
+    borderTopColor: colorScheme === 'dark' ? Colors.dark.border : Colors.light.border,
     gap: 12,
   },
   button: {
@@ -627,18 +637,18 @@ const styles = StyleSheet.create({
     gap: 8,
   },
   cancelButton: {
-    backgroundColor: '#f8f8f8',
+    backgroundColor: colorScheme === 'dark' ? Colors.dark.background : Colors.light.background,
   },
   saveButton: {
-    backgroundColor: '#4a90e2',
+    backgroundColor: colorScheme === 'dark' ? Colors.dark.primary : Colors.light.primary,
   },
   cancelButtonText: {
     fontSize: 16,
-    color: '#333',
+    color: colorScheme === 'dark' ? Colors.dark.text : Colors.light.text,
   },
   saveButtonText: {
     fontSize: 16,
-    color: '#fff',
+    color: colorScheme === 'dark' ? Colors.dark.white : Colors.light.white,
     fontWeight: '600',
   },
   searchResultsOverlay: {
@@ -649,10 +659,10 @@ const styles = StyleSheet.create({
     zIndex: 1000,
   },
   searchResults: {
-    backgroundColor: '#fff',
+    backgroundColor: colorScheme === 'dark' ? Colors.dark.background : Colors.light.background,
     borderRadius: 8,
     borderWidth: 1,
-    borderColor: '#ddd',
+    borderColor: colorScheme === 'dark' ? Colors.dark.border : Colors.light.border,
     maxHeight: 300,
     shadowColor: '#000',
     shadowOffset: {
@@ -666,10 +676,10 @@ const styles = StyleSheet.create({
   searchResultItem: {
     padding: 12,
     borderBottomWidth: 1,
-    borderBottomColor: '#eee',
+    borderBottomColor: colorScheme === 'dark' ? Colors.dark.border : Colors.light.border,
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#fff',
+    backgroundColor: colorScheme === 'dark' ? Colors.dark.background : Colors.light.background,
   },
   searchResultItemLast: {
     borderBottomWidth: 0,
@@ -686,12 +696,12 @@ const styles = StyleSheet.create({
   searchResultText: {
     fontSize: 16,
     fontWeight: '500',
-    color: '#333',
+    color: colorScheme === 'dark' ? Colors.dark.text : Colors.light.text,
     marginBottom: 4,
   },
   searchResultSubtext: {
     fontSize: 14,
-    color: '#666',
+    color: colorScheme === 'dark' ? Colors.dark.text : Colors.light.text,
   },
   loadingIcon: {
     marginLeft: 8,
@@ -706,6 +716,7 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: '600',
     marginHorizontal: 8,
+    color: colorScheme === 'dark' ? Colors.dark.text : Colors.light.text,
   },
   quantityInput: {
     fontSize: 16,
@@ -713,7 +724,7 @@ const styles = StyleSheet.create({
     marginHorizontal: 8,
     minWidth: 40,
     borderBottomWidth: 1,
-    borderColor: '#4a90e2',
+    borderColor: colorScheme === 'dark' ? Colors.dark.primary : Colors.light.primary,
     textAlign: 'center',
     padding: 0,
   },
@@ -728,7 +739,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   modalContent: {
-    backgroundColor: '#fff',
+    backgroundColor: colorScheme === 'dark' ? Colors.dark.background : Colors.light.background,
     borderRadius: 16,
     padding: 24,
     width: '80%',
@@ -743,16 +754,17 @@ const styles = StyleSheet.create({
     fontSize: 18,
     fontWeight: '700',
     marginBottom: 16,
+    color: colorScheme === 'dark' ? Colors.dark.text : Colors.light.text,
   },
   closeModalButton: {
     marginTop: 12,
-    backgroundColor: '#4a90e2',
+    backgroundColor: colorScheme === 'dark' ? Colors.dark.primary : Colors.light.primary,
     paddingVertical: 8,
     paddingHorizontal: 20,
     borderRadius: 8,
   },
   closeModalButtonText: {
-    color: '#fff',
+    color: colorScheme === 'dark' ? Colors.dark.white : Colors.light.white,
     fontWeight: '600',
     fontSize: 16,
   },

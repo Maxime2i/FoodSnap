@@ -17,8 +17,8 @@ interface MacroPieChartProps {
 
 export default function MacroPieChart({ pieData, colorScheme }: MacroPieChartProps) {
   return (
-    <View style={[styles.card, { backgroundColor: colorScheme === 'dark' ? Colors.dark.background : '#fff' }]}> 
-      <Text style={[styles.title, { color: colorScheme === 'dark' ? Colors.dark.text : Colors.light.text }]}>Distribution des macros</Text>
+    <View style={[styles(colorScheme).card, { backgroundColor: colorScheme === 'dark' ? Colors.dark.background : Colors.light.background }]}> 
+      <Text style={[styles(colorScheme).title, { color: colorScheme === 'dark' ? Colors.dark.text : Colors.light.text }]}>Distribution des macros</Text>
       <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'center', marginVertical: 20, marginLeft: 32 }}>
         {/* PieChart à gauche */}
         <PieChart
@@ -27,7 +27,7 @@ export default function MacroPieChart({ pieData, colorScheme }: MacroPieChartPro
           radius={55}
           innerRadius={38}
           centerLabelComponent={() => (
-            <Text style={{ fontSize: 16, fontWeight: '600', color: colorScheme === 'dark' ? Colors.dark.text : Colors.light.text }}>Macros</Text>
+            <Text style={{ fontSize: 16, fontWeight: '600', color: Colors.light.text }}>Macros</Text>
           )}
         />
         {/* Colonne des données à droite */}
@@ -44,7 +44,7 @@ export default function MacroPieChart({ pieData, colorScheme }: MacroPieChartPro
               <Text style={{ fontSize: 15, fontWeight: '600', color: colorScheme === 'dark' ? Colors.dark.text : Colors.light.text }}>
                 {item.label}
               </Text>
-              <Text style={{ marginLeft: 8, fontSize: 15, color: '#888' }}>
+              <Text style={{ marginLeft: 8, fontSize: 15, color: colorScheme === 'dark' ? Colors.dark.text : Colors.light.text }}>
                 {item.text}
               </Text>
             </View>
@@ -55,7 +55,7 @@ export default function MacroPieChart({ pieData, colorScheme }: MacroPieChartPro
   );
 }
 
-const styles = StyleSheet.create({
+const styles = (colorScheme: 'light' | 'dark') => StyleSheet.create({
   card: {
     borderRadius: 18,
     padding: 20,
@@ -69,5 +69,6 @@ const styles = StyleSheet.create({
     fontSize: 20,
     fontWeight: '700',
     marginBottom: 8,
+    color: colorScheme === 'dark' ? Colors.dark.text : Colors.light.text,
   },
 }); 

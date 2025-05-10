@@ -222,7 +222,7 @@ export default function ReviewScreen() {
                 onPress={() => setSelectedRange(range as 7 | 14 | 30)}
               >
                 <Text style={{
-                  color: isSelected ? '#2563eb' : '#111',
+                  color: isSelected ? colorScheme === 'dark' ? Colors.dark.primary : Colors.light.primary : colorScheme === 'dark' ? Colors.dark.text : Colors.light.text,
                   fontWeight: isSelected ? 'bold' : 'normal',
                   fontSize: 14,
                 }}>{range}j</Text>

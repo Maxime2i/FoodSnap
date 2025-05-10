@@ -1,5 +1,7 @@
 import React from 'react';
 import { View, Text, StyleSheet, ViewStyle } from 'react-native';
+import { useColorScheme } from '@/hooks/useColorScheme';
+import { Colors } from '@/constants/Colors';
 
 interface NutritionTableProps {
   calories: number;
@@ -21,52 +23,66 @@ const NutritionTable: React.FC<NutritionTableProps> = ({
   lipides,
   satures,
   style,
-}) => (
-  <View style={[styles.nutritionTable, style]}>
-    <View style={styles.nutritionRow}>
-      <Text style={styles.nutritionLabel}>Calories</Text>
-      <Text style={styles.nutritionValue}>{calories} kcal</Text>
+}) => {
+  const colorScheme = useColorScheme();
+
+  return (
+    <View style={[getStyles(colorScheme).nutritionTable, style]}>
+      <View style={getStyles(colorScheme).nutritionRow}>
+        <Text style={getStyles(colorScheme).nutritionLabel}>Calories</Text>
+      <Text style={getStyles(colorScheme).nutritionValue}>{calories} kcal</Text>
     </View>
-    <View style={styles.nutritionRow}>
-      <Text style={styles.nutritionLabel}>Glucides</Text>
-      <Text style={styles.nutritionValue}>{glucides}g</Text>
+    <View style={getStyles(colorScheme).nutritionRow}>
+      <Text style={getStyles(colorScheme).nutritionLabel}>Glucides</Text>
+      <Text style={getStyles(colorScheme).nutritionValue}>{glucides}g</Text>
     </View>
-    <View style={[styles.nutritionRow, styles.subRow]}>
-      <Text style={styles.nutritionSubLabel}>dont sucres</Text>
-      <Text style={styles.nutritionValue}>{sucres}g</Text>
+    <View style={[getStyles(colorScheme).nutritionRow, getStyles(colorScheme).subRow]}>
+      <Text style={getStyles(colorScheme).nutritionSubLabel}>dont sucres</Text>
+      <Text style={getStyles(colorScheme).nutritionValue}>{sucres}g</Text>
     </View>
-    <View style={[styles.nutritionRow, styles.subRow]}>
-      <Text style={styles.nutritionSubLabel}>dont fibres</Text>
-      <Text style={styles.nutritionValue}>{fibres}g</Text>
+    <View style={[getStyles(colorScheme).nutritionRow, getStyles(colorScheme).subRow]}>
+      <Text style={getStyles(colorScheme).nutritionSubLabel}>dont fibres</Text>
+      <Text style={getStyles(colorScheme).nutritionValue}>{fibres}g</Text>
     </View>
-    <View style={styles.nutritionRow}>
-      <Text style={styles.nutritionLabel}>Protéines</Text>
-      <Text style={styles.nutritionValue}>{proteines}g</Text>
+    <View style={getStyles(colorScheme).nutritionRow}>
+      <Text style={getStyles(colorScheme).nutritionLabel}>Protéines</Text>
+      <Text style={getStyles(colorScheme).nutritionValue}>{proteines}g</Text>
     </View>
-    <View style={styles.nutritionRow}>
-      <Text style={styles.nutritionLabel}>Lipides</Text>
-      <Text style={styles.nutritionValue}>{lipides}g</Text>
+    <View style={getStyles(colorScheme).nutritionRow}>
+      <Text style={getStyles(colorScheme).nutritionLabel}>Lipides</Text>
+      <Text style={getStyles(colorScheme).nutritionValue}>{lipides}g</Text>
     </View>
-    <View style={[styles.nutritionRow, styles.subRow]}>
-      <Text style={styles.nutritionSubLabel}>dont saturés</Text>
-      <Text style={styles.nutritionValue}>{satures}g</Text>
+    <View style={[getStyles(colorScheme).nutritionRow, getStyles(colorScheme).subRow]}>
+      <Text style={getStyles(colorScheme).nutritionSubLabel}>dont saturés</Text>
+      <Text style={getStyles(colorScheme).nutritionValue}>{satures}g</Text>
     </View>
   </View>
-);
+  );
+};
 
-const styles = StyleSheet.create({
+
+const getStyles = (colorScheme: string) => StyleSheet.create({
   nutritionTable: {
-    backgroundColor: '#f8f8f8',
+    backgroundColor: colorScheme === 'dark' ? Colors.dark.background : Colors.light.background,
     borderRadius: 12,
     padding: 16,
     marginBottom: 20,
+    borderWidth: 1,
+    borderColor: colorScheme === 'dark' ? Colors.dark.text : Colors.light.text,
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.25,
+    shadowRadius: 3.84,
   },
   nutritionRow: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     paddingVertical: 8,
     borderBottomWidth: 1,
-    borderBottomColor: '#eee',
+    borderBottomColor: colorScheme === 'dark' ? Colors.dark.text : Colors.light.text,
   },
   subRow: {
     paddingLeft: 20,
@@ -74,14 +90,16 @@ const styles = StyleSheet.create({
   nutritionLabel: {
     fontSize: 16,
     fontWeight: '600',
+    color: colorScheme === 'dark' ? Colors.dark.text : Colors.light.text,
   },
   nutritionSubLabel: {
     fontSize: 14,
-    color: '#666',
+    color: colorScheme === 'dark' ? Colors.dark.text : Colors.light.text,
   },
   nutritionValue: {
     fontSize: 16,
     fontWeight: '500',
+    color: colorScheme === 'dark' ? Colors.dark.text : Colors.light.text,
   },
 });
 

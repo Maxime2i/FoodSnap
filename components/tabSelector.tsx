@@ -58,7 +58,7 @@ const TabSelector: React.FC<TabSelectorProps> = ({ tabs, selectedTab, onSelectTa
       {bgWidth > 0 && (
         <Animated.View
           style={[
-            styles.animatedBg,
+            styles(colorScheme).animatedBg,
             {
               width: bgWidth,
               left: 4,
@@ -79,7 +79,7 @@ const TabSelector: React.FC<TabSelectorProps> = ({ tabs, selectedTab, onSelectTa
           onLayout={onTabLayout(index)}
         >
           <Text style={{
-            color: selectedTab === tab ? '#222B45' : '#7B8A9D',
+            color: selectedTab === tab ? colorScheme === 'dark' ? Colors.dark.text : Colors.light.text : colorScheme === 'dark' ? Colors.dark.text : Colors.light.text,
             fontWeight: selectedTab === tab ? 'bold' : 'normal',
           }}>
             {tab}
@@ -93,7 +93,7 @@ const TabSelector: React.FC<TabSelectorProps> = ({ tabs, selectedTab, onSelectTa
 const getStyles = (colorScheme: string) => StyleSheet.create({
   container: {
     flexDirection: 'row',
-    backgroundColor: '#E0E3E7',
+    backgroundColor: colorScheme === 'dark' ? Colors.dark.border : Colors.light.border,
     borderRadius: 24,
     padding: 4,
     alignItems: 'center',
@@ -107,7 +107,7 @@ const getStyles = (colorScheme: string) => StyleSheet.create({
   tab: {
     flex: 1,
     fontSize: 14,
-    color: '#7B8A9D',
+    color: colorScheme === 'dark' ? Colors.dark.text : Colors.light.text,
     paddingVertical: 5,
     borderRadius: 20,
     marginHorizontal: TAB_MARGIN,
@@ -121,13 +121,13 @@ const getStyles = (colorScheme: string) => StyleSheet.create({
   },
 });
 
-const styles = StyleSheet.create({
+const styles = (colorScheme: string) => StyleSheet.create({
   animatedBg: {
     position: 'absolute',
     top: 4,
     bottom: 4,
     // left est géré dynamiquement
-    backgroundColor: '#fff',
+    backgroundColor: colorScheme === 'dark' ? Colors.dark.background : Colors.light.background,
     borderRadius: 20,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 2 },

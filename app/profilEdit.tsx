@@ -317,6 +317,7 @@ export default function ProfileEdit() {
               value={profile.weight?.toString()}
               keyboardType="numeric"
               onChangeText={(text) => setProfile(prev => ({ ...prev, weight: text ? parseInt(text) : null }))}
+              
             />
           </View>
         </View>
@@ -383,6 +384,7 @@ const getStyles = (colorScheme: "dark" | "light") => StyleSheet.create({
     fontSize: 16,
     backgroundColor: colorScheme === 'dark' ? Colors.dark.background : Colors.light.background,
     height: 60,
+    color: colorScheme === 'dark' ? Colors.dark.text : Colors.light.text,
   },
   textArea: {
     height: 100,
@@ -498,6 +500,7 @@ const getStyles = (colorScheme: "dark" | "light") => StyleSheet.create({
     flex: 1,
     padding: 12,
     fontSize: 16,
+    color: colorScheme === 'dark' ? Colors.dark.text : Colors.light.text,
   },
   pickerContainer: {
     borderWidth: 1,
@@ -509,6 +512,7 @@ const getStyles = (colorScheme: "dark" | "light") => StyleSheet.create({
   picker: {
     height: 60,
     width: '100%',
+    color: colorScheme === 'dark' ? Colors.dark.text : Colors.light.text,
   },
   disabledInput: {
     backgroundColor: colorScheme === 'dark' ? Colors.dark.background : Colors.light.background,
