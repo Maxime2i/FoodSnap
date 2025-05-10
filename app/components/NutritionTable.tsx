@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, Text, StyleSheet } from 'react-native';
+import { View, Text, StyleSheet, ViewStyle } from 'react-native';
 
 interface NutritionTableProps {
   calories: number;
@@ -9,6 +9,7 @@ interface NutritionTableProps {
   proteines: number;
   lipides: number;
   satures: number;
+  style?: ViewStyle;
 }
 
 const NutritionTable: React.FC<NutritionTableProps> = ({
@@ -19,8 +20,9 @@ const NutritionTable: React.FC<NutritionTableProps> = ({
   proteines,
   lipides,
   satures,
+  style,
 }) => (
-  <View style={styles.nutritionTable}>
+  <View style={[styles.nutritionTable, style]}>
     <View style={styles.nutritionRow}>
       <Text style={styles.nutritionLabel}>Calories</Text>
       <Text style={styles.nutritionValue}>{calories} kcal</Text>

@@ -1,5 +1,5 @@
 import React from 'react';
-import { StyleSheet, View, Text, TextInput, TouchableOpacity, ScrollView, ActivityIndicator, Image, Alert } from 'react-native';
+import { StyleSheet, View, Text, TextInput, TouchableOpacity, ScrollView, ActivityIndicator, Image, Alert, Modal } from 'react-native';
 import { router, useLocalSearchParams } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import { useState } from 'react';
@@ -50,6 +50,10 @@ export default function CreateMealScreen() {
     return [];
   });
   const [isSaving, setIsSaving] = useState(false);
+  const [macroModalVisible, setMacroModalVisible] = useState(false);
+  const [selectedFood, setSelectedFood] = useState<FoodItem | null>(null);
+  const [editingQuantityIndex, setEditingQuantityIndex] = useState<number | null>(null);
+  const [editingQuantityValue, setEditingQuantityValue] = useState<string>('');
 
   const handleSearch = async (query: string) => {
     setSearchQuery(query);
@@ -104,6 +108,63 @@ export default function CreateMealScreen() {
 
   const handleRemoveFood = (index: number) => {
     setFoods(prev => prev.filter((_, i) => i !== index));
+  };
+
+  const handleUpdateQuantity = (index: number, delta: number) => {
+    setFoods(prevFoods => prevFoods.map((food, i) => {
+      if (i !== index) return food;
+      const newQuantity = Math.max(0, Math.min(10000, food.quantity + delta));
+      if (newQuantity === food.quantity || food.quantity === 0) return food;
+      // On recalcule les valeurs nutritionnelles proportionnellement à la nouvelle quantité
+      const ratio = newQuantity / food.quantity;
+      return {
+        ...food,
+        quantity: newQuantity,
+        calories: Number((food.calories * ratio).toFixed(2)),
+        carbs: Number((food.carbs * ratio).toFixed(2)),
+        proteins: Number((food.proteins * ratio).toFixed(2)),
+        fats: Number((food.fats * ratio).toFixed(2)),
+        sugars: Number((food.sugars * ratio).toFixed(2)),
+        fibers: Number((food.fibers * ratio).toFixed(2)),
+        saturatedFats: Number((food.saturatedFats * ratio).toFixed(2)),
+        glycemicImpact: Number((food.glycemicImpact * ratio).toFixed(2)),
+      };
+    }));
+  };
+
+  const handleQuantityInput = (index: number) => {
+    setEditingQuantityIndex(index);
+    setEditingQuantityValue(foods[index].quantity.toString());
+  };
+
+  const handleQuantityChange = (value: string) => {
+    // On autorise uniquement les chiffres
+    if (/^\d*$/.test(value)) {
+      setEditingQuantityValue(value);
+    }
+  };
+
+  const handleQuantitySubmit = (index: number) => {
+    let newQuantity = Math.max(0, parseInt(editingQuantityValue) || 0);
+    if (newQuantity > 10000) newQuantity = 10000;
+    setFoods(prevFoods => prevFoods.map((food, i) => {
+      if (i !== index || food.quantity === 0 || newQuantity === food.quantity) return food;
+      const ratio = newQuantity / food.quantity;
+      return {
+        ...food,
+        quantity: newQuantity,
+        calories: Number((food.calories * ratio).toFixed(2)),
+        carbs: Number((food.carbs * ratio).toFixed(2)),
+        proteins: Number((food.proteins * ratio).toFixed(2)),
+        fats: Number((food.fats * ratio).toFixed(2)),
+        sugars: Number((food.sugars * ratio).toFixed(2)),
+        fibers: Number((food.fibers * ratio).toFixed(2)),
+        saturatedFats: Number((food.saturatedFats * ratio).toFixed(2)),
+        glycemicImpact: Number((food.glycemicImpact * ratio).toFixed(2)),
+      };
+    }));
+    setEditingQuantityIndex(null);
+    setEditingQuantityValue('');
   };
 
   // Calculer le résumé nutritionnel
@@ -172,18 +233,6 @@ export default function CreateMealScreen() {
         return;
       }
 
-      console.log('Tentative d\'enregistrement avec les données:', {
-        user_id: user.id,
-        name: mealName,
-        total_calories: nutritionSummary.calories,
-        total_carbs: nutritionSummary.carbs,
-        total_proteins: nutritionSummary.proteins,
-        total_fats: nutritionSummary.fats,
-        glycemic_index: glycemicSummary.weightedIG,
-        glycemic_load: glycemicSummary.glycemicLoad,
-        foods: foods
-      });
-
       const { data, error } = await supabase
         .from('meals')
         .insert({
@@ -206,7 +255,7 @@ export default function CreateMealScreen() {
       }
 
       Alert.alert('Succès', 'Le repas a été enregistré avec succès !');
-      router.back();
+      router.push('/');
     } catch (error: any) {
       console.error('Erreur détaillée lors de l\'enregistrement du repas:', {
         message: error.message,
@@ -263,10 +312,31 @@ export default function CreateMealScreen() {
               />
               <View style={styles.foodInfo}>
                 <Text style={styles.foodName}>{food.name}</Text>
-                <View style={styles.nutritionValues}>
-                  <Text style={styles.nutritionValue}>{food.carbs}g G</Text>
-                  <Text style={styles.nutritionValue}>{food.proteins}g P</Text>
-                  <Text style={styles.nutritionValue}>{food.fats}g L</Text>
+                <View style={styles.quantityControl}>
+                  <TouchableOpacity onPress={() => handleUpdateQuantity(index, -10)}>
+                    <Ionicons name="remove" size={20} color="#4a90e2" />
+                  </TouchableOpacity>
+                  {editingQuantityIndex === index ? (
+                    <TextInput
+                      style={styles.quantityInput}
+                      value={editingQuantityValue}
+                      onChangeText={handleQuantityChange}
+                      onBlur={() => handleQuantitySubmit(index)}
+                      onSubmitEditing={() => handleQuantitySubmit(index)}
+                      keyboardType="numeric"
+                      autoFocus
+                    />
+                  ) : (
+                    <TouchableOpacity onPress={() => handleQuantityInput(index)}>
+                      <Text style={styles.quantityText}>{food.quantity}g</Text>
+                    </TouchableOpacity>
+                  )}
+                  <TouchableOpacity onPress={() => handleUpdateQuantity(index, 10)}>
+                    <Ionicons name="add" size={20} color="#4a90e2" />
+                  </TouchableOpacity>
+                  <TouchableOpacity onPress={() => { setSelectedFood(food); setMacroModalVisible(true); }} style={styles.infoButton}>
+                    <Ionicons name="information-circle-outline" size={22} color="#4a90e2" />
+                  </TouchableOpacity>
                 </View>
               </View>
               <TouchableOpacity 
@@ -347,6 +417,35 @@ export default function CreateMealScreen() {
           )}
         </TouchableOpacity>
       </View>
+
+      {/* Modal macros */}
+      <Modal
+        visible={macroModalVisible}
+        transparent
+        animationType="fade"
+        onRequestClose={() => setMacroModalVisible(false)}
+      >
+        <View style={styles.modalOverlay}>
+          <View style={styles.modalContent}>
+            <Text style={styles.modalTitle}>Macros de l'aliment: {selectedFood?.name}</Text>
+            {selectedFood && (
+              <NutritionTable
+                calories={selectedFood.calories}
+                glucides={selectedFood.carbs}
+                sucres={selectedFood.sugars}
+                fibres={selectedFood.fibers}
+                proteines={selectedFood.proteins}
+                lipides={selectedFood.fats}
+                satures={selectedFood.saturatedFats}
+                style={styles.nutritionTableModal}
+              />
+            )}
+            <TouchableOpacity style={styles.closeModalButton} onPress={() => setMacroModalVisible(false)}>
+              <Text style={styles.closeModalButtonText}>Fermer</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      </Modal>
     </View>
   );
 }
@@ -596,5 +695,69 @@ const styles = StyleSheet.create({
   },
   loadingIcon: {
     marginLeft: 8,
+  },
+  quantityControl: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+    marginTop: 4,
+  },
+  quantityText: {
+    fontSize: 16,
+    fontWeight: '600',
+    marginHorizontal: 8,
+  },
+  quantityInput: {
+    fontSize: 16,
+    fontWeight: '600',
+    marginHorizontal: 8,
+    minWidth: 40,
+    borderBottomWidth: 1,
+    borderColor: '#4a90e2',
+    textAlign: 'center',
+    padding: 0,
+  },
+  infoButton: {
+    marginLeft: 8,
+    padding: 4,
+  },
+  modalOverlay: {
+    flex: 1,
+    backgroundColor: 'rgba(0,0,0,0.3)',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  modalContent: {
+    backgroundColor: '#fff',
+    borderRadius: 16,
+    padding: 24,
+    width: '80%',
+    alignItems: 'center',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.2,
+    shadowRadius: 4,
+    elevation: 5,
+  },
+  modalTitle: {
+    fontSize: 18,
+    fontWeight: '700',
+    marginBottom: 16,
+  },
+  closeModalButton: {
+    marginTop: 12,
+    backgroundColor: '#4a90e2',
+    paddingVertical: 8,
+    paddingHorizontal: 20,
+    borderRadius: 8,
+  },
+  closeModalButtonText: {
+    color: '#fff',
+    fontWeight: '600',
+    fontSize: 16,
+  },
+  nutritionTableModal: {
+    padding: 4,
+    width: '100%',
   },
 }); 

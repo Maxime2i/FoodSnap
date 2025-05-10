@@ -28,7 +28,6 @@ export default function ProfileEdit() {
   const [profile, setProfile] = useState<Partial<Profile>>({
     first_name: '',
     last_name: '',
-    goal: null,
     age: null,
     height: null,
     weight: null,
@@ -192,7 +191,6 @@ export default function ProfileEdit() {
         id: user.id,
         first_name: profile.first_name,
         last_name: profile.last_name,
-        goal: profile.goal,
         age: profile.age,
         height: profile.height,
         weight: profile.weight,
@@ -240,6 +238,8 @@ export default function ProfileEdit() {
       </View>
 
       <View style={getStyles(colorScheme).section}>
+        <Text style={getStyles(colorScheme).sectionTitle}>Informations personnelles</Text>
+
         <View style={getStyles(colorScheme).fieldContainer}>
           <Text style={getStyles(colorScheme).label}>Nom complet</Text>
           <View style={getStyles(colorScheme).inputWithIcon}>
@@ -320,21 +320,6 @@ export default function ProfileEdit() {
             />
           </View>
         </View>
-
-        <View style={getStyles(colorScheme).fieldContainer}>
-          <Text style={getStyles(colorScheme).label}>Objectif principal</Text>
-          <View style={getStyles(colorScheme).pickerContainer}>
-            <Picker
-              selectedValue={profile.goal}
-              style={getStyles(colorScheme).picker}
-              onValueChange={(value) => setProfile(prev => ({ ...prev, goal: value as GoalType }))}>
-              <Picker.Item label="Prise de masse" value="muscle_gain" />
-              <Picker.Item label="Perte de poids" value="weight_loss" />
-              <Picker.Item label="Maintien" value="maintenance" />
-              <Picker.Item label="Santé" value="health_improvement" />
-            </Picker>
-          </View>
-        </View>
       </View>
 
       <View style={getStyles(colorScheme).buttonContainer}>
@@ -364,10 +349,9 @@ const getStyles = (colorScheme: "dark" | "light") => StyleSheet.create({
   section: {
     backgroundColor: colorScheme === 'dark' ? Colors.dark.background : Colors.light.background,
     padding: 16,
-    marginBottom: 16,
     borderRadius: 8,
     marginHorizontal: 16,
-    marginTop: 16,
+
   },
   sectionTitle: {
     fontSize: 18,
@@ -408,7 +392,6 @@ const getStyles = (colorScheme: "dark" | "light") => StyleSheet.create({
     flexDirection: 'row',
     gap: 12,
     padding: 16,
-    marginBottom: 32,
   },
   cancelButton: {
     flex: 1,

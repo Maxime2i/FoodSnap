@@ -28,6 +28,56 @@ type NutritionalGoal = {
   globalGoal: string;
 };
 
+const macroMeta = {
+  calories: { label: 'Calories', icon: '🔥', color: '#FF9800', placeholder: 'Objectif calorique quotidien', unit: 'kcal' },
+  proteins: { label: 'Protéines', icon: '🍗', color: '#4CAF50', placeholder: 'Objectif protéines quotidien', unit: 'g' },
+  carbs: { label: 'Glucides', icon: '🍞', color: '#2196F3', placeholder: 'Objectif glucides quotidien', unit: 'g' },
+  fats: { label: 'Lipides', icon: '🥑', color: '#9C27B0', placeholder: 'Objectif lipides quotidien', unit: 'g' },
+};
+
+function MacroItem({
+  type,
+  enabled,
+  value,
+  onToggle,
+  onChange,
+  colorScheme
+}: {
+  type: keyof typeof macroMeta;
+  enabled: boolean;
+  value: string;
+  onToggle: (v: boolean) => void;
+  onChange: (v: string) => void;
+  colorScheme: 'light' | 'dark';
+}) {
+  const meta = macroMeta[type];
+  return (
+    <View style={[getStyles(colorScheme).macroItem, { borderColor: meta.color }]}>  
+      <View style={getStyles(colorScheme).macroHeader}>
+        <Text style={[getStyles(colorScheme).macroIcon, { color: meta.color }]}>{meta.icon}</Text>
+        <Text style={getStyles(colorScheme).macroLabel}>{meta.label}</Text>
+      </View>
+      <View style={getStyles(colorScheme).macroSwitchContainer}>
+        <Switch
+          value={enabled}
+          onValueChange={onToggle}
+          trackColor={{ false: '#D1D1D6', true: meta.color }}
+        />
+      </View>
+      {enabled && (
+        <TextInput
+          style={getStyles(colorScheme).macroInput}
+          value={value}
+          onChangeText={onChange}
+          keyboardType="numeric"
+          placeholder={meta.placeholder}
+          placeholderTextColor="#999"
+        />
+      )}
+    </View>
+  );
+}
+
 export default function NutritionalGoalsScreen() {
   const colorScheme = useColorScheme();
   const { user } = useAuth();
@@ -146,9 +196,10 @@ export default function NutritionalGoalsScreen() {
     <ScrollView style={getStyles(colorScheme).container}>
       <HeaderTitle title="Objectifs nutritionnels" showBackArrow/>
 
-      <View style={getStyles(colorScheme).section}>
-        <Text style={getStyles(colorScheme).sectionTitle}>Objectif Global</Text>
-        <View style={getStyles(colorScheme).pickerContainer}>
+      {/* Objectif global */}
+      <View style={getStyles(colorScheme).card}>
+        <Text style={getStyles(colorScheme).sectionTitle}>Objectif global</Text>
+        <View style={getStyles(colorScheme).pickerContainerCard}>
           <Picker
             selectedValue={goals.globalGoal}
             onValueChange={(value) => setGoals(prev => ({ ...prev, globalGoal: value }))}
@@ -162,123 +213,42 @@ export default function NutritionalGoalsScreen() {
         </View>
       </View>
 
-      <View style={getStyles(colorScheme).section}>
-        <Text style={getStyles(colorScheme).sectionTitle}>Calories (kcal)</Text>
-        <View style={getStyles(colorScheme).goalItem}>
-          <View style={getStyles(colorScheme).goalHeader}>
-            <Text style={getStyles(colorScheme).goalLabel}>Activer l'objectif calorique</Text>
-            <Switch
-              value={goals.calories.enabled}
-              onValueChange={(value) => setGoals(prev => ({
-                ...prev,
-                calories: { ...prev.calories, enabled: value }
-              }))}
-              trackColor={{ false: '#D1D1D6', true: '#4A90E2' }}
-            />
-          </View>
-          {goals.calories.enabled && (
-            <TextInput
-              style={getStyles(colorScheme).input}
-              value={goals.calories.value}
-              onChangeText={(value) => setGoals(prev => ({
-                ...prev,
-                calories: { ...prev.calories, value }
-              }))}
-              keyboardType="numeric"
-              placeholder="Objectif calorique quotidien"
-              placeholderTextColor="#999"
-            />
-          )}
-        </View>
-      </View>
-
-      <View style={getStyles(colorScheme).section}>
-        <Text style={getStyles(colorScheme).sectionTitle}>Protéines (g)</Text>
-        <View style={getStyles(colorScheme).goalItem}>
-          <View style={getStyles(colorScheme).goalHeader}>
-            <Text style={getStyles(colorScheme).goalLabel}>Activer l'objectif protéines</Text>
-            <Switch
-              value={goals.proteins.enabled}
-              onValueChange={(value) => setGoals(prev => ({
-                ...prev,
-                proteins: { ...prev.proteins, enabled: value }
-              }))}
-              trackColor={{ false: '#D1D1D6', true: '#4A90E2' }}
-            />
-          </View>
-          {goals.proteins.enabled && (
-            <TextInput
-              style={getStyles(colorScheme).input}
-              value={goals.proteins.value}
-              onChangeText={(value) => setGoals(prev => ({
-                ...prev,
-                proteins: { ...prev.proteins, value }
-              }))}
-              keyboardType="numeric"
-              placeholder="Objectif protéines quotidien"
-              placeholderTextColor="#999"
-            />
-          )}
-        </View>
-      </View>
-
-      <View style={getStyles(colorScheme).section}>
-        <Text style={getStyles(colorScheme).sectionTitle}>Glucides (g)</Text>
-        <View style={getStyles(colorScheme).goalItem}>
-          <View style={getStyles(colorScheme).goalHeader}>
-            <Text style={getStyles(colorScheme).goalLabel}>Activer l'objectif glucides</Text>
-            <Switch
-              value={goals.carbs.enabled}
-              onValueChange={(value) => setGoals(prev => ({
-                ...prev,
-                carbs: { ...prev.carbs, enabled: value }
-              }))}
-              trackColor={{ false: '#D1D1D6', true: '#4A90E2' }}
-            />
-          </View>
-          {goals.carbs.enabled && (
-            <TextInput
-              style={getStyles(colorScheme).input}
-              value={goals.carbs.value}
-              onChangeText={(value) => setGoals(prev => ({
-                ...prev,
-                carbs: { ...prev.carbs, value }
-              }))}
-              keyboardType="numeric"
-              placeholder="Objectif glucides quotidien"
-              placeholderTextColor="#999"
-            />
-          )}
-        </View>
-      </View>
-
-      <View style={getStyles(colorScheme).section}>
-        <Text style={getStyles(colorScheme).sectionTitle}>Lipides (g)</Text>
-        <View style={getStyles(colorScheme).goalItem}>
-          <View style={getStyles(colorScheme).goalHeader}>
-            <Text style={getStyles(colorScheme).goalLabel}>Activer l'objectif lipides</Text>
-            <Switch
-              value={goals.fats.enabled}
-              onValueChange={(value) => setGoals(prev => ({
-                ...prev,
-                fats: { ...prev.fats, enabled: value }
-              }))}
-              trackColor={{ false: '#D1D1D6', true: '#4A90E2' }}
-            />
-          </View>
-          {goals.fats.enabled && (
-            <TextInput
-              style={getStyles(colorScheme).input}
-              value={goals.fats.value}
-              onChangeText={(value) => setGoals(prev => ({
-                ...prev,
-                fats: { ...prev.fats, value }
-              }))}
-              keyboardType="numeric"
-              placeholder="Objectif lipides quotidien"
-              placeholderTextColor="#999"
-            />
-          )}
+      {/* Macros */}
+      <View style={getStyles(colorScheme).card}>
+        <Text style={getStyles(colorScheme).sectionTitle}>Macros</Text>
+        <View style={getStyles(colorScheme).macrosGrid}>
+          <MacroItem
+            type="calories"
+            enabled={goals.calories.enabled}
+            value={goals.calories.value}
+            onToggle={value => setGoals(prev => ({ ...prev, calories: { ...prev.calories, enabled: value } }))}
+            onChange={value => setGoals(prev => ({ ...prev, calories: { ...prev.calories, value } }))}
+            colorScheme={colorScheme}
+          />
+          <MacroItem
+            type="proteins"
+            enabled={goals.proteins.enabled}
+            value={goals.proteins.value}
+            onToggle={value => setGoals(prev => ({ ...prev, proteins: { ...prev.proteins, enabled: value } }))}
+            onChange={value => setGoals(prev => ({ ...prev, proteins: { ...prev.proteins, value } }))}
+            colorScheme={colorScheme}
+          />
+          <MacroItem
+            type="carbs"
+            enabled={goals.carbs.enabled}
+            value={goals.carbs.value}
+            onToggle={value => setGoals(prev => ({ ...prev, carbs: { ...prev.carbs, enabled: value } }))}
+            onChange={value => setGoals(prev => ({ ...prev, carbs: { ...prev.carbs, value } }))}
+            colorScheme={colorScheme}
+          />
+          <MacroItem
+            type="fats"
+            enabled={goals.fats.enabled}
+            value={goals.fats.value}
+            onToggle={value => setGoals(prev => ({ ...prev, fats: { ...prev.fats, enabled: value } }))}
+            onChange={value => setGoals(prev => ({ ...prev, fats: { ...prev.fats, value } }))}
+            colorScheme={colorScheme}
+          />
         </View>
       </View>
 
@@ -300,53 +270,75 @@ const getStyles = (colorScheme: 'light' | 'dark') => StyleSheet.create({
     flex: 1,
     backgroundColor: colorScheme === 'dark' ? Colors.dark.background : Colors.light.background,
   },
-  header: {
+  card: {
+    backgroundColor: colorScheme === 'dark' ? Colors.dark.card : '#FFF',
+    borderRadius: 16,
+    marginHorizontal: 16,
+    marginTop: 20,
     padding: 20,
-    paddingBottom: 10,
-  },
-  title: {
-    fontSize: 32,
-    fontWeight: 'bold',
-    color: colorScheme === 'dark' ? Colors.dark.text : Colors.light.text,
-  },
-  section: {
-    padding: 20,
-    borderBottomWidth: 1,
-    borderBottomColor: colorScheme === 'dark' ? Colors.dark.buttonInactive : Colors.light.buttonInactive,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.08,
+    shadowRadius: 8,
+    elevation: 2,
   },
   sectionTitle: {
-    fontSize: 18,
+    fontSize: 20,
     fontWeight: 'bold',
     color: colorScheme === 'dark' ? Colors.dark.text : Colors.light.text,
     marginBottom: 15,
+    letterSpacing: 0.5,
   },
-  goalItem: {
-    marginBottom: 10,
-  },
-  goalHeader: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    marginBottom: 10,
-  },
-  goalLabel: {
-    fontSize: 16,
-    color: colorScheme === 'dark' ? Colors.dark.text : Colors.light.text,
-  },
-  input: {
-    backgroundColor: colorScheme === 'dark' ? Colors.dark.buttonInactive : Colors.light.buttonInactive,
-    padding: 12,
-    borderRadius: 8,
-    fontSize: 16,
-    color: colorScheme === 'dark' ? Colors.dark.text : Colors.light.text,
-  },
-  pickerContainer: {
+  pickerContainerCard: {
     backgroundColor: colorScheme === 'dark' ? Colors.dark.buttonInactive : Colors.light.buttonInactive,
     borderRadius: 8,
     marginTop: 5,
+    paddingHorizontal: 8,
   },
   picker: {
     color: colorScheme === 'dark' ? Colors.dark.text : Colors.light.text,
+  },
+  macrosGrid: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    justifyContent: 'space-between',
+  },
+  macroItem: {
+    width: '48%',
+    borderWidth: 2,
+    borderRadius: 12,
+    padding: 12,
+    marginBottom: 16,
+    backgroundColor: colorScheme === 'dark' ? Colors.dark.buttonInactive : '#F7F7F7',
+  },
+  macroHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 0,
+    justifyContent: 'center',
+  },
+  macroIcon: {
+    fontSize: 22,
+    marginRight: 8,
+  },
+  macroLabel: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: colorScheme === 'dark' ? Colors.dark.text : Colors.light.text,
+  },
+  macroSwitchContainer: {
+    alignItems: 'center',
+    marginVertical: 8,
+  },
+  macroInput: {
+    backgroundColor: colorScheme === 'dark' ? Colors.dark.background : '#FFF',
+    padding: 10,
+    borderRadius: 8,
+    fontSize: 16,
+    color: colorScheme === 'dark' ? Colors.dark.text : Colors.light.text,
+    borderWidth: 1,
+    borderColor: '#DDD',
+    marginTop: 4,
   },
   saveButton: {
     backgroundColor: Colors.light.primary,
