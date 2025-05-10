@@ -6,6 +6,7 @@ import { Colors } from "@/constants/Colors";
 import { useState, useEffect } from 'react';
 import Slider from '@react-native-community/slider';
 import HeaderTitle from '@/components/headerTitle';
+import NutritionTable from './components/NutritionTable';
 
 type FoodInfo = {
   food_name: string;
@@ -76,6 +77,9 @@ export default function FoodDetailsScreen() {
     lipides: Math.round((food?.nf_total_fat || 0) * ratio),
     ig: ig,
     cg: Math.round((food?.nf_total_carbohydrate || 0) * ratio * ig / 100),
+    sugars: Math.round((food?.nf_sugars || 0) * ratio),
+    fibers: Math.round((food?.nf_dietary_fiber || 0) * ratio),
+    saturatedFats: Math.round((food?.nf_saturated_fat || 0) * ratio)
   };
 
   return (
@@ -119,7 +123,11 @@ export default function FoodDetailsScreen() {
                     carbs: nutritionInfo.glucides,
                     proteins: nutritionInfo.proteines,
                     fats: nutritionInfo.lipides,
-                    glycemicImpact: nutritionInfo.cg
+                    glycemicImpact: nutritionInfo.cg,
+                    sugars: nutritionInfo.sugars,
+                    fibers: nutritionInfo.fibers,
+                    saturatedFats: nutritionInfo.saturatedFats,
+                    photo: food?.photo?.thumb || food?.photo?.highres || photo_url
                   })
                 }
               })}
@@ -153,36 +161,15 @@ export default function FoodDetailsScreen() {
             />
           </View>
 
-          <View style={styles.nutritionTable}>
-            <View style={styles.nutritionRow}>
-              <Text style={styles.nutritionLabel}>Calories</Text>
-              <Text style={styles.nutritionValue}>{nutritionInfo.calories} kcal</Text>
-            </View>
-            <View style={styles.nutritionRow}>
-              <Text style={styles.nutritionLabel}>Glucides</Text>
-              <Text style={styles.nutritionValue}>{nutritionInfo.glucides}g</Text>
-            </View>
-            <View style={[styles.nutritionRow, styles.subRow]}>
-              <Text style={styles.nutritionSubLabel}>dont sucres</Text>
-              <Text style={styles.nutritionValue}>{Math.round((food?.nf_sugars || 0) * ratio)}g</Text>
-            </View>
-            <View style={[styles.nutritionRow, styles.subRow]}>
-              <Text style={styles.nutritionSubLabel}>dont fibres</Text>
-              <Text style={styles.nutritionValue}>{Math.round((food?.nf_dietary_fiber || 0) * ratio)}g</Text>
-            </View>
-            <View style={styles.nutritionRow}>
-              <Text style={styles.nutritionLabel}>Protéines</Text>
-              <Text style={styles.nutritionValue}>{nutritionInfo.proteines}g</Text>
-            </View>
-            <View style={styles.nutritionRow}>
-              <Text style={styles.nutritionLabel}>Lipides</Text>
-              <Text style={styles.nutritionValue}>{nutritionInfo.lipides}g</Text>
-            </View>
-            <View style={[styles.nutritionRow, styles.subRow]}>
-              <Text style={styles.nutritionSubLabel}>dont saturés</Text>
-              <Text style={styles.nutritionValue}>{Math.round((food?.nf_saturated_fat || 0) * ratio)}g</Text>
-            </View>
-          </View>
+          <NutritionTable
+            calories={nutritionInfo.calories}
+            glucides={nutritionInfo.glucides}
+            sucres={Math.round((food?.nf_sugars || 0) * ratio)}
+            fibres={Math.round((food?.nf_dietary_fiber || 0) * ratio)}
+            proteines={nutritionInfo.proteines}
+            lipides={nutritionInfo.lipides}
+            satures={Math.round((food?.nf_saturated_fat || 0) * ratio)}
+          />
 
           {nutritionInfo.ig && (
           <View style={styles.impactSection}>

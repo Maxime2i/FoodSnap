@@ -5,6 +5,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { useState } from 'react';
 import { supabase } from '@/lib/supabase';
 import HeaderTitle from '@/components/headerTitle';
+import NutritionTable from './components/NutritionTable';
 
 interface SearchResult {
   food_name: string;
@@ -24,6 +25,9 @@ type FoodItem = {
   proteins: number;
   fats: number;
   glycemicImpact: number;
+  sugars: number;
+  fibers: number;
+  saturatedFats: number;
   photo?: string;
 };
 
@@ -83,6 +87,9 @@ export default function CreateMealScreen() {
           proteins: food.nf_protein || 0,
           fats: food.nf_total_fat || 0,
           glycemicImpact: (food.nf_total_carbohydrate || 0) * ig / 100,
+          sugars: food.nf_sugars || 0,
+          fibers: food.nf_dietary_fiber || 0,
+          saturatedFats: food.nf_saturated_fat || 0,
           photo: food.photo?.thumb || result.photo.thumb
         };
 
@@ -105,11 +112,17 @@ export default function CreateMealScreen() {
     carbs: Number((acc.carbs + food.carbs).toFixed(2)),
     proteins: Number((acc.proteins + food.proteins).toFixed(2)),
     fats: Number((acc.fats + food.fats).toFixed(2)),
+    sugars: Number((acc.sugars + (food.sugars || 0)).toFixed(2)),
+    fibers: Number((acc.fibers + (food.fibers || 0)).toFixed(2)),
+    saturatedFats: Number((acc.saturatedFats + (food.saturatedFats || 0)).toFixed(2)),
   }), {
     calories: 0,
     carbs: 0,
     proteins: 0,
     fats: 0,
+    sugars: 0,
+    fibers: 0,
+    saturatedFats: 0,
   });
 
   // Calculer l'index glycémique moyen pondéré et la charge glycémique totale
@@ -229,7 +242,7 @@ export default function CreateMealScreen() {
           <Ionicons name="search" size={20} color="#666" style={styles.searchIcon} />
           <TextInput
             style={styles.searchInput}
-            placeholder="Ajouter un aliment... (min. 3 caractères)"
+            placeholder="Ajouter un aliment..."
             placeholderTextColor="#666"
             value={searchQuery}
             onChangeText={handleSearch}
@@ -269,26 +282,15 @@ export default function CreateMealScreen() {
         {/* Résumé nutritionnel */}
         <View style={styles.nutritionSummary}>
           <Text style={styles.sectionTitle}>Résumé nutritionnel</Text>
-          <View style={styles.nutritionTable}>
-            <View style={styles.nutritionRow}>
-              <Text style={styles.nutritionLabel}>Calories</Text>
-              <Text style={styles.nutritionValue}>{nutritionSummary.calories.toFixed(2)} kcal</Text>
-            </View>
-            <View style={styles.nutritionRow}>
-              <Text style={styles.nutritionLabel}>Glucides</Text>
-              <Text style={styles.nutritionValue}>{nutritionSummary.carbs.toFixed(2)}g</Text>
-            </View>
-            <View style={styles.nutritionRow}>
-              <Text style={styles.nutritionLabel}>Protéines</Text>
-              <Text style={styles.nutritionValue}>{nutritionSummary.proteins.toFixed(2)}g</Text>
-            </View>
-            <View style={styles.nutritionRow}>
-              <Text style={styles.nutritionLabel}>Lipides</Text>
-              <Text style={styles.nutritionValue}>{nutritionSummary.fats.toFixed(2)}g</Text>
-            </View>
-          </View>
-
-          
+          <NutritionTable
+            calories={Number(nutritionSummary.calories.toFixed(2))}
+            glucides={Number(nutritionSummary.carbs.toFixed(2))}
+            sucres={Number(nutritionSummary.sugars.toFixed(2))}
+            fibres={Number(nutritionSummary.fibers.toFixed(2))}
+            proteines={Number(nutritionSummary.proteins.toFixed(2))}
+            lipides={Number(nutritionSummary.fats.toFixed(2))}
+            satures={Number(nutritionSummary.saturatedFats.toFixed(2))}
+          />
         </View>
       </ScrollView>
 
