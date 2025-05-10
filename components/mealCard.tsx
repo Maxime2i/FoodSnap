@@ -95,6 +95,7 @@ const getStyles = (colorScheme: string) =>
   title: {
     fontWeight: 'bold',
     fontSize: 17,
+    color: colorScheme === 'light' ? '#000' : '#fff',
   },
   badge: {
     backgroundColor: colorScheme === 'light' ? '#e6f0ff' : '#2c2c2c',

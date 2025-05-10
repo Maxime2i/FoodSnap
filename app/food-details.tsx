@@ -59,7 +59,7 @@ export default function FoodDetailsScreen() {
 
   if (loading) {
     return (
-      <View style={styles.container}>
+      <View style={getStyles(colorScheme).container}>
         <Text>Chargement...</Text>
       </View>
     );
@@ -83,36 +83,36 @@ export default function FoodDetailsScreen() {
   };
 
   return (
-    <View style={styles.container}>
-      <View style={styles.heroContainer}>
+    <View style={getStyles(colorScheme).container}>
+      <View style={getStyles(colorScheme).heroContainer}>
         <Image 
           source={{ uri: food?.photo?.highres || photo_url as string }} 
-          style={styles.heroImage}
+          style={getStyles(colorScheme).heroImage}
           resizeMode="cover"
         />
-        <View style={styles.headerOverlay}>
-          <HeaderTitle title={food_name as string} showBackArrow/>
+        <View style={getStyles(colorScheme).headerOverlay}>
+          <HeaderTitle title={food_name as string} showBackArrow color="black" />
         </View>
       </View>
 
-      <ScrollView style={styles.scrollView} contentContainerStyle={styles.scrollContent}>
-        <View style={styles.infoCard}>
-          <View style={styles.igContainer}>
-            <View style={styles.igTitleContainer}>
+      <ScrollView style={getStyles(colorScheme).scrollView} contentContainerStyle={getStyles(colorScheme).scrollContent}>
+        <View style={getStyles(colorScheme).infoCard}>
+          <View style={getStyles(colorScheme).igContainer}>
+            <View style={getStyles(colorScheme).igTitleContainer}>
               <View style={[
-                styles.igBadge,
+                getStyles(colorScheme).igBadge,
                 { backgroundColor: ig <= 55 ? '#4CAF50' : ig <= 70 ? '#FFC107' : '#FF5722' }
               ]}>
-                <Text style={styles.igBadgeText}>
+                <Text style={getStyles(colorScheme).igBadgeText}>
                   {ig <= 55 ? 'IG Bas' : ig <= 70 ? 'IG Moyen' : 'IG Élevé'}
                 </Text>
               </View>
-              <Text style={styles.categorySubtext} numberOfLines={2}>
+              <Text style={getStyles(colorScheme).categorySubtext} numberOfLines={2}>
                 {foodData?.index_glycemique?.aliment || food?.food_name}
               </Text>
             </View>
             <TouchableOpacity 
-              style={styles.createButton} 
+              style={getStyles(colorScheme).createButton} 
               onPress={() => router.push({
                 pathname: '/create-meal',
                 params: {
@@ -132,24 +132,24 @@ export default function FoodDetailsScreen() {
                 }
               })}
             >
-              <Ionicons name="add" size={20} color="#fff" />
-              <Text style={styles.createButtonText}>Créer un repas</Text>
+              <Ionicons name="add" size={20} color={colorScheme === 'dark' ? Colors.dark.text : Colors.light.text} />
+              <Text style={getStyles(colorScheme).createButtonText}>Créer un repas</Text>
             </TouchableOpacity>
           </View>
 
-          <View style={styles.quantitySection}>
-            <Text style={styles.sectionTitle}>Quantité</Text>
-            <View style={styles.quantityControl}>
+          <View style={getStyles(colorScheme).quantitySection}>
+            <Text style={getStyles(colorScheme).sectionTitle}>Quantité</Text>
+            <View style={getStyles(colorScheme).quantityControl}>
               <TouchableOpacity onPress={() => setQuantity(Math.max(0, quantity - 50))}>
                 <Ionicons name="remove" size={24} color="#4a90e2" />
               </TouchableOpacity>
-              <Text style={styles.quantityText}>{quantity}g</Text>
+              <Text style={getStyles(colorScheme).quantityText}>{quantity}g</Text>
               <TouchableOpacity onPress={() => setQuantity(quantity + 50)}>
                 <Ionicons name="add" size={24} color="#4a90e2" />
               </TouchableOpacity>
             </View>
             <Slider
-              style={styles.slider}
+              style={getStyles(colorScheme).slider}
               minimumValue={0}
               maximumValue={1000}
               value={quantity}
@@ -172,20 +172,20 @@ export default function FoodDetailsScreen() {
           />
 
           {nutritionInfo.ig && (
-          <View style={styles.impactSection}>
-            <Text style={styles.sectionTitle}>Impact glycémique</Text>
-            <View style={styles.impactCard}>
-              <View style={styles.glycemicMetrics}>
-                <View style={styles.metricItem}>
-                  <Text style={styles.metricLabel}>Index glycémique</Text>
-                  <View style={[styles.metricValue, { backgroundColor: ig <= 55 ? '#E8F5E9' : ig <= 70 ? '#FFF3E0' : '#FBE9E7' }]}>
-                    <Text style={styles.metricNumber}>{nutritionInfo.ig}</Text>
+          <View style={getStyles(colorScheme).impactSection}>
+            <Text style={getStyles(colorScheme).sectionTitle}>Impact glycémique</Text>
+            <View style={getStyles(colorScheme).impactCard}>
+              <View style={getStyles(colorScheme).glycemicMetrics}>
+                <View style={getStyles(colorScheme).metricItem}>
+                  <Text style={getStyles(colorScheme).metricLabel}>Index glycémique</Text>
+                  <View style={[getStyles(colorScheme).metricValue, { backgroundColor: ig <= 55 ? '#E8F5E9' : ig <= 70 ? '#FFF3E0' : '#FBE9E7' }]}>
+                    <Text style={getStyles(colorScheme).metricNumber}>{nutritionInfo.ig}</Text>
                   </View>
                 </View>
-                <View style={styles.metricItem}>
-                  <Text style={styles.metricLabel}>Charge glycémique</Text>
-                  <View style={[styles.metricValue, { backgroundColor: '#FFF8E1' }]}>
-                    <Text style={styles.metricNumber}>{nutritionInfo.cg}</Text>
+                <View style={getStyles(colorScheme).metricItem}>
+                  <Text style={getStyles(colorScheme).metricLabel}>Charge glycémique</Text>
+                  <View style={[getStyles(colorScheme).metricValue, { backgroundColor: '#FFF8E1' }]}>
+                    <Text style={getStyles(colorScheme).metricNumber}>{nutritionInfo.cg}</Text>
                   </View>
                 </View>
               </View>
@@ -201,10 +201,10 @@ export default function FoodDetailsScreen() {
   );
 }
 
-const styles = StyleSheet.create({
+const getStyles = (colorScheme: string) => StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#fff',
+    backgroundColor: colorScheme === 'dark' ? Colors.dark.background : Colors.light.background,
   },
   scrollView: {
     flex: 1,
@@ -232,7 +232,7 @@ const styles = StyleSheet.create({
   headerText: {
     fontSize: 20,
     fontWeight: '600',
-    color: '#fff',
+    color: colorScheme === 'dark' ? Colors.dark.text : Colors.light.text,
     marginLeft: 16,
     flex: 1,
     marginRight: 16,
@@ -241,7 +241,7 @@ const styles = StyleSheet.create({
     padding: 8,
   },
   infoCard: {
-    backgroundColor: '#fff',
+    backgroundColor: colorScheme === 'dark' ? Colors.dark.background : Colors.light.background,
     borderTopLeftRadius: 20,
     borderTopRightRadius: 20,
     marginTop: -20,
@@ -267,17 +267,17 @@ const styles = StyleSheet.create({
     marginBottom: 8,
   },
   igBadgeText: {
-    color: '#fff',
+    color: colorScheme === 'dark' ? Colors.dark.text : Colors.light.text,
     fontSize: 12,
     fontWeight: '600',
   },
   categorySubtext: {
     fontSize: 16,
-    color: '#666',
+    color: colorScheme === 'dark' ? Colors.dark.text : Colors.light.text,
     flexShrink: 1,
   },
   createButton: {
-    backgroundColor: '#4a90e2',
+    backgroundColor: colorScheme === 'dark' ? Colors.dark.primary : Colors.light.primary,
     flexDirection: 'row',
     alignItems: 'center',
     padding: 8,
@@ -285,12 +285,12 @@ const styles = StyleSheet.create({
     gap: 4,
   },
   createButtonText: {
-    color: '#fff',
+    color: colorScheme === 'dark' ? Colors.dark.text : Colors.light.text,
     fontSize: 14,
     fontWeight: '600',
   },
   nutritionTable: {
-    backgroundColor: '#f8f8f8',
+    backgroundColor: colorScheme === 'dark' ? Colors.dark.background : Colors.light.background,
     borderRadius: 12,
     padding: 16,
     marginBottom: 20,
@@ -300,7 +300,7 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     paddingVertical: 8,
     borderBottomWidth: 1,
-    borderBottomColor: '#eee',
+    borderBottomColor: colorScheme === 'dark' ? Colors.dark.text : Colors.light.text,
   },
   subRow: {
     paddingLeft: 20,
@@ -311,7 +311,7 @@ const styles = StyleSheet.create({
   },
   nutritionSubLabel: {
     fontSize: 14,
-    color: '#666',
+    color: colorScheme === 'dark' ? Colors.dark.text : Colors.light.text,
   },
   nutritionValue: {
     fontSize: 16,
@@ -325,6 +325,7 @@ const styles = StyleSheet.create({
     fontSize: 18,
     fontWeight: '600',
     marginBottom: 12,
+    color: colorScheme === 'dark' ? Colors.dark.text : Colors.light.text,
   },
   quantityControl: {
     flexDirection: 'row',
@@ -336,6 +337,7 @@ const styles = StyleSheet.create({
   quantityText: {
     fontSize: 18,
     fontWeight: '600',
+    color: colorScheme === 'dark' ? Colors.dark.text : Colors.light.text,
   },
   slider: {
     width: '100%',
@@ -355,7 +357,7 @@ const styles = StyleSheet.create({
   },
   metricLabel: {
     fontSize: 14,
-    color: '#666',
+    color: colorScheme === 'dark' ? Colors.dark.text : Colors.light.text,
     marginBottom: 8,
   },
   metricValue: {
@@ -372,12 +374,12 @@ const styles = StyleSheet.create({
   },
   impactLabel: {
     fontSize: 14,
-    color: '#666',
+    color: colorScheme === 'dark' ? Colors.dark.text : Colors.light.text,
     marginBottom: 8,
   },
   impactBar: {
     height: 8,
-    backgroundColor: '#f5f5f5',
+    backgroundColor: colorScheme === 'dark' ? Colors.dark.background : Colors.light.background,
     borderRadius: 4,
     marginBottom: 8,
     overflow: 'hidden',
@@ -389,7 +391,7 @@ const styles = StyleSheet.create({
   },
   impactValue: {
     fontSize: 14,
-    color: '#666',
+    color: colorScheme === 'dark' ? Colors.dark.text : Colors.light.text,
   },
   infoBox: {
     flexDirection: 'row',
@@ -403,7 +405,7 @@ const styles = StyleSheet.create({
     flex: 1,
     marginLeft: 12,
     fontSize: 14,
-    color: '#1976D2',
+    color: colorScheme === 'dark' ? Colors.dark.text : Colors.light.text,
     lineHeight: 20,
   },
   warningBox: {
@@ -418,29 +420,29 @@ const styles = StyleSheet.create({
     flex: 1,
     marginLeft: 12,
     fontSize: 14,
-    color: '#F57C00',
+    color: colorScheme === 'dark' ? Colors.dark.text : Colors.light.text,
     lineHeight: 20,
   },
   alternativesButton: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    backgroundColor: '#f8f8f8',
+    backgroundColor: colorScheme === 'dark' ? Colors.dark.background : Colors.light.background,
     padding: 16,
     borderRadius: 12,
     marginTop: 8,
   },
   alternativesText: {
     fontSize: 16,
-    color: '#4a90e2',
+    color: colorScheme === 'dark' ? Colors.dark.text : Colors.light.text,
     fontWeight: '500',
   },
   impactCard: {
-    backgroundColor: '#fff',
+    backgroundColor: colorScheme === 'dark' ? Colors.dark.background : Colors.light.background,
     borderRadius: 16,
     padding: 16,
     borderWidth: 1,
-    borderColor: '#e0e0e0',
+    borderColor: colorScheme === 'dark' ? Colors.dark.text : Colors.light.text,
     shadowColor: '#000',
     shadowOffset: {
       width: 0,
