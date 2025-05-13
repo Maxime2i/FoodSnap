@@ -4,7 +4,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { useColorScheme } from "@/hooks/useColorScheme";
 import { Colors } from "@/constants/Colors";
 import { useState, useEffect } from 'react';
-import Slider from '@react-native-community/slider';
+import Slider from '@react-native-assets/slider';
 import HeaderTitle from '@/components/headerTitle';
 import NutritionTable from './components/NutritionTable';
 
@@ -47,6 +47,7 @@ export default function FoodDetailsScreen() {
         const response = await fetch(`https://food-snap.vercel.app/api/food-info?query=${food_name}`);
         const data = await response.json();
         setFoodData(data);
+        setQuantity(data.foods[0].serving_weight_grams);
       } catch (error) {
         console.error('Erreur lors de la récupération des données:', error);
       } finally {
@@ -149,15 +150,14 @@ export default function FoodDetailsScreen() {
               </TouchableOpacity>
             </View>
             <Slider
-              style={getStyles(colorScheme).slider}
+              value={quantity}
               minimumValue={0}
               maximumValue={1000}
-              value={quantity}
-              onValueChange={(value) => setQuantity(Math.round(value))}
-              onSlidingComplete={(value) => setQuantity(Math.round(value))}
+              onValueChange={setQuantity}
               minimumTrackTintColor="#4a90e2"
               maximumTrackTintColor="#ddd"
-              step={50}
+              thumbTintColor="#4a90e2"
+              step={1}
             />
           </View>
 
