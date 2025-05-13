@@ -27,62 +27,52 @@ export default function AnalyzeScreen() {
       setError(null);
       try {
         // Lire le fichier et l'encoder en base64
-        // const base64Image = await FileSystem.readAsStringAsync(photoUri as string, { encoding: FileSystem.EncodingType.Base64 });
+        const base64Image = await FileSystem.readAsStringAsync(photoUri as string, { encoding: FileSystem.EncodingType.Base64 });
 
-        // const response = await fetch('https://api.openai.com/v1/chat/completions', {
-        //   method: 'POST',
-        //   headers: {
-        //     'Content-Type': 'application/json',
-        //     'Authorization': `Bearer ${process.env.EXPO_PUBLIC_OPENAI_API_KEY}`,
-        //   },
-        //   body: JSON.stringify({
-        //     model: "gpt-4o-mini",
-        //     messages: [
-        //       {
-        //         role: "user",
-        //         content: [
-        //           {
-        //             type: "text",
-        //             text: "Analyze this food image and return a JSON object. Give me the name of the dish (nom_plat), and for each ingredient, provide its name, estimated quantity, and nutritional values per 100g. Use this format: { nom_plat: string, ingredients: [{ nom: string, quantite: number, unite: string, nutritionPer100g: { calories: number, proteines: number, glucides: number, lipides: number } }] }. Return ONLY the JSON, no other text."
-        //           },
-        //           {
-        //             type: "image_url",
-        //             image_url: {
-        //               url: `data:image/jpeg;base64,${base64Image}`
-        //             }
-        //           }
-        //         ]
-        //       }
-        //     ],
-        //     max_tokens: 1000,
-        //   })
-        // });
+        const response = await fetch('https://api.openai.com/v1/chat/completions', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${process.env.EXPO_PUBLIC_OPENAI_API_KEY}`,
+          },
+          body: JSON.stringify({
+            model: "gpt-4o-mini",
+            messages: [
+              {
+                role: "user",
+                content: [
+                  {
+                    type: "text",
+                    text: "Analysez cette image de nourriture et retournez un objet JSON. Donnez-moi le nom du plat (nom_plat), et pour chaque ingrédient, fournissez son nom, sa quantité estimée, et ses valeurs nutritionnelles par 100g. Pour chaque ingrédient, je veux : calories, protéines, glucides, lipides, sucres, fibres, saturés (graisses saturées). Utilisez ce format : { nom_plat: string, ingredients: [{ nom: string, quantite: number, unite: string, nutritionPer100g: { calories: number, proteines: number, glucides: number, lipides: number, sucres: number, fibres: number, satures: number } }] }. Retournez SEULEMENT le JSON, sans autre texte."
+                  },
+                  {
+                    type: "image_url",
+                    image_url: {
+                      url: `data:image/jpeg;base64,${base64Image}`
+                    }
+                  }
+                ]
+              }
+            ],
+            max_tokens: 1000,
+          })
+        });
     
-        // const data = await response.json();
-        // if (!data.choices?.[0]?.message?.content) {
-        //   throw new Error('Réponse invalide de GPT');
-        // }
+        const data = await response.json();
+        if (!data.choices?.[0]?.message?.content) {
+          throw new Error('Réponse invalide de GPT');
+        }
     
-        // // Nettoyer la réponse pour s'assurer qu'elle ne contient que du JSON valide
-        // let cleanedContent = data.choices[0].message.content.trim();
-        // // Parfois la réponse contient du texte avant/après le JSON, on tente d'extraire le JSON
-        // const firstBrace = cleanedContent.indexOf('{');
-        // const lastBrace = cleanedContent.lastIndexOf('}');
-        // if (firstBrace === -1 || lastBrace === -1) throw new Error('JSON non trouvé dans la réponse');
-        // cleanedContent = cleanedContent.substring(firstBrace, lastBrace + 1);
-        // const json = JSON.parse(cleanedContent);
+        // Nettoyer la réponse pour s'assurer qu'elle ne contient que du JSON valide
+        let cleanedContent = data.choices[0].message.content.trim();
+        // Parfois la réponse contient du texte avant/après le JSON, on tente d'extraire le JSON
+        const firstBrace = cleanedContent.indexOf('{');
+        const lastBrace = cleanedContent.lastIndexOf('}');
+        if (firstBrace === -1 || lastBrace === -1) throw new Error('JSON non trouvé dans la réponse');
+        cleanedContent = cleanedContent.substring(firstBrace, lastBrace + 1);
+        const json = JSON.parse(cleanedContent);
 
-        const json = {
-          nom_plat: "Pâtes carbonara",
-          ingredients: [
-            { nom: "Pâtes", quantite: 200, unite: "g", nutritionPer100g: { calories: 100, proteines: 10, glucides: 20, lipides: 1 } },
-            { nom: "Poulet", quantite: 150, unite: "g", nutritionPer100g: { calories: 100, proteines: 10, glucides: 20, lipides: 1 } },
-            { nom: "Pommes de terre", quantite: 100, unite: "g", nutritionPer100g: { calories: 100, proteines: 10, glucides: 20, lipides: 1 } },
-            { nom: "Carottes", quantite: 100, unite: "g", nutritionPer100g: { calories: 100, proteines: 10, glucides: 20, lipides: 1 } },
-            { nom: "Brocoli", quantite: 100, unite: "g", nutritionPer100g: { calories: 100, proteines: 10, glucides: 20, lipides: 1 } },
-            { nom: "Petits pois", quantite: 50, unite: "g", nutritionPer100g: { calories: 100, proteines: 10, glucides: 20, lipides: 1 } },
-          ],
-        };
+      
 
         // Enrichir chaque ingrédient avec une photo depuis l'API food-info
         const enrichIngredientsWithPhoto = async (ingredients: any[]): Promise<any[]> => {
@@ -159,7 +149,7 @@ export default function AnalyzeScreen() {
   if (loading) {
     return (
       <View style={getStyle(colorScheme).container}>
-        <Image source={{ uri: photoUri as string }} style={getStyle(colorScheme).landscapeImage} />
+        <Image source={{ uri: photoUri as string }} style={getStyle(colorScheme).fullImage} />
         <View style={getStyle(colorScheme).overlay}>
           <ActivityIndicator size="large" color="#fff" style={getStyle(colorScheme).loader} />
           <Text style={getStyle(colorScheme).loadingText}>Analyse en cours...</Text>
@@ -378,10 +368,10 @@ const getStyle = (colorScheme: string) => StyleSheet.create({
     position: 'absolute',
     top: 0,
     left: 0,
-    backgroundColor: colorScheme === 'dark' ? Colors.dark.background : Colors.light.background,
+    backgroundColor: 'rgba(0,0,0,0.4)',
   },
   loadingText: {
-    color: colorScheme === 'dark' ? Colors.dark.text : Colors.light.text,
+    color: "white",
     fontSize: 24,
     fontWeight: 'bold',
     marginTop: 20,
