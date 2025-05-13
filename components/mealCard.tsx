@@ -32,7 +32,14 @@ type Meal = {
 const MealCard = ({
   meal
 }: { meal: Meal }) => {
-  const displayedFoods = meal.foods.slice(0, 3);
+  const imageToExclude = 'https://d2eawub7utcl6.cloudfront.net/images/nix-apple-grey.png';
+  const sortedFoods = [...meal.foods].sort((a, b) => {
+    const aHasImage = a.photo === imageToExclude;
+    const bHasImage = b.photo === imageToExclude;
+    if (aHasImage === bHasImage) return 0;
+    return aHasImage ? 1 : -1;
+  });
+  const displayedFoods = sortedFoods.slice(0, 3);
   const extraCount = meal.foods.length - displayedFoods.length;
   const colorScheme = useColorScheme();
 

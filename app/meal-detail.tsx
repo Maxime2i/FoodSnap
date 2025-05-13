@@ -36,6 +36,7 @@ interface Meal {
   total_fibers: number;
   total_saturated_fats: number;
   foods: FoodItem[];
+  photo_url?: string;
 }
 
 export default function MealDetailScreen() {
@@ -43,6 +44,7 @@ export default function MealDetailScreen() {
   const { id } = useLocalSearchParams();
   const [meal, setMeal] = useState<Meal | null>(null);
   const [loading, setLoading] = useState(true);
+  const [modalVisible, setModalVisible] = useState(false);
 
   useEffect(() => {
     fetchMealDetail();
@@ -86,6 +88,30 @@ export default function MealDetailScreen() {
       <HeaderTitle title="Repas" showBackArrow/>
 
       <ScrollView style={getStyles(colorScheme).content}>
+        {meal.photo_url && (
+          <TouchableOpacity activeOpacity={0.8} onPress={() => setModalVisible(true)}>
+            <Image
+              source={{ uri: meal.photo_url }}
+              style={{ width: Dimensions.get('window').width - 32, height: 200, borderRadius: 16, alignSelf: 'center', marginBottom: 20, resizeMode: 'cover' }}
+            />
+          </TouchableOpacity>
+        )}
+        <Modal
+          visible={modalVisible}
+          transparent
+          animationType="fade"
+        >
+          <TouchableOpacity
+            style={{ flex: 1, backgroundColor: 'rgba(0,0,0,0.95)', justifyContent: 'center', alignItems: 'center' }}
+            activeOpacity={1}
+            onPress={() => setModalVisible(false)}
+          >
+            <Image
+              source={{ uri: meal?.photo_url }}
+              style={{ width: Dimensions.get('window').width, height: Dimensions.get('window').height * 0.6, resizeMode: 'contain', borderRadius: 12 }}
+            />
+          </TouchableOpacity>
+        </Modal>
         <View style={getStyles(colorScheme).mealHeader}>
           <Text style={getStyles(colorScheme).mealName}>{meal.name}</Text>
           <Text style={getStyles(colorScheme).mealTime}>
