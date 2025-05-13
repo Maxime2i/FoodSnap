@@ -155,30 +155,30 @@ export default function HomeScreen() {
         <View style={getStyles(colorScheme).carbsHeader}>
           <Text style={getStyles(colorScheme).carbsTitle}>Glucides aujourd'hui </Text>
           {(user?.glucides || 0) > 0 ? (
-            <Text style={getStyles(colorScheme).carbsTotal}>{totals.glucides} / {user?.glucides}g</Text>
+            <Text style={getStyles(colorScheme).carbsTotal}>{totals.glucides.toFixed(1)} / {user?.glucides?.toFixed(1)}g</Text>
           ) : null}
         </View>
 
         <View style={getStyles(colorScheme).carbsMain}>
           <Ionicons name="pizza-outline" size={32} color="#4a90e2" />
-          <Text style={getStyles(colorScheme).carbsValue}>{totals.glucides}g</Text>
+          <Text style={getStyles(colorScheme).carbsValue}>{totals.glucides.toFixed(1)}g</Text>
         </View>
 
         {(user?.glucides || 0) > 0 ? (
           <>
-            <Text style={getStyles(colorScheme).carbsRemaining}>{Math.max((user?.glucides || 0) - totals.glucides, 0).toFixed(2)}g restants</Text>
+            <Text style={getStyles(colorScheme).carbsRemaining}>{Math.max((user?.glucides || 0) - totals.glucides, 0).toFixed(1)}g restants</Text>
 
             <View style={getStyles(colorScheme).carbsBar}>
               <LinearGradient
                 colors={['#4a90e2', '#e8f4f8']}
-                style={[getStyles(colorScheme).carbsProgress, { width: `${Math.min((totals.glucides / (user?.glucides || 1)) * 100, 100)}%` }]}
+                style={[getStyles(colorScheme).carbsProgress, { width: `${parseFloat(Math.min((totals.glucides / (user?.glucides || 1)) * 100, 100).toFixed(1))}%` }]}
                 start={{ x: 0, y: 0 }}
                 end={{ x: 1, y: 0 }}
               />
             </View>
             <View style={getStyles(colorScheme).carbsRange}>
-              <Text style={getStyles(colorScheme).carbsRangeText}>{totals.glucides}g</Text>
-              <Text style={getStyles(colorScheme).carbsRangeText}>{user?.glucides}g</Text>
+              <Text style={getStyles(colorScheme).carbsRangeText}>{totals.glucides.toFixed(1)}g</Text>
+              <Text style={getStyles(colorScheme).carbsRangeText}>{user?.glucides?.toFixed(1)}g</Text>
             </View>
           </>
         ) : (
@@ -199,8 +199,8 @@ export default function HomeScreen() {
               <Ionicons name="flame-outline" size={24} color="#ff9500" />
             </View>
             <Text style={getStyles(colorScheme).macroLabel}>Calories</Text>
-            <Text style={getStyles(colorScheme).macroValue}>{totals.calories}kcal</Text>
-            {user?.calories && <Text style={getStyles(colorScheme).macroGoal}>sur {user?.calories}kcal</Text>}
+            <Text style={getStyles(colorScheme).macroValue}>{totals.calories.toFixed(1)}kcal</Text>
+            {user?.calories && <Text style={getStyles(colorScheme).macroGoal}>sur {user?.calories?.toFixed(1)}kcal</Text>}
           </View>
 
           <View style={getStyles(colorScheme).macroCard}>
@@ -208,8 +208,8 @@ export default function HomeScreen() {
               <Ionicons name="fish-outline" size={24} color="#2ecc71" />
             </View>
             <Text style={getStyles(colorScheme).macroLabel}>Protéines</Text>
-            <Text style={getStyles(colorScheme).macroValue}>{totals.proteines}g</Text>
-            {user?.proteines && <Text style={getStyles(colorScheme).macroGoal}>sur {user?.proteines}g</Text>}
+            <Text style={getStyles(colorScheme).macroValue}>{totals.proteines.toFixed(1)}g</Text>
+            {user?.proteines && <Text style={getStyles(colorScheme).macroGoal}>sur {user?.proteines?.toFixed(1)}g</Text>}
           </View>
 
           <View style={getStyles(colorScheme).macroCard}>
@@ -217,8 +217,8 @@ export default function HomeScreen() {
               <Ionicons name="water-outline" size={24} color="#f1c40f" />
             </View>
             <Text style={getStyles(colorScheme).macroLabel}>Lipides</Text>
-            <Text style={getStyles(colorScheme).macroValue}>{totals.lipides}g</Text>
-            {user?.lipides && <Text style={getStyles(colorScheme).macroGoal}>sur {user?.lipides}g</Text>}
+            <Text style={getStyles(colorScheme).macroValue}>{totals.lipides.toFixed(1)}g</Text>
+            {user?.lipides && <Text style={getStyles(colorScheme).macroGoal}>sur {user?.lipides?.toFixed(1)}g</Text>}
           </View>
         </View>
       </View>
