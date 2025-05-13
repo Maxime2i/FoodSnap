@@ -269,6 +269,12 @@ export default function AnalyzeScreen() {
         behavior={Platform.OS === 'ios' ? 'padding' : undefined}
       >
         <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
+          <TouchableOpacity
+            style={getStyle(colorScheme).closeTopLeftButton}
+            onPress={() => router.push('/(tabs)')}
+          >
+            <Text style={getStyle(colorScheme).closeTopLeftButtonText}>✕</Text>
+          </TouchableOpacity>
           <Image source={{ uri: photoUri as string }} style={getStyle(colorScheme).landscapeImage} resizeMode="cover" />
           <TextInput
             style={getStyle(colorScheme).dishNameInput}
@@ -311,7 +317,7 @@ export default function AnalyzeScreen() {
           </View>
           <View style={getStyle(colorScheme).nutritionContainer}>
             <Text style={getStyle(colorScheme).ingredientsTitle}>Valeurs nutritionnelles</Text>
-            <NutritionTable {...getTotalNutrition()} style={{ marginHorizontal: 24, marginTop: 16 }}/>
+            <NutritionTable {...getTotalNutrition()} style={getStyle(colorScheme).nutritionTable}/>
           </View>
         </ScrollView>
         <TouchableOpacity
@@ -379,9 +385,6 @@ const getStyle = (colorScheme: string) => StyleSheet.create({
     fontSize: 24,
     fontWeight: 'bold',
     marginTop: 20,
-    textShadowColor: colorScheme === 'dark' ? Colors.dark.text : Colors.light.text,
-    textShadowOffset: { width: 0, height: 2 },
-    textShadowRadius: 4,
   },
   loader: {
     marginBottom: 10,
@@ -442,6 +445,9 @@ const getStyle = (colorScheme: string) => StyleSheet.create({
     fontWeight: 'bold',
     marginBottom: 12,
   },
+  nutritionTable: {
+    marginTop: 16,
+  },
   ingredientRow: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -477,7 +483,7 @@ const getStyle = (colorScheme: string) => StyleSheet.create({
     color: colorScheme === 'dark' ? Colors.dark.text : Colors.light.text,
     fontSize: 16,
     width: 40,
-    textAlign: 'right',
+    textAlign: 'left',
     marginLeft: 2,
     marginRight: 2,
   },
@@ -607,5 +613,22 @@ const getStyle = (colorScheme: string) => StyleSheet.create({
     fontSize: 16,
     fontWeight: 'bold',
     lineHeight: 20,
+  },
+  closeTopLeftButton: {
+    position: 'absolute',
+    top: 40,
+    left: 16,
+    zIndex: 10,
+    borderRadius: 20,
+    width: 36,
+    height: 36,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  closeTopLeftButtonText: {
+    color: '#fff',
+    fontSize: 24,
+    fontWeight: 'bold',
+    lineHeight: 28,
   },
 });
