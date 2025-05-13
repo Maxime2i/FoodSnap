@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, TextInput, ActivityIndicator, TouchableOpacity, Image, Text, StyleSheet, ScrollView } from 'react-native';
+import { View, TextInput, ActivityIndicator, TouchableOpacity, Image, Text, StyleSheet, ScrollView, Alert } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 
 interface SearchResult {
@@ -89,10 +89,17 @@ const SearchBar: React.FC<SearchBarProps> = ({ colorScheme, getStyles, onResultS
             <TouchableOpacity
               key={result.tag_id + result.food_name || index}
               style={getStyles(colorScheme).searchResultItem}
-              onPress={() => {
-                onResultSelect(result);
+              onPress={async () => {
                 setSearchQuery('');
                 setSearchResults([]);
+                try {
+                  const response = await fetch(`https://food-snap.vercel.app/api/food-info?query=${encodeURIComponent(result.food_name)}`);
+                  const data = await response.json();
+
+                  onResultSelect(data);
+                } catch (error) {
+                  Alert.alert('Erreur', 'Erreur lors de la récupération des infos nutritionnelles.');
+                }
               }}
             >
               <View style={getStyles(colorScheme).searchResultContent}>

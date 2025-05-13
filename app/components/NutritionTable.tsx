@@ -30,31 +30,31 @@ const NutritionTable: React.FC<NutritionTableProps> = ({
     <View style={[getStyles(colorScheme).nutritionTable, style]}>
       <View style={getStyles(colorScheme).nutritionRow}>
         <Text style={getStyles(colorScheme).nutritionLabel}>Calories</Text>
-      <Text style={getStyles(colorScheme).nutritionValue}>{calories} kcal</Text>
+      <Text style={getStyles(colorScheme).nutritionValue}>{calories.toFixed(1)} kcal</Text>
     </View>
     <View style={getStyles(colorScheme).nutritionRow}>
       <Text style={getStyles(colorScheme).nutritionLabel}>Glucides</Text>
-      <Text style={getStyles(colorScheme).nutritionValue}>{glucides}g</Text>
+      <Text style={getStyles(colorScheme).nutritionValue}>{glucides.toFixed(1)}g</Text>
     </View>
     <View style={[getStyles(colorScheme).nutritionRow, getStyles(colorScheme).subRow]}>
       <Text style={getStyles(colorScheme).nutritionSubLabel}>dont sucres</Text>
-      <Text style={getStyles(colorScheme).nutritionValue}>{sucres}g</Text>
+      <Text style={getStyles(colorScheme).nutritionValue}>{sucres.toFixed(1)}g</Text>
     </View>
     <View style={[getStyles(colorScheme).nutritionRow, getStyles(colorScheme).subRow]}>
       <Text style={getStyles(colorScheme).nutritionSubLabel}>dont fibres</Text>
-      <Text style={getStyles(colorScheme).nutritionValue}>{fibres}g</Text>
+      <Text style={getStyles(colorScheme).nutritionValue}>{fibres.toFixed(1)}g</Text>
     </View>
     <View style={getStyles(colorScheme).nutritionRow}>
       <Text style={getStyles(colorScheme).nutritionLabel}>Protéines</Text>
-      <Text style={getStyles(colorScheme).nutritionValue}>{proteines}g</Text>
+      <Text style={getStyles(colorScheme).nutritionValue}>{proteines.toFixed(1)}g</Text>
     </View>
     <View style={getStyles(colorScheme).nutritionRow}>
       <Text style={getStyles(colorScheme).nutritionLabel}>Lipides</Text>
-      <Text style={getStyles(colorScheme).nutritionValue}>{lipides}g</Text>
+      <Text style={getStyles(colorScheme).nutritionValue}>{lipides.toFixed(1)}g</Text>
     </View>
     <View style={[getStyles(colorScheme).nutritionRow, getStyles(colorScheme).subRow]}>
       <Text style={getStyles(colorScheme).nutritionSubLabel}>dont saturés</Text>
-      <Text style={getStyles(colorScheme).nutritionValue}>{satures}g</Text>
+      <Text style={getStyles(colorScheme).nutritionValue}>{satures.toFixed(1)}g</Text>
     </View>
   </View>
   );
