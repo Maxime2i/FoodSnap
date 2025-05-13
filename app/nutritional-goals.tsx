@@ -107,7 +107,6 @@ export default function NutritionalGoalsScreen() {
         throw error;
       }
 
-      console.log("Received data:", data);
 
       if (data) {
         const newGoals = {
@@ -129,7 +128,7 @@ export default function NutritionalGoalsScreen() {
           },
           globalGoal: data.goal || 'maintenance'
         };
-        console.log("Setting new goals:", newGoals);
+
         setGoals(newGoals);
       }
     } catch (error) {
@@ -146,15 +145,10 @@ export default function NutritionalGoalsScreen() {
     }
   }, [user, initialLoad]);
 
-  // Ajout d'un useEffect pour logger les changements de goals
-  useEffect(() => {
-    console.log("Goals updated:", goals);
-  }, [goals]);
 
   const saveGoals = async () => {
     if (!user) return;
     setLoading(true);
-    console.log("Saving goals:", goals);
 
     try {
       const updateData = {
@@ -164,7 +158,6 @@ export default function NutritionalGoalsScreen() {
         lipides: goals.fats.enabled ? Math.max(0, parseInt(goals.fats.value) || 0) : 0,
         goal: goals.globalGoal
       };
-      console.log("Update data:", updateData);
 
       const { error } = await supabase
         .from('profiles')
@@ -175,7 +168,7 @@ export default function NutritionalGoalsScreen() {
         console.error('Error updating goals:', error);
         throw error;
       }
-      console.log("Save successful");
+
       router.back();
     } catch (error) {
       console.error('Erreur lors de la sauvegarde des objectifs:', error);

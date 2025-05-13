@@ -115,7 +115,7 @@ export default function AnalyzeScreen() {
     let totalSucres = 0;
     let totalFibres = 0;
     let totalSatures = 0;
-    console.log("recalcul", ingredients);
+
     ingredients.forEach(ingredient => {
       const q = ingredient.quantite || 0;
       const nut = ingredient.nutritionPer100g || {};
@@ -178,7 +178,6 @@ export default function AnalyzeScreen() {
         ratio = 100 / food.serving_weight_grams;
       }
 
-      console.log(ratio);
       setIngredients([
         ...ingredients,
         {
@@ -198,7 +197,6 @@ export default function AnalyzeScreen() {
         },
       ]);
 
-      console.log(ingredients, food.nf_total_carbohydrate ? Math.round(food.nf_total_carbohydrate * ratio * 10) / 10 : 0);
       setModalVisible(false);
     };
 

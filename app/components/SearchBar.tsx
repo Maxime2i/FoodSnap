@@ -130,7 +130,7 @@ const SearchBar: React.FC<SearchBarProps> = ({
                     )}`
                   );
                   const data = await response.json();
-                  console.log(data);
+
                   onResultSelect(data);
                 } catch (error) {
                   Alert.alert(
