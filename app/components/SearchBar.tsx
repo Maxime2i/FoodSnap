@@ -1,10 +1,22 @@
-import React, { useState } from 'react';
-import { View, TextInput, ActivityIndicator, TouchableOpacity, Image, Text, StyleSheet, ScrollView, Alert } from 'react-native';
-import { Ionicons } from '@expo/vector-icons';
+import React, { useState } from "react";
+import {
+  View,
+  TextInput,
+  ActivityIndicator,
+  TouchableOpacity,
+  Image,
+  Text,
+  StyleSheet,
+  ScrollView,
+  Alert,
+} from "react-native";
+import { Ionicons } from "@expo/vector-icons";
 
 interface SearchResult {
+  foods: any;
   food_name: string;
   tag_id: number;
+
   photo: {
     thumb: string;
   };
@@ -13,13 +25,17 @@ interface SearchResult {
 }
 
 interface SearchBarProps {
-  colorScheme: 'light' | 'dark';
-  getStyles: (colorScheme: 'light' | 'dark') => any;
+  colorScheme: "light" | "dark";
+  getStyles: (colorScheme: "light" | "dark") => any;
   onResultSelect: (result: SearchResult) => void;
 }
 
-const SearchBar: React.FC<SearchBarProps> = ({ colorScheme, getStyles, onResultSelect }) => {
-  const [searchQuery, setSearchQuery] = useState('');
+const SearchBar: React.FC<SearchBarProps> = ({
+  colorScheme,
+  getStyles,
+  onResultSelect,
+}) => {
+  const [searchQuery, setSearchQuery] = useState("");
   const [searchResults, setSearchResults] = useState<SearchResult[]>([]);
   const [isSearching, setIsSearching] = useState(false);
 
@@ -29,25 +45,32 @@ const SearchBar: React.FC<SearchBarProps> = ({ colorScheme, getStyles, onResultS
       setSearchResults([]);
       return;
     }
-    if (query.trim() === '') {
+    if (query.trim() === "") {
       setSearchResults([]);
       return;
     }
     setIsSearching(true);
     try {
-      const response = await fetch(`https://food-snap.vercel.app/api/search?query=${encodeURIComponent(query)}`);
+      const response = await fetch(
+        `https://food-snap.vercel.app/api/search?query=${encodeURIComponent(
+          query
+        )}`
+      );
       const data = await response.json();
       setSearchResults(data.common || []);
     } catch (error) {
       setSearchResults([
         {
+          foods: [{}],
           tag_id: 0,
-          food_name: 'Erreur de connexion au serveur',
+
+          food_name: "Erreur de connexion au serveur",
           photo: {
-            thumb: 'https://d2eawub7utcl6.cloudfront.net/images/nix-apple-grey.png',
+            thumb:
+              "https://d2eawub7utcl6.cloudfront.net/images/nix-apple-grey.png",
           },
           serving_qty: 0,
-          serving_unit: '',
+          serving_unit: "",
         },
       ]);
     } finally {
@@ -58,23 +81,31 @@ const SearchBar: React.FC<SearchBarProps> = ({ colorScheme, getStyles, onResultS
   return (
     <View style={getStyles(colorScheme).searchContainer}>
       <View style={getStyles(colorScheme).searchInputContainer}>
-        <Ionicons name="search-outline" size={20} color={colorScheme === 'dark' ? '#fff' : '#000'} />
+        <Ionicons
+          name="search-outline"
+          size={20}
+          color={colorScheme === "dark" ? "#fff" : "#000"}
+        />
         <TextInput
           style={getStyles(colorScheme).searchInput}
           placeholder="Rechercher..."
-          placeholderTextColor={colorScheme === 'dark' ? '#fff' : '#000'}
+          placeholderTextColor={colorScheme === "dark" ? "#fff" : "#000"}
           value={searchQuery}
           onChangeText={handleSearch}
         />
         {searchQuery.length > 0 && !isSearching && (
           <TouchableOpacity
             onPress={() => {
-              setSearchQuery('');
+              setSearchQuery("");
               setSearchResults([]);
             }}
             style={{ marginLeft: 8 }}
           >
-            <Ionicons name="close-circle" size={20} color={colorScheme === 'dark' ? '#fff' : '#000'} />
+            <Ionicons
+              name="close-circle"
+              size={20}
+              color={colorScheme === "dark" ? "#fff" : "#000"}
+            />
           </TouchableOpacity>
         )}
         {isSearching && <ActivityIndicator size="small" color="#4a90e2" />}
@@ -90,15 +121,23 @@ const SearchBar: React.FC<SearchBarProps> = ({ colorScheme, getStyles, onResultS
               key={result.tag_id + result.food_name || index}
               style={getStyles(colorScheme).searchResultItem}
               onPress={async () => {
-                setSearchQuery('');
+                setSearchQuery("");
                 setSearchResults([]);
                 try {
-                  const response = await fetch(`https://food-snap.vercel.app/api/food-info?query=${encodeURIComponent(result.food_name)}`);
+                  const response = await fetch(
+                    `https://food-snap.vercel.app/api/food-info?query=${encodeURIComponent(
+                      result.food_name
+                    )}`
+                  );
                   const data = await response.json();
-
+                  console.log(data);
                   onResultSelect(data);
                 } catch (error) {
-                  Alert.alert('Erreur', 'Erreur lors de la récupération des infos nutritionnelles.');
+                  Alert.alert(
+                    "Erreur",
+                    "Erreur lors de la récupération des infos nutritionnelles."
+                  );
+                  console.log(error);
                 }
               }}
             >
@@ -108,7 +147,9 @@ const SearchBar: React.FC<SearchBarProps> = ({ colorScheme, getStyles, onResultS
                   style={getStyles(colorScheme).searchResultImage}
                 />
                 <View style={getStyles(colorScheme).searchResultTextContainer}>
-                  <Text style={getStyles(colorScheme).searchResultText}>{result.food_name}</Text>
+                  <Text style={getStyles(colorScheme).searchResultText}>
+                    {result.food_name}
+                  </Text>
                   <Text style={getStyles(colorScheme).searchResultSubtext}>
                     {result.serving_qty} {result.serving_unit}
                   </Text>
@@ -122,4 +163,4 @@ const SearchBar: React.FC<SearchBarProps> = ({ colorScheme, getStyles, onResultS
   );
 };
 
-export default SearchBar; 
+export default SearchBar;

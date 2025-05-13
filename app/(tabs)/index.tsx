@@ -13,13 +13,17 @@ import SearchBar from '../components/SearchBar';
 import MealCard from '@/components/mealCard';
 
 interface SearchResult {
-  food_name: string;
-  tag_id: number;
-  photo: {
-    thumb: string;
-  };
-  serving_qty: number;
-  serving_unit: string;
+  foods: {
+    food_name: string;
+    tags: {
+      tag_id: number;
+    };
+    photo: {
+      thumb: string;
+    };
+    serving_qty: number;
+    serving_unit: string;
+  }[];
 }
 
 interface FoodItem {
@@ -116,13 +120,17 @@ export default function HomeScreen() {
     } catch (error) {
       console.error('Erreur lors de la recherche:', error);
       setSearchResults([{
-        tag_id: 0,
-        food_name: 'Erreur de connexion au serveur',
-        photo: {
-          thumb: 'https://d2eawub7utcl6.cloudfront.net/images/nix-apple-grey.png'
-        },
-        serving_qty: 0,
-        serving_unit: ''
+        foods: [{
+          tags: {
+            tag_id: 0,
+          },
+          food_name: 'Erreur de connexion au serveur',
+          photo: {
+            thumb: 'https://d2eawub7utcl6.cloudfront.net/images/nix-apple-grey.png'
+          },
+          serving_qty: 0,
+          serving_unit: ''
+        }],
       }]);
     } finally {
       setIsSearching(false);
@@ -143,9 +151,9 @@ export default function HomeScreen() {
           router.push({
             pathname: '/food-details',
             params: {
-              food_name: result.food_name,
-              photo_url: result.photo.thumb,
-              tag_id: result.tag_id.toString(),
+              food_name: result.foods[0].food_name,
+              photo_url: result.foods[0].photo.thumb,
+              tag_id: result.foods[0].tags.tag_id.toString(),
             },
           });
         }}
