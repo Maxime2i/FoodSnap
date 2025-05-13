@@ -402,13 +402,6 @@ export default function CreateMealScreen() {
       {/* Boutons d'action */}
       <View style={getStyles(colorScheme).actions}>
         <TouchableOpacity 
-          style={[getStyles(colorScheme).button, getStyles(colorScheme).cancelButton]} 
-          onPress={() => router.back()}
-          disabled={isSaving}
-        >
-          <Text style={getStyles(colorScheme).cancelButtonText}>Annuler</Text>
-        </TouchableOpacity>
-        <TouchableOpacity 
           style={[getStyles(colorScheme).button, getStyles(colorScheme).saveButton]}
           onPress={handleSaveMeal}
           disabled={isSaving}

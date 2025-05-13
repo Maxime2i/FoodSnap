@@ -325,11 +325,6 @@ export default function ProfileEdit() {
 
       <View style={getStyles(colorScheme).buttonContainer}>
         <TouchableOpacity 
-          style={getStyles(colorScheme).cancelButton}
-          onPress={() => router.back()}>
-          <Text style={getStyles(colorScheme).cancelButtonText}>Annuler</Text>
-        </TouchableOpacity>
-        <TouchableOpacity 
           style={[getStyles(colorScheme).saveButton, loading && getStyles(colorScheme).saveButtonDisabled]}
           onPress={handleSave}
           disabled={loading}>
