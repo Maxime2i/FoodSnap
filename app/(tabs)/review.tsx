@@ -105,7 +105,7 @@ export default function ReviewScreen() {
     const groups: { [key: string]: Meal[] } = {};
 
     meals.forEach((meal) => {
-      const date = meal.created_at;
+      const date = format(parseISO(meal.created_at), 'yyyy-MM-dd');
       if (!groups[date]) {
         groups[date] = [];
       }
