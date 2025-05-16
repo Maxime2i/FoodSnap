@@ -1,6 +1,6 @@
 {
   "expo": {
-    "name": "foodSnap",
+    "name": "nutrisnap",
     "slug": "foodSnap",
     "version": "1.0.0",
     "orientation": "portrait",
@@ -10,7 +10,7 @@
     "newArchEnabled": true,
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "com.maxime2i.foodSnap"
+      "bundleIdentifier": "com.maxime2i.nutrisnap"
     },
     "android": {
       "adaptiveIcon": {
@@ -21,7 +21,7 @@
         "android.permission.CAMERA",
         "android.permission.RECORD_AUDIO"
       ],
-      "package": "com.maxime2i.foodSnap"
+      "package": "com.maxime2i.nutrisnap"
     },
     "plugins": [
       "expo-router",
@@ -45,6 +45,10 @@
         "projectId": "9d76545f-ad7d-4f6a-9e16-a29ce0cbe4f2"
       }
     },
-    "owner": "maxime2ii"
+    "owner": "maxime2ii",
+    "splash": {
+      "image": "./assets/images/splash.png",
+      "backgroundColor": "#31AFF0"
+    }
   }
 }

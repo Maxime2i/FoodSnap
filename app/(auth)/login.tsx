@@ -191,7 +191,7 @@ const getStyles = (colorScheme: 'light' | 'dark') => StyleSheet.create({
     color: colorScheme === 'dark' ? Colors.dark.text : Colors.light.text,
   },
   button: {
-    backgroundColor: colorScheme === 'dark' ? Colors.dark.tint : Colors.light.tint,
+    backgroundColor: colorScheme === 'dark' ? Colors.dark.primary : Colors.light.primary,
     padding: 15,
     borderRadius: 10,
     alignItems: 'center',
@@ -207,7 +207,7 @@ const getStyles = (colorScheme: 'light' | 'dark') => StyleSheet.create({
     alignItems: 'center',
   },
   switchText: {
-    color: colorScheme === 'dark' ? Colors.dark.tint : Colors.light.tint,
+    color: colorScheme === 'dark' ? Colors.dark.primary : Colors.light.primary,
     fontSize: 14,
   },
   error: {
@@ -220,7 +220,7 @@ const getStyles = (colorScheme: 'light' | 'dark') => StyleSheet.create({
     alignItems: 'center',
   },
   resendButtonText: {
-    color: colorScheme === 'dark' ? Colors.dark.tint : Colors.light.tint,
+    color: colorScheme === 'dark' ? Colors.dark.primary : Colors.light.primary,
     fontSize: 14,
     textDecorationLine: 'underline',
   },
